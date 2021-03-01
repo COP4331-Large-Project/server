@@ -15,8 +15,6 @@ npm install
 
 ## Running various components
 
-### Web Server
-
 1. Make sure you're in the `client` or `server` directory:
 ```shell
 cd client # For front-end
