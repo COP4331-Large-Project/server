@@ -1,5 +1,10 @@
 # Large Group Website + Server
 
+## Before you start...
+
+#### 1. [Install Node.js](https://nodejs.org/en/download/)
+#### 2. [Install MongoDB](https://docs.mongodb.com/manual/installation/)
+
 ## Quick start guide
 
 ### Once cloned, install the dependencies:
