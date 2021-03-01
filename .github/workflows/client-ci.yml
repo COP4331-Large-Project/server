@@ -10,11 +10,11 @@ on:
     branches: [ main ]
 
 jobs:
-  defaults:
-    run:
-      working-directory: client
   CI:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -24,6 +24,9 @@ jobs:
       - run: npm test
   lint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
