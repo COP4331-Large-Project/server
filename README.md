@@ -21,7 +21,7 @@ cd client # For front-end
 cd server # For back-end
 ```
 
-Then start the process
+2. Then start the process
 ```shell
 npm start
 ```
