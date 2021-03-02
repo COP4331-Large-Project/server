@@ -13,17 +13,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/express-rate-limit": "^5.1.1",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "mongoose": "^5.11.18",
-    "dotenv": "^8.2.0"
+    "express-rate-limit": "^5.2.6",
+    "mongoose": "^5.11.18"
   },
   "devDependencies": {
     "eslint": "^7.21.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
-    "prettier": "^2.2.1",
     "husky": "^4.3.8",
-    "lint-staged": "^10.5.4"
+    "lint-staged": "^10.5.4",
+    "prettier": "^2.2.1"
   },
   "husky": {
     "hooks": {
