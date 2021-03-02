@@ -33,6 +33,12 @@
     "./src/**/*.js": [
       "prettier --write",
       "npm run lint"
+    ],
+    "../client/src/**/*{.js,.jsx}": [
+      "npm run lint"
+    ],
+    "../client/src/**/*{.scss,.js,.jsx}": [
+      "prettier --write"
     ]
   }
 }
