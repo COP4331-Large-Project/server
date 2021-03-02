@@ -19,5 +19,7 @@
         "react"
     ],
     "rules": {
+        "import/extensions": [2, "ignorePackages"],
+        "arrow-parens": "off"
     }
 }
