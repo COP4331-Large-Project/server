@@ -13,9 +13,7 @@ environment = [
 ]
 dependency_file_paths = [
     "client/package.json",
-    "server/package.json",
-    "client/package.lock",
-    "server/package.lock"
+    "server/package.json"
 ]
 plugins = ["react"]
 style_guide = "airbnb"
