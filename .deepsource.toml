@@ -11,5 +11,9 @@ environment = [
     "mongo",
     "browser"
 ]
+dependency_file_paths = [
+    "client/package.json",
+    "server/package.json",
+]
 plugins = ["react"]
 style_guide = "airbnb"
