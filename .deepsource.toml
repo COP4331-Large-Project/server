@@ -7,9 +7,13 @@ enabled = true
 [analyzers.meta]
 environment = [
     "nodejs",
-    "browser",
     "jest",
-    "mongo"
+    "mongo",
+    "browser"
 ]
 plugins = ["react"]
 style_guide = "airbnb"
+
+[[transformers]]
+name = "prettier"
+enabled = true
