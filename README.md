@@ -1,3 +1,15 @@
+<p align="center">
+
+[![Server Node.js CI](https://github.com/COP4331-Large-Project/website/actions/workflows/CI-server.yml/badge.svg?branch=main)](https://github.com/COP4331-Large-Project/website/actions/workflows/CI-server.yml)
+[![Client Node.js CI](https://github.com/COP4331-Large-Project/website/actions/workflows/CI-client.yml/badge.svg)](https://github.com/COP4331-Large-Project/website/actions/workflows/CI-client.yml)
+
+</p>
+
+<p align="center">
+  
+[![DeepSource](https://deepsource.io/gh/COP4331-Large-Project/website.svg/?label=active+issues&show_trend=true)](https://deepsource.io/gh/COP4331-Large-Project/website/?ref=repository-badge)
+</p>
+
 # Large Group Website + Server
 
 ## Before you start...
