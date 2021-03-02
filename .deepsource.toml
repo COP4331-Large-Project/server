@@ -13,7 +13,3 @@ environment = [
 ]
 plugins = ["react"]
 style_guide = "airbnb"
-
-[[transformers]]
-name = "prettier"
-enabled = true
