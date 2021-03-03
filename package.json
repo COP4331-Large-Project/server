@@ -9,7 +9,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "heroku-postbuild": "npm install --prefix ./server && cd client && npm install --production=false && npm run build"
   },
-  "cacheDirectories": ["client/node_modules", "server/node_modules"],
+  "cacheDirectories": [
+    "node_modules",
+    "client/node_modules",
+    "server/node_modules"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/COP4331-Large-Project/website.git"
@@ -20,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/COP4331-Large-Project/website/issues"
   },
-  "homepage": "https://github.com/COP4331-Large-Project/website#readme"
+  "homepage": "https://github.com/COP4331-Large-Project/website#readme",
+  "dependencies": {
+    "pino-pretty": "^4.6.0"
+  }
 }
