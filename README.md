@@ -21,24 +21,18 @@
 
 ### Once cloned, install the dependencies:
 ```shell
-cd client
-npm install
-cd ..
-```
-```shell
-cd server
-npm install
+npm run install-all
 ```
 
 ## Running various components
 
-1. Make sure you're in the `client` or `server` directory:
+### If you just want to run the server:
 ```shell
-cd client # For front-end
-cd server # For back-end
+npm start
 ```
 
-2. Then start the process
+### If you just want to run frontend react code:
 ```shell
+cd client
 npm start
 ```
