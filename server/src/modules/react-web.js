@@ -29,12 +29,14 @@ function initStaticWebFiles(app) {
     return;
   }
 
-  // Hook Up React static website files for frontend
-  app.use(express.static(filePath));
+  if (process.env.NODE_ENV === 'production') {
+    // Hook Up React static website files for frontend
+    app.use(express.static(filePath));
 
-  app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
-  });
+    app.get('/', (req, res) => {
+      res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    });
+  }
 }
 
 export default initStaticWebFiles;
