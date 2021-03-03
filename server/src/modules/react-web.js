@@ -30,6 +30,7 @@ function initStaticWebFiles(app) {
   }
 
   if (process.env.NODE_ENV === 'production') {
+    console.log('Production Mode, using static site files...');
     // Hook Up React static website files for frontend
     app.use(express.static(filePath));
 
