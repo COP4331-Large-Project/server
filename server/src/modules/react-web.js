@@ -2,7 +2,7 @@ import path from 'path';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import fs from 'fs';
-import __dirname from './globals.js';
+import { __dirname, logger } from './globals.js';
 
 /**
  * Bootstraps the statically generated web files from react
@@ -22,21 +22,23 @@ function initStaticWebFiles(app) {
 
   // Check if website has been built
   if (!fs.existsSync(filePath)) {
-    console.error('Skipping setting up react web files...');
-    console.error(
+    logger.warn('Skipping setting up react web files...');
+    logger.warn(
       "Run 'npm run build' in the client directory to upload the react website.",
     );
     return;
   }
 
   if (process.env.NODE_ENV === 'production') {
-    console.log('Production Mode, using static site files...');
+    logger.info('Production Mode, using static site files...');
     // Hook Up React static website files for frontend
     app.use(express.static(filePath));
 
     app.get('/', (req, res) => {
       res.sendFile(path.join(__dirname, 'build', 'index.html'));
     });
+  } else {
+    logger.info('Non-Production Mode, not using static web files...');
   }
 }
 
