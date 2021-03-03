@@ -1,24 +1,18 @@
 import React from 'react';
-import logo from '../logo.svg';
 import '../scss/App.scss';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit
-          <code>src/App.js</code>
-          and save to reload.
-        </p>
+        <h1>COP4331C Large Group #7</h1>
         <a
           className="App-link"
-          href="https://reactjs.org"
+          href="https://github.com/COP4331-Large-Project/website"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React
+          <code>Visit Our Github</code>
         </a>
       </header>
     </div>
