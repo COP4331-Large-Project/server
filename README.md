@@ -36,3 +36,9 @@ npm start
 cd client
 npm start
 ```
+
+## Configuring MongoDB
+
+1. Create `.env` file in the `server/` directory.
+2. Add `MONGODB_URI=YOUR MONGO URI` to the file replacing "YOUR MONGO URI" with the URI you're using to connect.
+
