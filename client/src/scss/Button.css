@@ -1,0 +1,30 @@
+.btn {
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 18px;
+  text-decoration: none;
+  border: none;
+}
+
+.btn-primary {
+  color: #0058b1;
+  background-color: rgba(0, 113, 228, 0.2);
+}
+
+.btn-danger {
+  color: #ff0a00;
+  background-color: rgba(255, 59, 51, 0.2);
+}
+
+.btn-success {
+  color: #00a813;
+  background-color: rgba(0, 219, 25, 0.2);
+}
+
+.btn-warning {
+  color: #ab9646;
+  background-color: rgba(192, 173, 100, 0.2);
+}
+
+/*# sourceMappingURL=Button.css.map */

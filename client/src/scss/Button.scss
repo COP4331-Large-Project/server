@@ -1,0 +1,22 @@
+@import 'variables';
+
+@mixin buttonStyle($color) {
+  color: $color;
+  background-color: lighten(rgba($color, 0.2), 10%);
+}
+
+.btn {
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 18px;
+  text-decoration: none;
+  border: none;
+}
+
+// Iterate over the color map and construct variants from it's keys and values.
+@each $color, $value in $variant-colors {
+  .btn-#{$color} {
+    @include buttonStyle($value);
+  }
+}

@@ -1,0 +1,44 @@
+.Gradient-box {
+  background: linear-gradient(312deg, #6c0979 24%, #ff0005 100%);
+}
+
+.Display-Box {
+  display: flex;
+  width: 100%;
+  max-width: 700px;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+  border: 1px solid #ebebeb;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.Card {
+  border-radius: 15px;
+  padding: 20px 30px 20px 30px;
+  background-color: white;
+  color: black;
+  -webkit-box-shadow: 0 0 8px 1px rgba(76, 76, 76, 0.1);
+  box-shadow: 0 0 8px 1px rgba(76, 76, 76, 0.1);
+}
+
+.Rotated-Container {
+  transform: rotate(1.5deg);
+  padding: 10px;
+}
+.Rotated-Container > * {
+  transform: rotate(-1.5deg);
+}
+
+.Gradient-Box {
+  background: linear-gradient(312deg, #b000c8 24%, #7700ff 98%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  border-radius: 30px;
+  color: white;
+}
+
+/*# sourceMappingURL=Container.css.map */

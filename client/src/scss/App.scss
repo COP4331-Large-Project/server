@@ -1,3 +1,5 @@
+@import 'variables';
+
 .App {
   text-align: center;
 }
@@ -11,34 +13,6 @@
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
-}
-
-@mixin gradient-apply($colors...) {
-  background: linear-gradient(312deg, $colors);
-}
-
-.Gradient-box {
-  @include gradient-apply(rgba(108, 9, 121, 1) 24%, rgba(255, 0, 5, 1) 100%);
-}
-
-.Card {
-  border-radius: 15px;
-  padding: 20px 30px 20px 30px;
-  background-color: white;
-  transform: rotate(-2.5deg);
-}
-
-.Gradient-Container {
-  @include gradient-apply(rgb(176, 0, 200) 24%, rgba(119, 0, 255, 1) 98%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
-  border-radius: 30px;
-  -webkit-box-shadow: 0px 0px 8px 1px rgba(76, 76, 76, 0.1);
-  box-shadow: 0px 0px 8px 1px rgba(76, 76, 76, 0.1);
-  transform: rotate(2.5deg);
-  position: relative;
 }
 
 .accent {
