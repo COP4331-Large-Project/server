@@ -15,10 +15,18 @@ function Catalogue() {
     >
       <h1>Buttons</h1>
       <div className="Display-Box">
-        <button className="btn btn-primary">.btn btn-primary</button>
-        <button className="btn btn-danger">.btn btn-danger</button>
-        <button className="btn btn-success">.btn btn-success</button>
-        <button className="btn btn-warning">.btn btn-warning</button>
+        <button type="button" className="btn btn-primary">
+          .btn btn-primary
+        </button>
+        <button type="button" className="btn btn-danger">
+          .btn btn-danger
+        </button>
+        <button type="button" className="btn btn-success">
+          .btn btn-success
+        </button>
+        <button type="button" className="btn btn-warning">
+          .btn btn-warning
+        </button>
       </div>
       <h1>Card</h1>
       <div className="Display-Box">
