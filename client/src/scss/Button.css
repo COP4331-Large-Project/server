@@ -6,25 +6,48 @@
   text-decoration: none;
   border: none;
 }
-
 .btn-primary {
   color: #0058b1;
-  background-color: rgba(0, 113, 228, 0.2);
+  background-color: rgba(101, 177, 255, 0.2);
+  transition: 0.5s;
+}
+.btn-primary:hover {
+  background-color: #0058b1;
+  color: white;
+  transition: 0.5s;
 }
 
 .btn-danger {
   color: #ff0a00;
-  background-color: rgba(255, 59, 51, 0.2);
+  background-color: rgba(255, 182, 179, 0.2);
+  transition: 0.5s;
+}
+.btn-danger:hover {
+  background-color: #ff0a00;
+  color: white;
+  transition: 0.5s;
 }
 
 .btn-success {
   color: #00a813;
-  background-color: rgba(0, 219, 25, 0.2);
+  background-color: rgba(92, 255, 110, 0.2);
+  transition: 0.5s;
+}
+.btn-success:hover {
+  background-color: #00a813;
+  color: white;
+  transition: 0.5s;
 }
 
 .btn-warning {
-  color: #ab9646;
-  background-color: rgba(192, 173, 100, 0.2);
+  color: #e3c010;
+  background-color: rgba(249, 236, 172, 0.2);
+  transition: 0.5s;
+}
+.btn-warning:hover {
+  background-color: #e3c010;
+  color: white;
+  transition: 0.5s;
 }
 
 /*# sourceMappingURL=Button.css.map */

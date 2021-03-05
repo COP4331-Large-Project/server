@@ -2,6 +2,8 @@ import React from 'react';
 import '../scss/App.scss';
 import '../scss/Container.scss';
 import '../scss/Button.scss';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import Catalogue from './Catalogue.jsx';
 
 function App() {
   return (
@@ -16,8 +18,10 @@ function App() {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <i className="bi-github"> </i>
               Visit Our Github
             </a>
+            <Catalogue />
           </div>
         </div>
       </header>

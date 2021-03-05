@@ -26,6 +26,7 @@
 .Rotated-Container {
   transform: rotate(1.5deg);
   padding: 10px;
+  margin: 30px;
 }
 .Rotated-Container > * {
   transform: rotate(-1.5deg);

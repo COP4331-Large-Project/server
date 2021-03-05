@@ -2,7 +2,14 @@
 
 @mixin buttonStyle($color) {
   color: $color;
-  background-color: lighten(rgba($color, 0.2), 10%);
+  background-color: lighten(rgba($color, 0.2), 35%);
+  transition: 0.5s;
+
+  &:hover {
+    background-color: $color;
+    color: white;
+    transition: 0.5s;
+  }
 }
 
 .btn {
@@ -12,6 +19,9 @@
   font-size: 18px;
   text-decoration: none;
   border: none;
+
+  &:hover {
+  }
 }
 
 // Iterate over the color map and construct variants from it's keys and values.

@@ -32,6 +32,7 @@
 .Rotated-Container {
   transform: rotate($rotationDegrees);
   padding: 10px;
+  margin: 30px;
 
   // This is used to normalize the rotation from the parent to any child.
   > * {
