@@ -4,13 +4,12 @@
   background: linear-gradient(312deg, $colors);
 }
 
-.Gradient-box {
-  @include gradient-apply(rgba(108, 9, 121, 1) 24%, rgba(255, 0, 5, 1) 100%);
+.Gradient {
+  @include gradient-apply(rgba(166, 0, 255, 1) 11%, rgba(205, 0, 255, 1) 86%);
 }
 
 .Display-Box {
   display: flex;
-  width: 100%;
   max-width: 700px;
   align-items: center;
   justify-items: center;
@@ -18,6 +17,7 @@
   border: 1px solid #ebebeb;
   border-radius: 10px;
   padding: 10px;
+  background-color: #f4f4f4;
 }
 
 .Card {
@@ -25,8 +25,7 @@
   padding: 20px 30px 20px 30px;
   background-color: white;
   color: black;
-  -webkit-box-shadow: 0 0 8px 1px rgba(76, 76, 76, 0.1);
-  box-shadow: 0 0 8px 1px rgba(76, 76, 76, 0.1);
+  box-shadow: $dropShadow;
 }
 
 .Rotated-Container {
@@ -40,12 +39,12 @@
   }
 }
 
-.Gradient-Box {
-  @include gradient-apply(rgb(176, 0, 200) 24%, rgba(119, 0, 255, 1) 98%);
+.Box {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 40px;
   border-radius: 30px;
   color: white;
+  box-shadow: $dropShadow;
 }

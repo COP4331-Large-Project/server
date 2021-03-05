@@ -25,14 +25,20 @@ function Catalogue() {
         <div className="Card">.Card - Displays a Block of content</div>
       </div>
       <h1>Gradient Box</h1>
-      <div className="Gradient-Box">Gradient Box - Lorem Ipsum</div>
+      <div className="Display-Box">
+        <div className="Gradient Box">Gradient Box - Lorem Ipsum</div>
+      </div>
       <h1>Rotated Container</h1>
-      <div className="Rotated-Container" style={{ border: '1px solid red' }}>
-        <div className="Card"> My Parent is Rotated but I am not</div>
+      <div className="Display-Box">
+        <div className="Rotated-Container" style={{ border: '1px solid red' }}>
+          <div className="Card"> My Parent is Rotated but I am not</div>
+        </div>
       </div>
       <h1>Card + Rotated Container + Gradient Box</h1>
-      <div className="Gradient-Box Rotated-Container">
-        <div className="Card">Hello World!</div>
+      <div className="Display-Box">
+        <div className="Rotated-Container Gradient Box">
+          <div className="Card">Hello World!</div>
+        </div>
       </div>
     </div>
   );
