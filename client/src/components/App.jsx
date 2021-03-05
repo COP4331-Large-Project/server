@@ -3,7 +3,6 @@ import '../scss/App.scss';
 import '../scss/Container.scss';
 import '../scss/Button.scss';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import Catalogue from './Catalogue.jsx';
 
 function App() {
   return (
@@ -23,7 +22,6 @@ function App() {
             </a>
           </div>
         </div>
-        <Catalogue />
       </header>
     </div>
   );
