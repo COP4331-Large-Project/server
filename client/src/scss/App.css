@@ -8,7 +8,7 @@
 }
 
 body {
-  background-color: #e3e3e3;
+  background-color: #f0f0f0;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -30,7 +30,7 @@ a.accent {
 }
 
 .App-header {
-  background-color: white;
+  background-color: #f0f0f0 !important;
   min-height: 100vh;
   display: flex;
   flex-direction: column;

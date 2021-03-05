@@ -33,7 +33,7 @@ a.accent {
 }
 
 .App-header {
-  background-color: white;
+  background-color: $bodyColor !important;
   min-height: 100vh;
   display: flex;
   flex-direction: column;

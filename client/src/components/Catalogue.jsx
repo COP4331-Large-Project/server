@@ -34,7 +34,12 @@ function Catalogue() {
       </div>
       <h1>Gradient Box</h1>
       <div className="Display-Box">
-        <div className="Gradient Box">Gradient Box - Lorem Ipsum</div>
+        <div
+          className="Gradient Box"
+          style={{ fontWeight: 650, fontSize: '24px' }}
+        >
+          I am a Gradient Box
+        </div>
       </div>
       <h1>Rotated Container</h1>
       <div className="Display-Box">
