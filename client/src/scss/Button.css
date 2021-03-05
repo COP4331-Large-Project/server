@@ -5,6 +5,7 @@
   font-size: 18px;
   text-decoration: none;
   border: none;
+  cursor: pointer;
 }
 .btn-primary {
   color: #0058b1;
