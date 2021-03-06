@@ -1,6 +1,7 @@
 import React from 'react';
 import '../scss/Button.scss';
 import '../scss/App.scss';
+import Button from './Button.jsx';
 
 function Catalogue() {
   return (
@@ -15,18 +16,11 @@ function Catalogue() {
     >
       <h1>Buttons</h1>
       <div className="Display-Box">
-        <button type="button" className="btn btn-primary">
-          .btn btn-primary
-        </button>
-        <button type="button" className="btn btn-danger">
-          .btn btn-danger
-        </button>
-        <button type="button" className="btn btn-success">
-          .btn btn-success
-        </button>
-        <button type="button" className="btn btn-warning">
-          .btn btn-warning
-        </button>
+        <Button variant={'primary'}>.btn btn-primary</Button>
+        <Button variant={'danger'}>.btn btn-danger</Button>
+        <Button variant={'success'}>.btn btn-success</Button>
+        <Button variant={'warning'}>.btn btn-warning</Button>
+        <Button variant={'dark'}>.btn btn-dark</Button>
       </div>
       <h1>Card</h1>
       <div className="Display-Box">
