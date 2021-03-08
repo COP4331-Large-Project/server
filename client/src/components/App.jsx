@@ -22,7 +22,7 @@ function App() {
                 </div>
                 <Button variant="dark" onClick={goToGithub}>
                   <i className="bi bi-github"> </i>
-                  Visit Out Github
+                  Visit Our Github
                 </Button>
               </div>
             </header>
