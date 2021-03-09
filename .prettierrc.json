@@ -7,5 +7,6 @@
     "singleQuote": true,
     "arrowParens": "avoid",
     "quoteProps": "as-needed",
-    "jsxSingleQuote": false
+    "jsxSingleQuote": false,
+    ""
   }
