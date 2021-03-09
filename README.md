@@ -1,16 +1,4 @@
-<p align="center">
-
-[![Server Node.js CI](https://github.com/COP4331-Large-Project/website/actions/workflows/CI-server.yml/badge.svg?branch=main)](https://github.com/COP4331-Large-Project/website/actions/workflows/CI-server.yml)
-[![Client Node.js CI](https://github.com/COP4331-Large-Project/website/actions/workflows/CI-client.yml/badge.svg)](https://github.com/COP4331-Large-Project/website/actions/workflows/CI-client.yml)
-
-</p>
-
-<p align="center">
-  
-[![DeepSource](https://deepsource.io/gh/COP4331-Large-Project/website.svg/?label=active+issues&show_trend=true)](https://deepsource.io/gh/COP4331-Large-Project/website/?ref=repository-badge)
-</p>
-
-# Large Group Website + Server
+# Server
 
 ## Before you start...
 
@@ -21,7 +9,7 @@
 
 ### Once cloned, install the dependencies:
 ```shell
-npm run install-all
+npm install
 ```
 
 ## Running various components
@@ -31,14 +19,8 @@ npm run install-all
 npm start
 ```
 
-### If you just want to run frontend react code:
-```shell
-cd client
-npm start
-```
-
 ## Configuring MongoDB
 
-1. Create `.env` file in the `server/` directory.
+1. Create `.env` file in the root directory.
 2. Add `MONGODB_URI=YOUR MONGO URI` to the file replacing "YOUR MONGO URI" with the URI you're using to connect.
 
