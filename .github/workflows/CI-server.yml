@@ -12,9 +12,6 @@ on:
 jobs:
   CI:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./server
     steps:
       - uses: actions/checkout@v2
       - uses: actions/cache@v2
@@ -31,9 +28,6 @@ jobs:
         run: npm install
   Lint:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./server
     steps:
       - uses: actions/checkout@v2
       - uses: actions/cache@v2
