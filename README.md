@@ -13,7 +13,7 @@ In the project directory, you can run:
 
 Installs all the node package dependencies.
 
-## `npm install --only-dev`
+### `npm install --only-dev`
 
 Installs all the of developer dependencies.
 
