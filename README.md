@@ -2,7 +2,7 @@
 
 ## Before you start...
 
-#### 1. [Install Node.js](https://nodejs.org/en/download/)
+#### 1. [Install Node.js](https://nodejs.org/en/download/) **Version 14.x or higher!**
 #### 2. [Install MongoDB](https://docs.mongodb.com/manual/installation/)
 
 ## Available Scripts
