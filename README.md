@@ -5,19 +5,17 @@
 #### 1. [Install Node.js](https://nodejs.org/en/download/)
 #### 2. [Install MongoDB](https://docs.mongodb.com/manual/installation/)
 
-## Quick start guide
+## Available Scripts
 
-### Once cloned, install the dependencies:
-```shell
-npm install
-```
+In the project directory, you can run:
 
-## Running various components
+### `npm install`
 
-### If you just want to run the server:
-```shell
-npm start
-```
+Installs all the node package dependencies.
+
+### `npm start`
+
+Starts and runs the node server using nodemon.
 
 ## Configuring MongoDB
 
