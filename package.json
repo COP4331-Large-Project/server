@@ -19,7 +19,6 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.6",
-    "git": "^0.1.5",
     "mongoose": "^5.11.18",
     "pino": "^6.11.1",
     "pino-pretty": "^4.6.0"
