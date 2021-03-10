@@ -6,7 +6,7 @@ const connectToDB = () => {
   dotenv.config();
 
   // Log the values.
-  logger.info(`MongoDB URI = ${process.env.MONGO_URI}`);
+  logger.info(`MongoDB_URI = ${process.env.MONGODB_URI}`);
 };
 
 export default connectToDB;
