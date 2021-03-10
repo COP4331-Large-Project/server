@@ -20,5 +20,5 @@ Starts and runs the node server using nodemon.
 ## Configuring MongoDB
 
 1. Create `.env` file in the root directory.
-2. Add `MONGODB_URI=YOUR MONGO URI` to the file replacing "YOUR MONGO URI" with the URI you're using to connect.
+2. Add `MONGO_URI=YOUR MONGO URI` to the file replacing "YOUR MONGO URI" with the URI you're using to connect.
 
