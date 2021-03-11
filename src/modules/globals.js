@@ -1,8 +1,11 @@
-import path from 'path';
 import pino from 'pino';
 
-// eslint-disable-next-line no-underscore-dangle
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+/**
+ * The program wide logger being used.
+ *
+ * @type {Logger}
+ */
 const logger = pino();
 
-export { __dirname, logger };
+// eslint-disable-next-line import/prefer-default-export
+export { logger };
