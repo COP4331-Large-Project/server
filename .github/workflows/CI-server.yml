@@ -17,8 +17,6 @@ jobs:
       - uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         with:
           path: ~/.npm
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
@@ -30,6 +28,9 @@ jobs:
         run: npm install
       - name: Run Unit Tests
         run: npm test
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   Lint:
     runs-on: ubuntu-latest
     steps:
