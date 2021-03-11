@@ -25,12 +25,13 @@ const s3 = new S3Client({ region: REGION });
 /**
  * Fetches the all of the AWS S3 buckets.
  *
- * @returns {Promise<(ListBucketsOutput & MetadataBearer)>}
+ * @returns {Promise<Bucket[]>}
  */
 const getBuckets = async () => {
   preCheck();
 
-  return s3.send(new ListBucketsCommand({}));
+  return s3.send(new ListBucketsCommand({}))
+    .then(result => result.Buckets);
 };
 
 export default getBuckets;

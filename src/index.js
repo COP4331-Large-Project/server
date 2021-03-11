@@ -14,8 +14,8 @@ if (process.env.NODE_ENV !== 'production') {
 app.listen(process.env.PORT || 5000);
 
 connectToDB();
-getBuckets().then(result => {
+getBuckets().then((buckets) => {
   logger.info('Fetched Buckets: ');
-  result.Buckets.forEach(bucket => logger.info(bucket.Name));
+  buckets.forEach(bucket => logger.info(bucket.Name));
 })
   .catch(error => logger.warn(error));
