@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon server | pino-pretty",
-    "test": "mocha src/test | pino-pretty",
+    "test": "mocha src/test",
     "lint": "eslint .",
     "deploy": "node src/index.js"
   },
