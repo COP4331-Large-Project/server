@@ -21,6 +21,10 @@ Installs all the of developer dependencies.
 
 Starts and runs the node server using nodemon.
 
+### `npm test`
+
+Starts and runs the unit test suite and shows results.
+
 ## Configuring MongoDB
 
 1. Create `.env` file in the root directory.
