@@ -28,7 +28,7 @@ describe('Object Transfer', () => {
     await S3.uploadObject({
       Key: 'globals.js',
       Path: 'foo/',
-      File: '../modules/globals.js',
+      File: '../src/globals.js',
     });
   });
 
