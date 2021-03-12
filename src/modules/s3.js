@@ -2,7 +2,7 @@ import {
   S3Client,
   ListBucketsCommand,
   ListObjectsCommand,
-  PutObjectCommand,
+  PutObjectCommand, GetObjectCommand, DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import dotenv from 'dotenv';
 import assert from 'assert';
@@ -36,15 +36,17 @@ const getBuckets = async () => s3.send(new ListBucketsCommand({}))
  * @param {String} param.Bucket The name of the bucket
  * @returns {Promise<Object[]>}
  */
-const listObjects = async (param) => s3.send(new ListObjectsCommand({ Bucket: param.Bucket || 'image-sharing-prject' })).then(result => result.Contents);
+const listObjects = async (param = {
+  Bucket: 'image-sharing-project',
+}) => s3.send(new ListObjectsCommand(param)).then(result => result.Contents);
 
 /**
  * @param payload
- * @param {String} payload.Bucket The name of the bucket
+ * @param {String='image-sharing-project'} payload.Bucket The name of the bucket
  * @param {String} payload.Key The name of the file to be upload
  * @param {String} payload.Path The parent directory to put the file in
  * @param {String} payload.File The file to be uploaded
- * @returns {Promise<PutOBjectCommandOuput>}
+ * @returns {Promise<PutObjectCommandOutput>}
  */
 const uploadObject = async (payload) => {
   assert(payload.Key !== undefined);
@@ -59,4 +61,38 @@ const uploadObject = async (payload) => {
   return s3.send(new PutObjectCommand(input));
 };
 
-export { getBuckets, listObjects, uploadObject };
+/**
+ * @param payload
+ * @param {String='image-sharing-project'} payload.Bucket The name of the bucket.
+ * @param {String} payload.Key The path of the file to delete.
+ * @returns {Promise<DeleteObjectOutput & MetadataBearer>}
+ */
+const deleteObject = async (payload) => {
+  assert(payload);
+  assert(payload.Key !== undefined);
+  const input = {
+    Bucket: payload.Bucket || 'image-sharing-project',
+    Key: payload.Key,
+  };
+  return s3.send(new DeleteObjectCommand(input));
+};
+
+/**
+ * @param payload
+ * @param {String} payload.Key The name of the file to fetch.
+ * @param {String='image-sharing-project'} payload.Bucket The bucket to search in.
+ * @returns {Promise<GetObjectOutput & MetadataBearer>}
+ */
+const getObject = async (payload) => {
+  assert(payload);
+  assert(payload.Key);
+  const input = {
+    Bucket: payload.Bucket || 'image-sharing-project',
+    Key: payload.Key,
+  };
+  return s3.send(new GetObjectCommand(input));
+};
+
+export {
+  getBuckets, listObjects, uploadObject, getObject, deleteObject,
+};

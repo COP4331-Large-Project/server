@@ -1,4 +1,8 @@
-import { getBuckets, listObjects, uploadObject } from '../modules/s3.js';
+import { expect } from 'chai';
+import {
+  deleteObject,
+  getBuckets, getObject, listObjects, uploadObject,
+} from '../modules/s3.js';
 import { logger } from '../modules/globals.js';
 
 describe('#getBuckets', () => {
@@ -14,20 +18,34 @@ describe('#getBuckets', () => {
 describe('#listObjects', () => {
   it('should retrieve all the objects in the specified bucket', async () => {
     // Get objects
-    const objects = await listObjects();
+    const objects = await listObjects() || [];
     // Print items
     logger.info('Objects:');
     objects.forEach(item => logger.info(item.Key));
   });
 });
 
-describe('#uploadObject', () => {
-  it('should upload globals.js into foo/', async () => {
-    const data = uploadObject({
+describe('Object Transfer', () => {
+  // Setup: Upload file
+  it('should upload file', async () => {
+    await uploadObject({
       Key: 'globals.js',
       Path: 'foo/',
       File: '../modules/globals.js',
     });
-    logger.info(data);
+  });
+
+  // Test if file was uploaded
+  it('should get globals.js from foo/', async () => {
+    // Then verify that the file exists.
+    const object = await getObject({
+      Key: 'foo/globals.js',
+    });
+    expect(object).to.not.equal(undefined);
+  });
+
+  // Teardown: Delete uploaded file
+  it('should delete file', async () => {
+    await deleteObject({ Key: 'foo/globals.js' });
   });
 });
