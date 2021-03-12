@@ -1,13 +1,19 @@
 import express from 'express';
 import { logger } from './modules/globals.js';
-import connectToDB from './modules/mongo.js';
+import { connectToDB } from './modules/mongo.js';
+import users from './routes/user.js';
 
-const app = express();
-const webServerPort = process.env.PORT || 5000;
+async function main() {
+  const app = express();
+  app.use(express.json());
+  await connectToDB();
 
-if (process.env.NODE_ENV !== 'production') {
-  logger.info(`Server is running on http://localhost:${webServerPort}`);
+  app.use('/users', users);
+
+  if (process.env.NODE_ENV !== 'production') {
+    logger.info('Server is running on http://localhost:5000');
+  }
+
+  app.listen(process.env.PORT || 5000);
 }
-
-app.listen(webServerPort);
-connectToDB();
+main();
