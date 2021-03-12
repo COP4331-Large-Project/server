@@ -1,6 +1,6 @@
 import express from 'express';
-import { logger } from './modules/globals.js';
-import { connectToDB } from './modules/mongo.js';
+import { logger } from './globals.js';
+import { connectToDB } from './services/mongo.js';
 import users from './routes/user.js';
 
 async function main() {
