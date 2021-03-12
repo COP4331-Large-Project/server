@@ -4,7 +4,7 @@ import User from '../models/user.js';
 const router = express.Router();
 
 // add a new user
-router.post('/add', async (req, res) => {
+router.post('/', async (req, res) => {
   // create new user model with given request body
   const newUser = new User(
     {
