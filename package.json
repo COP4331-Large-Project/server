@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon server | pino-pretty",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha src/test",
     "lint": "eslint .",
     "deploy": "node src/index.js"
   },
@@ -14,11 +14,22 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-cognito-identity": "^3.3.0",
+    "@aws-sdk/client-s3": "^3.3.0",
+    "@aws-sdk/credential-provider-cognito-identity": "^3.3.0",
+    "@aws-sdk/credential-provider-sso": "^3.8.0",
+    "@aws-sdk/node-http-handler": "^3.3.0",
+    "@aws-sdk/s3-request-presigner": "^3.3.0",
+    "@aws-sdk/types": "^3.3.0",
+    "@aws-sdk/util-create-request": "^3.3.0",
+    "@aws-sdk/util-format-url": "^3.3.0",
     "body-parser": "^1.19.0",
+    "chai": "^4.3.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.6",
+    "mocha": "^8.3.1",
     "mongoose": "^5.11.18",
     "pino": "^6.11.1",
     "pino-pretty": "^4.6.0"

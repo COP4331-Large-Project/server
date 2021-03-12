@@ -1,4 +1,5 @@
-# Server
+[![Server Node.js CI](https://github.com/COP4331-Large-Project/server/actions/workflows/CI-server.yml/badge.svg)](https://github.com/COP4331-Large-Project/server/actions/workflows/CI-server.yml)
+[![DeepSource](https://deepsource.io/gh/COP4331-Large-Project/client.svg/?label=active+issues&show_trend=true)](https://deepsource.io/gh/COP4331-Large-Project/client/?ref=repository-badge)
 
 ## Before you start...
 
@@ -13,12 +14,29 @@ In the project directory, you can run:
 
 Installs all the node package dependencies.
 
+### `npm install --only-dev`
+
+Installs all the of developer dependencies.
+
 ### `npm start`
 
 Starts and runs the node server using nodemon.
 
-## Configuring MongoDB
+### `npm test`
 
-1. Create `.env` file in the root directory.
-2. Add `MONGODB_URI=YOUR MONGO URI` to the file replacing "YOUR MONGO URI" with the URI you're using to connect.
+Starts and runs the unit test suite and shows results.
 
+## Configuring Services with Environment Variables
+
+In order to use our services you'll need to create a `.env` in the root folder.
+Once created you'll populate it with secrets given to you by the repo maintainers:
+
+`.env`:
+```shell
+# MongoDB
+MONGO_URI=YOUR MONGO URI
+
+# AWS
+AWS_ACCESS_KEY_ID=YOUR AWS ACCESS KEY ID
+AWS_SECRET_ACCESS_KEY=YOUR AWS SECRET ACCESS KEY
+```
