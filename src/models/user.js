@@ -6,10 +6,10 @@ const userSchema = new mongoose.Schema({
   FirstName: String,
   LastName: String,
   Username: { type: String, required: true },
-  Password: String,
+  Password: { type: String, required: true },
 });
 
-userSchema.methods.saveUser = function (callback) {
+userSchema.methods.saveUser = function saveUser(callback) {
   return this.save(callback);
 };
 
