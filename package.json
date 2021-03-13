@@ -32,7 +32,9 @@
     "mocha": "^8.3.1",
     "mongoose": "^5.11.18",
     "pino": "^6.11.1",
-    "pino-pretty": "^4.6.0"
+    "pino-pretty": "^4.6.0",
+    "swagger-jsdoc": "^7.0.0-rc.6",
+    "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.10",
