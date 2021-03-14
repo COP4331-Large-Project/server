@@ -7,10 +7,10 @@ const groups = express.Router();
 groups.post('/', async (req, res) => {
   const newGroup = new Group(
     {
-        inviteCode: inviteCode,
-        users: req.body.users,
-        creator: req.body.creator,
-        invites: req.body.invites,
+      inviteCode: req.body.inviteCode,
+      users: req.body.users,
+      creator: req.body.creator,
+      invites: req.body.invites,
     },
   );
   await newGroup.saveGroup((err, result) => {

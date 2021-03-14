@@ -3,6 +3,7 @@ import cors from 'cors';
 import { logger } from './globals.js';
 import { connectToDB } from './services/mongo.js';
 import users from './routes/user.js';
+import groups from './routes/group.js';
 
 async function main() {
   const app = express();
