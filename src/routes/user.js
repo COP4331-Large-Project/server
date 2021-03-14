@@ -8,10 +8,10 @@ router.post('/', async (req, res) => {
   // create new user model with given request body
   const newUser = new User(
     {
-      FirstName: req.body.FirstName,
-      LastName: req.body.LastName,
-      Username: req.body.Username,
-      Password: req.body.Password,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      username: req.body.username,
+      password: req.body.password,
     },
   );
   await newUser.saveUser((err, result) => {
