@@ -12,6 +12,7 @@ async function main() {
   // Enable cross origin
   app.use(cors());
   app.use('/users', users);
+  app.use('/groups', groups);
 
   if (process.env.NODE_ENV !== 'production') {
     logger.info('Server is running on http://localhost:5000');

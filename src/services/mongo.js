@@ -15,14 +15,14 @@ const connectToDB = async () => {
   };
 
   if (typeof process.env.MONGO_URI === 'undefined') {
-    logger.fatal('Connection unsuccessful: the URI was not provided');
+    throw new Error('Connection unsuccessful: the URI was not provided');
   }
 
   try {
-  // Create the DB connection.
+    // Create the DB connection.
     await mongoose.connect(process.env.MONGO_URI, connectionOptions);
   } catch (error) {
-    logger.fatal(error);
+    throw new Error(error);
   }
 
   // Log the values.

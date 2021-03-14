@@ -23,16 +23,13 @@ router.post('/', async (req, res) => {
 router.post('/login', async (req, res) => {
   const user = new User(
     {
-      username: req.body.username,
+      username: req.body.firrstName,
       password: req.body.password,
     },
   );
-  user.findOne({ username: user.username, password: user.password }).then(existingUser => {
-    if (!existingUser) {
-      // the error should be redone, probably with some error library
-      return res.status(404).json({ usernotfound: 'User not found' });
-    }
-    return res.send(existingUser);
+  await user.loginUser((err, result) => {
+    if (err) return res.status(404).send('User/password combination is incorrect');
+    return res.send(result);
   });
 });
 
