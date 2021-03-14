@@ -8,7 +8,6 @@ import dotenv from 'dotenv';
 import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
-import { __dirname } from '../globals.js';
 
 const REGION = 'us-east-1';
 const BUCKET = 'image-sharing-project';
@@ -98,6 +97,8 @@ const S3 = {
     };
     return s3Client.send(new GetObjectCommand(input));
   },
+
+  destroy: () => s3Client.destroy(),
 };
 
 export default S3;

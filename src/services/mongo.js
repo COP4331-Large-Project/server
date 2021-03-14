@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import { logger } from '../globals.js';
+import { logger } from '../globals';
 
 const connectToDB = async () => {
   // Load in environment variables from file.
