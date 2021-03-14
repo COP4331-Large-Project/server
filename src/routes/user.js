@@ -20,4 +20,21 @@ router.post('/', async (req, res) => {
   });
 });
 
+// should add password checking
+router.post('/login', async (req, res) => {
+  const user = new User(
+    {
+      username: req.body.username,
+      password: req.body.password,
+    },
+  );
+  user.findOne({ username: user.username }).then(existingUser => {
+    if (!existingUser) {
+      // the error should be redone, probably with some error library
+      return res.status(404).json({ usernotfound: 'User not found' });
+    }
+    return res.send(existingUser);
+  });
+});
+
 export default router;

@@ -15,6 +15,6 @@ userSchema.methods.saveUser = function saveUser(callback) {
   return this.save(callback);
 };
 
-const Model = mongoose.model(modelName, userSchema);
+const User = mongoose.model(modelName, userSchema);
 
-export default Model;
+export default User;
