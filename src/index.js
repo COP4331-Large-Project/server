@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-import { logger } from './globals.js';
-import { connectToDB } from './services/mongo.js';
-import router from './routes/index.js';
+import { logger } from './globals';
+import { connectToDB } from './services/mongo';
+import router from './routes';
 
 async function main() {
   const app = express();

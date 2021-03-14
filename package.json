@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
-  "type": "module",
   "scripts": {
-    "start": "nodemon server | pino-pretty",
-    "test": "mocha src/test",
+    "start": "nodemon --exec babel-node src/index.js | pino-pretty",
+    "test": "jest src/test",
     "lint": "eslint .",
-    "deploy": "node src/index.js"
+    "deploy": "node build/index.js",
+    "heroku-postinstall": "npm install --only-dev && npm run build",
+    "build": "babel src -d build"
   },
   "keywords": [],
   "author": "",
@@ -24,28 +25,35 @@
     "@aws-sdk/util-create-request": "^3.3.0",
     "@aws-sdk/util-format-url": "^3.3.0",
     "body-parser": "^1.19.0",
-    "chai": "^4.3.3",
+    "core-js": "^2.6.12",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.6",
-    "mocha": "^8.3.1",
     "mongoose": "^5.11.18",
     "pino": "^6.11.1",
     "pino-pretty": "^4.6.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.13.10",
+    "@babel/core": "^7.13.10",
+    "@babel/node": "^7.13.10",
+    "@babel/plugin-transform-runtime": "^7.13.10",
+    "@babel/preset-env": "^7.13.10",
     "@types/cors": "^2.8.10",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.11",
     "@types/express-rate-limit": "^5.1.1",
     "@types/mongoose": "^5.10.3",
     "@types/pino": "^6.3.6",
+    "babel-jest": "^26.6.3",
     "eslint": "^7.21.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
     "install": "^0.13.0",
+    "jest": "^26.6.3",
     "nodemon": "^2.0.7",
-    "npm": "^7.6.3"
+    "npm": "^7.6.3",
+    "regenerator-runtime": "^0.13.7"
   }
 }
