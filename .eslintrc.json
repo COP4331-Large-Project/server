@@ -2,7 +2,7 @@
     "env": {
         "browser": true,
         "es2021": true,
-        "mocha": true
+        "jest": true
     },
     "extends": [
         "airbnb-base"
@@ -12,7 +12,6 @@
         "sourceType": "module"
     },
     "rules": {
-        "import/extensions": [2, "ignorePackages"],
         "arrow-parens": "off"
     }
 }
