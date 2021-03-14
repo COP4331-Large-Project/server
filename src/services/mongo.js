@@ -6,8 +6,16 @@ const connectToDB = () => {
   // Load in environment variables from file.
   dotenv.config();
 
+  // Connection options
+  const connectionOptions = {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+  };
+
   // Create the DB connection.
-  mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true });
+  mongoose.connect(process.env.MONGO_URI, connectionOptions);
 
   // Log the values.
   logger.info(`MongoDB_URI = ${process.env.MONGO_URI}`);
