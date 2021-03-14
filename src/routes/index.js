@@ -1,6 +1,6 @@
 import express from 'express';
 import userRouter from './user';
-import groups from './group.js';
+import groups from './group';
 
 const router = express.Router();
 

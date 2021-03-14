@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import User from './user.js';
+import User from './user';
 
 const modelName = 'Group';
 
