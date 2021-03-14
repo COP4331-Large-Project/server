@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
 router.post('/login', async (req, res) => {
   const user = new User(
     {
-      username: req.body.firrstName,
+      username: req.body.username,
       password: req.body.password,
     },
   );
