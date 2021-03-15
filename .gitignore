@@ -120,3 +120,6 @@ dist
 # Babel builds
 /build
 build/
+
+# Ignore IDEA
+.idea/
