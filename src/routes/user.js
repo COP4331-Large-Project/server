@@ -20,4 +20,17 @@ router.post('/', async (req, res) => {
   });
 });
 
+router.post('/login', async (req, res) => {
+  const user = new User(
+    {
+      username: req.body.username,
+      password: req.body.password,
+    },
+  );
+  await user.loginUser(req.body.username, req.body.password, (err, result) => {
+    if (err) return res.status(404).send('User/password combination is incorrect');
+    return res.send(result);
+  });
+});
+
 export default router;
