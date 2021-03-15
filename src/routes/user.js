@@ -27,7 +27,7 @@ router.post('/login', async (req, res) => {
       password: req.body.password,
     },
   );
-  await user.loginUser((err, result) => {
+  await user.loginUser(req.body.username, req.body.password, (err, result) => {
     if (err) return res.status(404).send('User/password combination is incorrect');
     return res.send(result);
   });
