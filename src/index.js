@@ -10,8 +10,10 @@ async function main() {
   await connectToDB();
 
   // Enable cross origin
-  app.use(cors());
-  app.use('/', router);
+  app.use(
+    cors(),
+    router,
+  );
 
   if (process.env.NODE_ENV !== 'production') {
     logger.info('Server is running on http://localhost:5000');
