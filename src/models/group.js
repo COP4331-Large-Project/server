@@ -5,9 +5,9 @@ const modelName = 'Group';
 
 const groupSchema = new mongoose.Schema({
   inviteCode: { type: String, required: true, unique: true },
-  users: [User],
-  creator: { type: User, required: true },
-  invites: [User],
+  users: [User.schema],
+  creator: { type: User.schema, required: true },
+  invites: [User.schema],
 });
 
 groupSchema.methods.saveGroup = function saveGroup(callback) {
