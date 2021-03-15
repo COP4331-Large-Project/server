@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { logger } from '../globals';
 
-const connectToDB = () => {
+const connectToDB = async () => {
   // Load in environment variables from file.
   dotenv.config();
 
@@ -14,8 +14,16 @@ const connectToDB = () => {
     useUnifiedTopology: true,
   };
 
-  // Create the DB connection.
-  mongoose.connect(process.env.MONGO_URI, connectionOptions);
+  if (typeof process.env.MONGO_URI === 'undefined') {
+    throw new Error('Connection unsuccessful: the URI was not provided');
+  }
+
+  try {
+    // Create the DB connection.
+    await mongoose.connect(process.env.MONGO_URI, connectionOptions);
+  } catch (error) {
+    throw new Error(error);
+  }
 
   // Log the values.
   logger.info(`MongoDB_URI = ${process.env.MONGO_URI}`);

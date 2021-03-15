@@ -15,6 +15,10 @@ userSchema.methods.saveUser = function saveUser(callback) {
   return this.save(callback);
 };
 
-const Model = mongoose.model(modelName, userSchema);
+userSchema.methods.loginUser = function loginUser(username, password) {
+  return this.findOne({ username, password });
+};
 
-export default Model;
+const User = mongoose.model(modelName, userSchema);
+
+export default User;
