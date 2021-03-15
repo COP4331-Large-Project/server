@@ -120,3 +120,5 @@ dist
 # Babel builds
 /build
 build/
+
+.idea/
