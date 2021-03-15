@@ -2,7 +2,9 @@ import {
   S3Client,
   ListBucketsCommand,
   ListObjectsCommand,
-  PutObjectCommand, GetObjectCommand, DeleteObjectCommand,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import dotenv from 'dotenv';
 import assert from 'assert';
