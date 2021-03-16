@@ -60,6 +60,7 @@ const S3 = {
     assert(payload.File !== undefined);
     const contents = fs.readFileSync(path.resolve(__dirname, payload.File));
     const filePath = payload.Path || '';
+    // TODO filePath validation
     const input = {
       Bucket: payload.Bucket || BUCKET,
       Key: `${filePath}${payload.Key}`,
@@ -101,6 +102,9 @@ const S3 = {
   },
 
   destroy: () => s3Client.destroy(),
+
+  getClient: () => s3Client,
+
 };
 
 export default S3;
