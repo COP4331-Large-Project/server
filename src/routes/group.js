@@ -19,4 +19,10 @@ groups.post('/', async (req, res) => {
   });
 });
 
+groups.post('/join/:inviteCode', async (req, res) => {
+  const { inviteCode, user } = req.params;
+  const group = await Group.findOne({ inviteCode });
+  res.send(group);
+});
+
 export default groups;

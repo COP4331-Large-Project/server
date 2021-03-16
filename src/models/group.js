@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import uuid from 'uuid';
 import User from './user';
 
 const modelName = 'Group';
@@ -11,7 +12,12 @@ const groupSchema = new mongoose.Schema({
 });
 
 groupSchema.methods.saveGroup = function saveGroup(callback) {
+  this.populateInviteCode();
   return this.save(callback);
+};
+
+groupSchema.methods.populateInviteCode = function populateInviteCode() {
+  this.inviteCode = uuid.v4();
 };
 
 // TODO: invite code generation
