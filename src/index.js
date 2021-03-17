@@ -12,9 +12,9 @@ import router from './routes';
 
   // Enable cross origin
   app.use(
-    router,
-    express.json(),
     cors(),
+    express.json(),
+    router,
   );
 
   // Log host
