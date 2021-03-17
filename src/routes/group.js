@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import Group from '../models/group';
+import Group, { popAll } from '../models/group';
 
 const groups = express.Router();
 const { ObjectId } = mongoose.Types;
@@ -11,19 +11,19 @@ groups.post('/', async (req, res) => {
     {
       users: req.body.users,
       creator: req.body.creator,
-      invites: req.body.invites,
+      invitedUsers: req.body.invites,
       public: req.body.public,
     },
   );
-  await newGroup.saveGroup((err, result) => {
+  await newGroup.saveGroup(async (err, result) => {
     if (err) return res.status(500).send(err);
-    return res.send(result);
+    return res.send(await result.populate(popAll).execPopulate());
   });
 });
 
 groups.post('/join/:inviteCode', async (req, res) => {
   const { inviteCode } = req.params;
-  const group = await Group.findOne({ inviteCode });
+  const group = await Group.findOne({ inviteCode }).populate('users creator invitedUsers');
   if (group === null) {
     return res.status(404).send({ message: 'TODO ERROR: GROUP DOES NOT EXIST' });
   }
