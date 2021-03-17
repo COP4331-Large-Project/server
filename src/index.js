@@ -4,21 +4,24 @@ import { logger } from './globals';
 import { connectToDB } from './services/mongo';
 import router from './routes';
 
-async function main() {
+(async function main() {
   const app = express();
-  app.use(express.json());
+
+  // Connect to the database
   await connectToDB();
 
   // Enable cross origin
   app.use(
-    cors(),
     router,
+    express.json(),
+    cors(),
   );
 
+  // Log host
   if (process.env.NODE_ENV !== 'production') {
     logger.info('Server is running on http://localhost:5000');
   }
 
+  // Start listening for webserver connections.
   app.listen(process.env.PORT || 5000);
-}
-main();
+}());
