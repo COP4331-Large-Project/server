@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
     },
   );
   await newUser.saveUser((err, result) => {
-    if (err) return res.status(500).send('TODO ERROR');
+    if (err) return res.status(500).send(err);
     return res.send(result);
   });
 });

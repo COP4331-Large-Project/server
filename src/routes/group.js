@@ -1,5 +1,6 @@
 import express from 'express';
 import Group from '../models/group';
+import { logger } from '../globals';
 
 const groups = express.Router();
 
@@ -7,10 +8,10 @@ const groups = express.Router();
 groups.post('/', async (req, res) => {
   const newGroup = new Group(
     {
-      inviteCode: req.body.inviteCode,
       users: req.body.users,
       creator: req.body.creator,
       invites: req.body.invites,
+      publicGroup: req.body.publicGroup,
     },
   );
   await newGroup.saveGroup((err, result) => {
@@ -20,9 +21,16 @@ groups.post('/', async (req, res) => {
 });
 
 groups.post('/join/:inviteCode', async (req, res) => {
-  const { inviteCode, user } = req.params;
+  const { inviteCode } = req.params;
+  const { user } = req.body;
   const group = await Group.findOne({ inviteCode });
-  res.send(group);
+  logger.info({
+    inviteCode, user, group, CREAT: group.creator,
+  });
+  if (group.creator.toString() !== user) {
+    return res.status(404).send('TODO ERROR: UNAUTHORIZED USER');
+  }
+  return res.send({ group, reqmessage: 'SUCCESSFULLY AUTHENTICATED' });
 });
 
 export default groups;
