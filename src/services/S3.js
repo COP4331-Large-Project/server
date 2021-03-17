@@ -109,7 +109,8 @@ const S3 = {
   },
 
   /**
-   * Gets the pre-signed URL for the given Key
+   * Perform a Get command for the specified Key and return
+   * a pre-signed URL for the object
    *
    * @param {Payload} payload
    * @returns {Promise<string>}
@@ -121,6 +122,23 @@ const S3 = {
 
     const getCommand = new GetObjectCommand(payload);
     return getSignedUrl(s3Client, getCommand);
+  },
+
+  /**
+   * Perform a Put command and return the pre-signed URL for the object
+   * that was uploaded
+   *
+   * @param {Payload} payload
+   * @returns {Promise<string>}
+   */
+  putPreSignedURL: async (payload) => {
+    assert(payload);
+    assert(payload.Key);
+    assert(payload.Bucket);
+    assert(payload.Body);
+
+    const putCommand = new PutObjectCommand(payload);
+    return getSignedUrl(s3Client, putCommand);
   },
 
   destroy: () => s3Client.destroy(),
