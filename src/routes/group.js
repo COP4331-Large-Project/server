@@ -1,8 +1,9 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Group from '../models/group';
-import { logger } from '../globals';
 
 const groups = express.Router();
+const { ObjectId } = mongoose.Types;
 
 // add a new group
 groups.post('/', async (req, res) => {
@@ -11,7 +12,7 @@ groups.post('/', async (req, res) => {
       users: req.body.users,
       creator: req.body.creator,
       invites: req.body.invites,
-      publicGroup: req.body.publicGroup,
+      public: req.body.public,
     },
   );
   await newGroup.saveGroup((err, result) => {
@@ -22,15 +23,22 @@ groups.post('/', async (req, res) => {
 
 groups.post('/join/:inviteCode', async (req, res) => {
   const { inviteCode } = req.params;
-  const { user } = req.body;
   const group = await Group.findOne({ inviteCode });
-  logger.info({
-    inviteCode, user, group, CREAT: group.creator,
-  });
-  if (group.creator.toString() !== user) {
-    return res.status(404).send('TODO ERROR: UNAUTHORIZED USER');
+  if (group === null) {
+    return res.status(404).send({ message: 'TODO ERROR: GROUP DOES NOT EXIST' });
   }
-  return res.send({ group, reqmessage: 'SUCCESSFULLY AUTHENTICATED' });
+  if (group.public) {
+    return res.send({ group, message: 'SUCCESSFULLY JOINED PUBLIC GROUP' });
+  }
+  if (!ObjectId.isValid(req.body.user)) {
+    return res.status(404).send({ message: 'TODO ERROR: BAD USER ObjectId' });
+  }
+  const user = ObjectId(req.body.user);
+  const authorizedUser = (group.users).some(x => x.equals(user));
+  if (group.creator.equals(user) || authorizedUser) {
+    return res.send({ group, message: 'SUCCESSFULLY AUTHENTICATED' });
+  }
+  return res.status(404).send('TODO ERROR: USER DOES NOT HAVE PERMISSION');
 });
 
 export default groups;

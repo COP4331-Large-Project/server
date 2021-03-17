@@ -8,7 +8,7 @@ const groupSchema = new mongoose.Schema({
   users: [mongoose.Schema.Types.ObjectId],
   creator: { type: mongoose.Schema.Types.ObjectId, required: true },
   invites: [mongoose.Schema.Types.ObjectId],
-  publicGroup: Boolean,
+  public: { type: Boolean, default: false },
 });
 
 groupSchema.methods.saveGroup = function saveGroup(callback) {
