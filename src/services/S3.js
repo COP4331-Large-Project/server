@@ -2,8 +2,11 @@ import {
   S3Client,
   ListBucketsCommand,
   ListObjectsCommand,
-  PutObjectCommand, GetObjectCommand, DeleteObjectCommand,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import dotenv from 'dotenv';
 import assert from 'assert';
 import fs from 'fs';
@@ -25,6 +28,13 @@ if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
 const s3Client = new S3Client({ region: REGION });
 
 /**
+ * @typedef Payload
+ * @property {String} Bucket The bucket to use.
+ * @property {String} Key The Key of the file within the bucket.
+ * @property {String} File The local file to use
+ */
+
+/**
  * An object responsible for communicating with S3.
  */
 const S3 = {
@@ -37,8 +47,9 @@ const S3 = {
     .then(result => result.Buckets),
 
   /**
-   * @param param
-   * @param {String} param.Bucket The name of the bucket
+   * Lists all objects within a given bucket.
+   *
+   * @param {Payload} param
    * @returns {Promise<Object[]>}
    */
   listObjects: async (param = {
@@ -46,11 +57,9 @@ const S3 = {
   }) => s3Client.send(new ListObjectsCommand(param)).then(result => result.Contents),
 
   /**
-   * @param payload
-   * @param {String='image-sharing-project'} payload.Bucket The name of the bucket
-   * @param {String} payload.Key The name of the file to be upload
-   * @param {String} payload.Path The parent directory to put the file in
-   * @param {String} payload.File The file to be uploaded
+   * Uploads a file to the bucket.
+   *
+   * @param {Payload} payload
    * @returns {Promise<PutObjectCommandOutput>}
    */
   uploadObject: async (payload) => {
@@ -58,6 +67,7 @@ const S3 = {
     assert(payload.File !== undefined);
     const contents = fs.readFileSync(path.resolve(__dirname, payload.File));
     const filePath = payload.Path || '';
+    // TODO filePath validation
     const input = {
       Bucket: payload.Bucket || BUCKET,
       Key: `${filePath}${payload.Key}`,
@@ -67,9 +77,9 @@ const S3 = {
   },
 
   /**
-   * @param payload
-   * @param {String='image-sharing-project'} payload.Bucket The name of the bucket.
-   * @param {String} payload.Key The path of the file to delete.
+   * Delete an object with the given key and bucket.
+   *
+   * @param {Payload} payload
    * @returns {Promise<DeleteObjectOutput & MetadataBearer>}
    */
   deleteObject: async (payload) => {
@@ -83,9 +93,9 @@ const S3 = {
   },
 
   /**
-   * @param payload
-   * @param {String} payload.Key The name of the file to fetch.
-   * @param {String='image-sharing-project'} payload.Bucket The bucket to search in.
+   * Gets the object file for the given key.
+   *
+   * @param {Payload} payload
    * @returns {Promise<GetObjectOutput & MetadataBearer>}
    */
   getObject: async (payload) => {
@@ -98,7 +108,41 @@ const S3 = {
     return s3Client.send(new GetObjectCommand(input));
   },
 
+  /**
+   * Perform a Get command for the specified Key and return
+   * a pre-signed URL for the object
+   *
+   * @param {Payload} payload
+   * @returns {Promise<string>}
+   */
+  getPreSignedURL: async (payload) => {
+    assert(payload);
+    assert(payload.Key);
+    assert(payload.Bucket);
+
+    const getCommand = new GetObjectCommand(payload);
+    return getSignedUrl(s3Client, getCommand);
+  },
+
+  /**
+   * Perform a Put command and return the pre-signed URL for the object
+   * that was uploaded
+   *
+   * @param {Payload} payload
+   * @returns {Promise<string>}
+   */
+  putPreSignedURL: async (payload) => {
+    assert(payload);
+    assert(payload.Key);
+    assert(payload.Bucket);
+    assert(payload.Body);
+
+    const putCommand = new PutObjectCommand(payload);
+    return getSignedUrl(s3Client, putCommand);
+  },
+
   destroy: () => s3Client.destroy(),
+  getClient: () => s3Client,
 };
 
 export default S3;

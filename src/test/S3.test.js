@@ -1,4 +1,4 @@
-import S3 from '../services/s3';
+import S3 from '../services/S3';
 import { logger } from '../globals';
 
 afterAll(() => S3.destroy());
@@ -41,6 +41,15 @@ describe('Object Transfer', () => {
       Key: 'foo/globals.js',
     });
     expect(object).toBeTruthy();
+  });
+
+  test('should pre-sign url', async () => {
+    const url = await S3.getPreSignedURL({
+      Bucket: 'image-sharing-project',
+      Key: 'foo/globals.js',
+    });
+
+    logger.info(url);
   });
 
   // Teardown: Delete uploaded file
