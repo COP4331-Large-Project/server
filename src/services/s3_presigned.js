@@ -5,7 +5,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
-import S3 from './s3';
+import S3 from './S3';
 
 const s3Presigned = {
 
