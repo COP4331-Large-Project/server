@@ -3,7 +3,6 @@ import UserModel from '../models/user';
 const User = {
   register: async (req, res) => {
     // create new user model with given request body
-    console.log(req.json);
     const newUser = new UserModel(
       {
         firstName: req.body.firstName,
@@ -19,7 +18,6 @@ const User = {
       const user = await newUser.save();
       return res.status(201).send(user);
     } catch (err) {
-      console.log(err);
       return res.status(500).send('TODO ERROR');
     }
   },
