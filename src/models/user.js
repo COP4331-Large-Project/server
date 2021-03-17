@@ -11,14 +11,6 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
 });
 
-userSchema.methods.saveUser = function saveUser(callback) {
-  return this.save(callback);
-};
-
-userSchema.methods.loginUser = function loginUser(username, password) {
-  return this.findOne({ username, password });
-};
-
 const User = mongoose.model(modelName, userSchema);
 
 export default User;

@@ -10,12 +10,6 @@ const groupSchema = new mongoose.Schema({
   invites: [User.schema],
 });
 
-groupSchema.methods.saveGroup = function saveGroup(callback) {
-  return this.save(callback);
-};
-
-// TODO: invite code generation
-
 const Group = mongoose.model(modelName, groupSchema);
 
 export default Group;
