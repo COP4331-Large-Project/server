@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import UUID from 'uuid';
 import GroupModel from '../models/group';
 
 const { ObjectId } = mongoose.Types;
@@ -15,6 +16,7 @@ const Group = {
     );
 
     try {
+      newGroup.inviteCode = UUID.v4();
       const group = await newGroup.save();
       await group.populate(GroupModel.fieldsToPopulate).execPopulate();
       return res.send(group);

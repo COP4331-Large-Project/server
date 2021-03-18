@@ -29,6 +29,11 @@ const User = {
         username: req.body.username,
         password: req.body.password,
       }).exec();
+
+      if (!user) {
+        return res.status(500).send('Invalid user');
+      }
+
       return res.status(200).send(user);
     } catch (err) {
       return res.status(500).send('TODO ERROR');
