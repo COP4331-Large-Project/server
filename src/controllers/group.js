@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import UUID from 'uuid';
+import { objectOptions } from './constants';
 import GroupModel from '../models/group';
 
 const { ObjectId } = mongoose.Types;
@@ -27,7 +28,8 @@ const Group = {
 
   join: async (req, res) => {
     const { inviteCode } = req.params;
-    const group = await GroupModel.findOne({ inviteCode }).populate(GroupModel.fieldsToPopulate);
+    const group = await GroupModel.findOne({ inviteCode }).populate(GroupModel.fieldsToPopulate)
+      .toObject(objectOptions);
     if (group === null) {
       return res.status(404).send({ message: 'TODO ERROR: GROUP DOES NOT EXIST' });
     }
