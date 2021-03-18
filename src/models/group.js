@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import uuid from 'uuid';
 import User from './user';
 
 const modelName = 'Group';
@@ -11,11 +10,6 @@ const groupSchema = new mongoose.Schema({
   invitedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: User }],
   publicGroup: { type: Boolean, default: false },
 });
-
-groupSchema.methods.saveGroup = function saveGroup(callback) {
-  this.inviteCode = uuid.v4();
-  return this.save(callback);
-};
 
 groupSchema.statics.fieldsToPopulate = 'users creator invitedUsers';
 
