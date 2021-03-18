@@ -1,33 +1,35 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import Group, { popAll } from '../models/group';
+import Group from '../models/group';
 
 const groups = express.Router();
 const { ObjectId } = mongoose.Types;
 
 // add a new group
 groups.post('/', async (req, res) => {
+  const {
+    users, creator, invitedUsers, publicGroup,
+  } = req.body;
   const newGroup = new Group(
     {
-      users: req.body.users,
-      creator: req.body.creator,
-      invitedUsers: req.body.invites,
-      public: req.body.public,
+      users, creator, invitedUsers, publicGroup,
     },
   );
   await newGroup.saveGroup(async (err, result) => {
     if (err) return res.status(500).send(err);
-    return res.send(await result.populate(popAll).execPopulate());
+    await result.populate(Group.fieldsToPopulate).execPopulate();
+    return res.send(result);
   });
 });
 
+// join an existing group, given by :inviteCode
 groups.post('/join/:inviteCode', async (req, res) => {
   const { inviteCode } = req.params;
-  const group = await Group.findOne({ inviteCode }).populate('users creator invitedUsers');
+  const group = await Group.findOne({ inviteCode }).populate(Group.fieldsToPopulate);
   if (group === null) {
     return res.status(404).send({ message: 'TODO ERROR: GROUP DOES NOT EXIST' });
   }
-  if (group.public) {
+  if (group.publicGroup) {
     return res.send({ group, message: 'SUCCESSFULLY JOINED PUBLIC GROUP' });
   }
   if (!ObjectId.isValid(req.body.user)) {
@@ -38,7 +40,7 @@ groups.post('/join/:inviteCode', async (req, res) => {
   if (group.creator.equals(user) || authorizedUser) {
     return res.send({ group, message: 'SUCCESSFULLY AUTHENTICATED' });
   }
-  return res.status(404).send('TODO ERROR: USER DOES NOT HAVE PERMISSION');
+  return res.status(404).send({ message: 'TODO ERROR: USER DOES NOT HAVE PERMISSION' });
 });
 
 export default groups;
