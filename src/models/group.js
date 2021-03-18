@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import uuid from 'uuid';
 import User from './user';
 
 const modelName = 'Group';
