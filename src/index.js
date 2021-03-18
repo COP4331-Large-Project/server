@@ -3,6 +3,7 @@ import cors from 'cors';
 import { logger } from './globals';
 import { connectToDB } from './services/mongo';
 import router from './routes';
+import ErrorHandler from './services/ErrorHandler';
 
 (async function main() {
   const app = express();
@@ -15,6 +16,7 @@ import router from './routes';
     cors(),
     express.json(),
     router,
+    ErrorHandler,
   );
 
   // Log host

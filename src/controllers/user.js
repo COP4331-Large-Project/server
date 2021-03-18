@@ -1,8 +1,9 @@
 import UserModel from '../models/user';
 import { objectOptions } from './constants';
+import APIError from '../services/APIError';
 
 const User = {
-  register: async (req, res) => {
+  register: async (req, res, next) => {
     // create new user model with given request body
     const newUser = new UserModel(
       {
@@ -11,37 +12,39 @@ const User = {
         username: req.body.username,
         password: req.body.password,
       },
-      { versionKey: false },
     );
 
     // TODO: Hashing.
 
     try {
-      const user = (await newUser.save()).toObject(objectOptions);
+      const user = await newUser.save().toObject(objectOptions);
       return res.status(201).send(user);
     } catch (err) {
-      return res.status(500).send('TODO ERROR');
+      return next(new APIError(err));
     }
   },
 
-  login: async (req, res) => {
+  login: async (req, res, next) => {
+    let user;
     try {
       // TODO: Hashing.
-      const user = (await UserModel.findOne({
+      user = (await UserModel.findOne({
         username: req.body.username,
         password: req.body.password,
       })
-        .exec())
-        .toObject(objectOptions);
-
-      if (!user) {
-        return res.status(500).send('Invalid user');
-      }
-
-      return res.status(200).send(user);
+        .exec());
     } catch (err) {
-      return res.status(500).send('TODO ERROR');
+      return next(new APIError());
     }
+
+    if (!user) {
+      return next(new APIError(
+        'Invalid Login',
+        `Cannot login user: ${req.body.username}`,
+      ));
+    }
+
+    return res.status(200).send(user.toObject(objectOptions));
   },
 };
 
