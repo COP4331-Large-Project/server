@@ -5,20 +5,21 @@ const { ObjectId } = mongoose.Types;
 
 const Group = {
   register: async (req, res) => {
+    const {
+      users, creator, invitedUsers, publicGroup,
+    } = req.body;
     const newGroup = new GroupModel(
       {
-        inviteCode: req.body.inviteCode,
-        users: req.body.users,
-        creator: req.body.creator,
-        invites: req.body.invites,
+        users, creator, invitedUsers, publicGroup,
       },
     );
 
     try {
       const group = await newGroup.save();
-      res.status(201).send(group);
+      await group.populate(GroupModel.fieldsToPopulate).execPopulate();
+      return res.send(group);
     } catch (err) {
-      res.status(500).send('TODO ERROR');
+      return res.status(500).send(err);
     }
   },
 
@@ -41,8 +42,6 @@ const Group = {
     }
     return res.status(404).send({ message: 'TODO ERROR: USER DOES NOT HAVE PERMISSION' });
   },
-
-  // TODO: invite code generation
 };
 
 export default Group;
