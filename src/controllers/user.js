@@ -64,6 +64,19 @@ const User = {
 
     return res.status(200).send(reifiedUser);
   },
+
+  delete: async (req, res, next) => {
+    const { userID } = req.params;
+
+    try {
+      await UserModel.findOneAndDelete({ _id: userID });
+    } catch (err) {
+      console.log(err);
+      next(new APIError());
+    }
+
+    return res.status(204);
+  },
 };
 
 export default User;

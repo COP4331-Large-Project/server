@@ -12,4 +12,8 @@ router.post('/', User.register);
 
 router.post('/login', User.login);
 
+// TODO: Add Swagger Docs
+
+router.delete('/:userID', User.delete);
+
 export default router;
