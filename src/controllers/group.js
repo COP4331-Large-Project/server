@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import UUID from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { objectOptions } from './constants';
 import GroupModel from '../models/group';
 import APIError from '../services/APIError';
@@ -18,20 +18,11 @@ const Group = {
     );
 
     try {
-      newGroup.inviteCode = UUID.v4();
+      newGroup.inviteCode = uuidv4();
       const group = await newGroup.save();
       await group.populate(GroupModel.fieldsToPopulate).execPopulate();
       return res.send(group);
     } catch (err) {
-      // Duplicate Key Error
-      if (err.status === 11000) {
-        return next(APIError(
-          'Username taken',
-          'Another username with the same name is already in use.',
-          409,
-        ));
-      }
-
       return next(new APIError());
     }
   },

@@ -8,8 +8,11 @@ const ErrorHandler = function handleError(err, req, res, next) {
     instance: err.instance,
   });
 
-  // Log the error to console for debugging purposes
-  logger.error(err);
+  // Log the error to console only for debugging purposes
+  if (process.env.NODE_ENV !== 'production') {
+    logger.error(err);
+  }
+
   next();
 };
 
