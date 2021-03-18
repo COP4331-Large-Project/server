@@ -25,7 +25,7 @@ const Group = {
 
   join: async (req, res) => {
     const { inviteCode } = req.params;
-    const group = await Group.findOne({ inviteCode }).populate(Group.fieldsToPopulate);
+    const group = await GroupModel.findOne({ inviteCode }).populate(GroupModel.fieldsToPopulate);
     if (group === null) {
       return res.status(404).send({ message: 'TODO ERROR: GROUP DOES NOT EXIST' });
     }
