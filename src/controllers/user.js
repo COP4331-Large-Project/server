@@ -71,7 +71,6 @@ const User = {
     try {
       await UserModel.findOneAndDelete({ _id: userID });
     } catch (err) {
-      console.log(err);
       next(new APIError());
     }
 
