@@ -25,7 +25,7 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
         env:
           NPM_CONFIG_PRODUCTION: false
       - name: Run Unit Tests
@@ -49,6 +49,6 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
       - name: Run Linter
         run: npm run lint
