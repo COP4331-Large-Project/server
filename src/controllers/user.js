@@ -5,26 +5,26 @@ import PasswordHasher from '../services/PasswordHasher';
 
 const User = {
   register: async (req, res, next) => {
+    const {
+      firstName, lastName, username, password,
+    } = req.body;
+
     // Hash password
-    const hashedPassword = await PasswordHasher.hash(req.body.password);
+    const hashedPassword = await PasswordHasher.hash(password);
 
     // create new user model with given request body
     const newUser = new UserModel(
       {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        username: req.body.username,
+        firstName,
+        lastName,
+        username,
         password: hashedPassword,
       },
     );
 
+    let user;
     try {
-      const user = await newUser.save();
-      // Strip sensitive info
-      const reifiedUser = user.toJSON(objectOptions);
-      delete reifiedUser.password;
-
-      return res.status(201).send(reifiedUser);
+      user = await newUser.save();
     } catch (err) {
       // Duplicate Key Error
       if (err.code === 11000) {
@@ -37,6 +37,12 @@ const User = {
 
       return next(new APIError());
     }
+
+    // Strip sensitive info
+    const reifiedUser = user.toJSON(objectOptions);
+    delete reifiedUser.password;
+
+    return res.status(201).send(reifiedUser);
   },
 
   login: async (req, res, next) => {
