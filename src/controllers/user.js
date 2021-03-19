@@ -1,43 +1,85 @@
 import UserModel from '../models/user';
+import APIError from '../services/APIError';
+import PasswordHasher from '../services/PasswordHasher';
 
 const User = {
-  register: async (req, res) => {
+  register: async (req, res, next) => {
+    const {
+      firstName, lastName, username, password,
+    } = req.body;
+
+    // Hash password
+    const hashedPassword = await PasswordHasher.hash(password);
+
     // create new user model with given request body
     const newUser = new UserModel(
       {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        username: req.body.username,
-        password: req.body.password,
+        firstName,
+        lastName,
+        username,
+        password: hashedPassword,
       },
     );
 
-    // TODO: Hashing.
-
+    let user;
     try {
-      const user = await newUser.save();
-      return res.status(201).send(user);
+      user = await newUser.save();
     } catch (err) {
-      return res.status(500).send('TODO ERROR');
-    }
-  },
-
-  login: async (req, res) => {
-    try {
-      // TODO: Hashing.
-      const user = await UserModel.findOne({
-        username: req.body.username,
-        password: req.body.password,
-      }).exec();
-
-      if (!user) {
-        return res.status(500).send('Invalid user');
+      // Duplicate Key Error
+      if (err.code === 11000) {
+        return next(new APIError(
+          'Username taken',
+          'Another username with the same name is already in use.',
+          409,
+        ));
       }
 
-      return res.status(200).send(user);
-    } catch (err) {
-      return res.status(500).send('TODO ERROR');
+      return next(new APIError());
     }
+
+    // Strip sensitive info
+    const reifiedUser = user.toJSON();
+    delete reifiedUser.password;
+
+    return res.status(201).send(reifiedUser);
+  },
+
+  login: async (req, res, next) => {
+    let user;
+
+    try {
+      user = (await UserModel.findOne({
+        username: req.body.username,
+      }, '+password')
+        .exec());
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    if (!user || !await PasswordHasher.validateHash(req.body.password, user.password)) {
+      return next(new APIError(
+        'Incorrect Credentials',
+        'Cannot Log user in',
+      ));
+    }
+
+    // Strip sensitive info
+    const reifiedUser = user.toJSON();
+    delete reifiedUser.password;
+
+    return res.status(200).send(reifiedUser);
+  },
+
+  delete: async (req, res, next) => {
+    const { userID } = req.params;
+
+    try {
+      await UserModel.findOneAndDelete({ _id: userID });
+    } catch (err) {
+      next(new APIError());
+    }
+
+    return res.status(204);
   },
 };
 

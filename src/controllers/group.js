@@ -1,11 +1,12 @@
 import mongoose from 'mongoose';
-import UUID from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import GroupModel from '../models/group';
+import APIError from '../services/APIError';
 
 const { ObjectId } = mongoose.Types;
 
 const Group = {
-  register: async (req, res) => {
+  register: async (req, res, next) => {
     const {
       users, creator, invitedUsers, publicGroup,
     } = req.body;
@@ -16,33 +17,58 @@ const Group = {
     );
 
     try {
-      newGroup.inviteCode = UUID.v4();
+      newGroup.inviteCode = uuidv4();
       const group = await newGroup.save();
       await group.populate(GroupModel.fieldsToPopulate).execPopulate();
       return res.send(group);
     } catch (err) {
-      return res.status(500).send(err);
+      return next(new APIError());
     }
   },
 
-  join: async (req, res) => {
+  join: async (req, res, next) => {
     const { inviteCode } = req.params;
-    const group = await GroupModel.findOne({ inviteCode }).populate(GroupModel.fieldsToPopulate);
-    if (group === null) {
-      return res.status(404).send({ message: 'TODO ERROR: GROUP DOES NOT EXIST' });
+    const groupResult = (await GroupModel
+      .findOne({ inviteCode })
+      .populate(GroupModel.fieldsToPopulate)
+      .exec());
+
+    // Check if group is found.
+    if (groupResult === null) {
+      return next(
+        new APIError(
+          'Group not found',
+          'Group does not exist',
+          404,
+        ),
+      );
     }
-    if (group.publicGroup) {
-      return res.send({ group, message: 'SUCCESSFULLY JOINED PUBLIC GROUP' });
-    }
+
+    const group = groupResult.toJSON();
+
+    // Check if user is authorized to join.
     if (!ObjectId.isValid(req.body.user)) {
-      return res.status(404).send({ message: 'TODO ERROR: BAD USER ObjectId' });
+      return next(new APIError(
+        'Bad User ObjectId',
+        'The given ObjectId for the joining user is invalid',
+        404,
+        `/groups/join/${inviteCode}`,
+      ));
     }
     const user = ObjectId(req.body.user);
     const authorizedUser = (group.users).some(x => x.equals(user));
-    if (group.creator.equals(user) || authorizedUser) {
-      return res.send({ group, message: 'SUCCESSFULLY AUTHENTICATED' });
+
+    // eslint-disable-next-line no-underscore-dangle
+    if (group.creator._id.equals(user._id) || authorizedUser) {
+      return res.status(204).send();
     }
-    return res.status(404).send({ message: 'TODO ERROR: USER DOES NOT HAVE PERMISSION' });
+
+    return next(new APIError(
+      'Cannot join Group.',
+      'User does not have permission to join this group.',
+      403,
+      `/groups/join/${inviteCode}`,
+    ));
   },
 };
 

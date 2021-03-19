@@ -1,21 +1,8 @@
-import express from 'express';
-import cors from 'cors';
 import { logger } from './globals';
-import { connectToDB } from './services/mongo';
-import router from './routes';
+import initWebServer from './services/webServer';
 
 (async function main() {
-  const app = express();
-
-  // Connect to the database
-  await connectToDB();
-
-  // Enable cross origin
-  app.use(
-    cors(),
-    express.json(),
-    router,
-  );
+  const app = await initWebServer();
 
   // Log host
   if (process.env.NODE_ENV !== 'production') {
