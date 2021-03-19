@@ -25,6 +25,14 @@ const connectToDB = async () => {
     throw new Error(error);
   }
 
+  const jsonOptions = {
+    versionKey: false,
+    useProjection: true,
+  };
+
+  // Set options
+  mongoose.set('toJSON', jsonOptions);
+
   // Log the values.
   logger.info(`MongoDB_URI = ${process.env.MONGO_URI}`);
 };

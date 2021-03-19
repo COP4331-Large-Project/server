@@ -1,5 +1,4 @@
 import UserModel from '../models/user';
-import { objectOptions } from './constants';
 import APIError from '../services/APIError';
 import PasswordHasher from '../services/PasswordHasher';
 
@@ -39,7 +38,7 @@ const User = {
     }
 
     // Strip sensitive info
-    const reifiedUser = user.toJSON(objectOptions);
+    const reifiedUser = user.toJSON();
     delete reifiedUser.password;
 
     return res.status(201).send(reifiedUser);
@@ -65,7 +64,7 @@ const User = {
     }
 
     // Strip sensitive info
-    const reifiedUser = user.toJSON(objectOptions);
+    const reifiedUser = user.toJSON();
     delete reifiedUser.password;
 
     return res.status(200).send(reifiedUser);

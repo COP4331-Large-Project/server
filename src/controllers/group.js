@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import { objectOptions } from './constants';
 import GroupModel from '../models/group';
 import APIError from '../services/APIError';
 
@@ -29,11 +28,13 @@ const Group = {
 
   join: async (req, res, next) => {
     const { inviteCode } = req.params;
-    const group = await GroupModel.findOne({ inviteCode }).populate(GroupModel.fieldsToPopulate)
-      .toObject(objectOptions);
+    const groupResult = (await GroupModel
+      .findOne({ inviteCode })
+      .populate(GroupModel.fieldsToPopulate)
+      .exec());
 
     // Check if group is found.
-    if (group === null) {
+    if (groupResult === null) {
       return next(
         new APIError(
           'Group not found',
@@ -42,6 +43,8 @@ const Group = {
         ),
       );
     }
+
+    const group = groupResult.toJSON();
 
     // Check if user is authorized to join.
     if (!ObjectId.isValid(req.body.user)) {
@@ -55,8 +58,9 @@ const Group = {
     const user = ObjectId(req.body.user);
     const authorizedUser = (group.users).some(x => x.equals(user));
 
-    if (group.creator.equals(user) || authorizedUser) {
-      return res.status(204).send({ group, message: 'SUCCESSFULLY AUTHENTICATED' });
+    // eslint-disable-next-line no-underscore-dangle
+    if (group.creator._id.equals(user._id) || authorizedUser) {
+      return res.status(204).send();
     }
 
     return next(new APIError(
