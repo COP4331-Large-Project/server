@@ -2,7 +2,7 @@ import { logger } from './globals';
 import initWebServer from './services/webServer';
 
 (async function main() {
-  const app = initWebServer();
+  const app = await initWebServer();
 
   // Log host
   if (process.env.NODE_ENV !== 'production') {
