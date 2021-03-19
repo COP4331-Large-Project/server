@@ -44,6 +44,14 @@ const Group = {
     }
 
     // Check if user is authorized to join.
+    if (!ObjectId.isValid(req.body.user)) {
+      return next(new APIError(
+        'Bad User ObjectId',
+        'The given ObjectId for the joining user is invalid',
+        404,
+        `/groups/join/${inviteCode}`,
+      ));
+    }
     const user = ObjectId(req.body.user);
     const authorizedUser = (group.users).some(x => x.equals(user));
 
