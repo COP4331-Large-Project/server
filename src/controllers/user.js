@@ -71,15 +71,37 @@ const User = {
   },
 
   delete: async (req, res, next) => {
-    const { userID } = req.params;
+    const { id } = req.params;
 
     try {
-      await UserModel.findOneAndDelete({ _id: userID });
+      await UserModel.findOneAndDelete({ _id: id });
     } catch (err) {
       next(new APIError());
     }
 
     return res.status(204);
+  },
+
+  fetch: async (req, res, next) => {
+    const { id } = req.params;
+    let result;
+
+    try {
+      result = await UserModel.findOne({ _id: id }).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    if (!result) {
+      return next(new APIError(
+        'Could not find User',
+        `User with id ${id} could not be found.`,
+        404,
+        `/users/${id}`,
+      ));
+    }
+
+    return res.status(200).send(result.toJSON());
   },
 };
 

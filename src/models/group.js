@@ -11,7 +11,17 @@ const groupSchema = new mongoose.Schema({
   publicGroup: { type: Boolean, default: false },
 });
 
-groupSchema.statics.fieldsToPopulate = 'users creator invitedUsers';
+const populateFields = 'users creator invitedUsers';
+
+const autoPopulate = async function populator(doc) {
+  await doc.populate(populateFields).execPopulate();
+};
+
+// Use hooks to auto-populate fields.
+groupSchema
+  .pre('find', function populate() { this.populate(populateFields); })
+  .post('findOne', autoPopulate)
+  .post('save', autoPopulate);
 
 const Group = mongoose.model(modelName, groupSchema);
 

@@ -34,12 +34,14 @@ const connectToDB = async () => {
   mongoose.set('toJSON', jsonOptions);
 
   // Log the values.
-  logger.info(`MongoDB_URI = ${process.env.MONGO_URI}`);
+  if (process.env.NODE_ENV !== 'production') {
+    logger.info(`MongoDB_URI = ${process.env.MONGO_URI}`);
+  }
 };
 
-const disconnectFromDB = () => {
+const disconnectFromDB = async () => {
   // Close the DB connection.
-  mongoose.connection().close();
+  await mongoose.connection.close();
 };
 
 export { connectToDB, disconnectFromDB };
