@@ -93,11 +93,21 @@ const Group = {
 
   delete: async (req, res, next) => {
     const { id } = req.params;
+    let result;
 
     try {
-      await GroupModel.findOneAndDelete({ _id: id }).exec();
+      result = await GroupModel.findOneAndDelete({ _id: id }).exec();
     } catch (err) {
       return next(new APIError());
+    }
+
+    if (!result) {
+      return next(new APIError(
+        'Group Could not be deleted',
+        'No such Group exists',
+        404,
+        `/groups/${id}/`,
+      ));
     }
 
     return res.status(204).send();

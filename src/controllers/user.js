@@ -72,14 +72,24 @@ const User = {
 
   delete: async (req, res, next) => {
     const { id } = req.params;
+    let result;
 
     try {
-      await UserModel.findOneAndDelete({ _id: id });
+      result = await UserModel.findOneAndDelete({ _id: id }).exec();
     } catch (err) {
       next(new APIError());
     }
 
-    return res.status(204);
+    if (!result) {
+      return next(new APIError(
+        'User Could not be deleted',
+        'No such User exists',
+        404,
+        `/users/${id}/`,
+      ));
+    }
+
+    return res.status(204).send();
   },
 
   fetch: async (req, res, next) => {
