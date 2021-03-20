@@ -19,8 +19,7 @@ const Group = {
     try {
       newGroup.inviteCode = uuidv4();
       const group = await newGroup.save();
-      await group.populate(GroupModel.fieldsToPopulate).execPopulate();
-      return res.send(group);
+      return res.send(group.toJSON());
     } catch (err) {
       return next(new APIError());
     }
@@ -30,7 +29,6 @@ const Group = {
     const { inviteCode } = req.params;
     const groupResult = (await GroupModel
       .findOne({ inviteCode })
-      .populate(GroupModel.fieldsToPopulate)
       .exec());
 
     // Check if group is found.
@@ -69,6 +67,50 @@ const Group = {
       403,
       `/groups/join/${inviteCode}`,
     ));
+  },
+
+  fetch: async (req, res, next) => {
+    const { id } = req.params;
+    let result;
+
+    try {
+      result = await GroupModel.findOne({ _id: id }).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    if (!result) {
+      return next(new APIError(
+        'Could not find Group',
+        `Group with id ${id} could not be found.`,
+        404,
+        `/groups/${id}`,
+      ));
+    }
+
+    return res.status(200).send(result.toJSON());
+  },
+
+  delete: async (req, res, next) => {
+    const { id } = req.params;
+    let result;
+
+    try {
+      result = await GroupModel.findOneAndDelete({ _id: id }).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    if (!result) {
+      return next(new APIError(
+        'Group Could not be deleted',
+        'No such Group exists',
+        404,
+        `/groups/${id}/`,
+      ));
+    }
+
+    return res.status(204).send();
   },
 };
 

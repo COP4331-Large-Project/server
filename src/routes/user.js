@@ -8,12 +8,14 @@ const router = express.Router();
 // add a new user
 router.post('/', User.register);
 
+router.get('/:id', User.fetch);
+
 // TODO: Add Swagger Docs
 
 router.post('/login', User.login);
 
 // TODO: Add Swagger Docs
 
-router.delete('/:userID', User.delete);
+router.delete('/:id', User.delete);
 
 export default router;
