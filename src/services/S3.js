@@ -57,63 +57,64 @@ const S3 = {
   /**
    * Uploads a file to the bucket.
    *
-   * @param {Payload} payload
+   * @param {string} key
+   * @param {Buffer} buffer
    * @returns {Promise<PutObjectCommandOutput>}
    */
-  uploadObject: async (payload) => {
-    assert(payload);
-    assert(payload.Key);
-    assert(payload.Bucket);
-    assert(payload.Body);
+  uploadObject: async (key, buffer) => {
+    assert(key);
+    assert(buffer);
 
-    return s3Client.send(new PutObjectCommand(payload));
+    return s3Client.send(new PutObjectCommand({
+      Key: key,
+      Bucket: BUCKET,
+      Body: buffer,
+    }));
   },
 
   /**
    * Delete an object with the given key and bucket.
    *
-   * @param {Payload} payload
+   * @param {String} key
    * @returns {Promise<DeleteObjectOutput & MetadataBearer>}
    */
-  deleteObject: async (payload) => {
-    assert(payload);
-    assert(payload.Key !== undefined);
-    const input = {
-      Bucket: payload.Bucket || BUCKET,
-      Key: payload.Key,
-    };
-    return s3Client.send(new DeleteObjectCommand(input));
+  deleteObject: async (key) => {
+    assert(key);
+    return s3Client.send(new DeleteObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+    }));
   },
 
   /**
    * Gets the object file for the given key.
    *
-   * @param {Payload} payload
+   * @param {string} key
    * @returns {Promise<GetObjectOutput & MetadataBearer>}
    */
-  getObject: async (payload) => {
-    assert(payload);
-    assert(payload.Key);
-    const input = {
-      Bucket: payload.Bucket || BUCKET,
-      Key: payload.Key,
-    };
-    return s3Client.send(new GetObjectCommand(input));
+  getObject: async (key) => {
+    assert(key);
+
+    return s3Client.send(new GetObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+    }));
   },
 
   /**
    * Perform a Get command for the specified Key and return
    * a pre-signed URL for the object
    *
-   * @param {Payload} payload
+   * @param {string} key
    * @returns {Promise<string>}
    */
-  getPreSignedURL: async (payload) => {
-    assert(payload);
-    assert(payload.Key);
-    assert(payload.Bucket);
+  getPreSignedURL: async (key) => {
+    assert(key);
 
-    const getCommand = new GetObjectCommand(payload);
+    const getCommand = new GetObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+    });
     return getSignedUrl(s3Client, getCommand);
   },
 

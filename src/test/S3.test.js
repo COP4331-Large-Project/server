@@ -28,34 +28,27 @@ describe('#listObjects', () => {
 describe('Object Transfer', () => {
   // Setup: Upload file
   test('should upload file', async () => {
-    await S3.uploadObject({
-      Key: 'foo/globals.js',
-      Bucket: 'image-sharing-project',
-      Body: fs.readFileSync(path.join(__dirname, '../globals.js')),
-    });
+    await S3.uploadObject(
+      'foo/globals.js',
+      fs.readFileSync(path.join(__dirname, '../globals.js')),
+    );
   });
 
   // Test if file was uploaded
   test('should get globals.js from foo/', async () => {
-    expect.assertions(1);
     // Then verify that the file exists.
-    const object = await S3.getObject({
-      Key: 'foo/globals.js',
-    });
+    const object = await S3.getObject('foo/globals.js');
     expect(object).toBeTruthy();
   });
 
   test('should pre-sign url', async () => {
-    const url = await S3.getPreSignedURL({
-      Bucket: 'image-sharing-project',
-      Key: 'foo/globals.js',
-    });
+    const url = await S3.getPreSignedURL('foo/globals.js');
 
     logger.info(url);
   });
 
   // Teardown: Delete uploaded file
   test('should delete file', async () => {
-    await S3.deleteObject({ Key: 'foo/globals.js' });
+    await S3.deleteObject('foo/globals.js');
   });
 });

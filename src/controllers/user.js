@@ -152,21 +152,13 @@ const User = {
       .jpeg()
       .toBuffer();
 
-    const Key = `users/${id}/profile.jpeg`;
+    const key = `users/${id}/profile.jpeg`;
     let imgURL;
 
     // Tack on image url
     try {
-      await S3.uploadObject({
-        Bucket: 'image-sharing-project',
-        Key,
-        Body: imageBuffer,
-      });
-
-      imgURL = await S3.getPreSignedURL({
-        Bucket: 'image-sharing-project',
-        Key,
-      });
+      await S3.uploadObject(key, imageBuffer);
+      imgURL = await S3.getPreSignedURL(key);
     } catch (e) {
       next(new APIError());
     }
