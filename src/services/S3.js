@@ -63,17 +63,12 @@ const S3 = {
    * @returns {Promise<PutObjectCommandOutput>}
    */
   uploadObject: async (payload) => {
-    assert(payload.Key !== undefined);
-    assert(payload.File !== undefined);
-    const contents = fs.readFileSync(path.resolve(__dirname, payload.File));
-    const filePath = payload.Path || '';
-    // TODO filePath validation
-    const input = {
-      Bucket: payload.Bucket || BUCKET,
-      Key: `${filePath}${payload.Key}`,
-      Body: contents,
-    };
-    return s3Client.send(new PutObjectCommand(input));
+    assert(payload);
+    assert(payload.Key);
+    assert(payload.Bucket);
+    assert(payload.Body);
+
+    return s3Client.send(new PutObjectCommand(payload));
   },
 
   /**
@@ -122,23 +117,6 @@ const S3 = {
 
     const getCommand = new GetObjectCommand(payload);
     return getSignedUrl(s3Client, getCommand);
-  },
-
-  /**
-   * Perform a Put command and return the pre-signed URL for the object
-   * that was uploaded
-   *
-   * @param {Payload} payload
-   * @returns {Promise<string>}
-   */
-  putPreSignedURL: async (payload) => {
-    assert(payload);
-    assert(payload.Key);
-    assert(payload.Bucket);
-    assert(payload.Body);
-
-    const putCommand = new PutObjectCommand(payload);
-    return getSignedUrl(s3Client, putCommand);
   },
 
   destroy: () => s3Client.destroy(),

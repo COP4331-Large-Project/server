@@ -1,6 +1,8 @@
+import sharp from 'sharp';
 import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import PasswordHasher from '../services/PasswordHasher';
+import S3 from '../services/S3';
 
 const User = {
   register: async (req, res, next) => {
@@ -95,9 +97,14 @@ const User = {
   fetch: async (req, res, next) => {
     const { id } = req.params;
     let result;
+    let imgURL;
 
     try {
       result = await UserModel.findOne({ _id: id }).exec();
+      imgURL = await S3.getPreSignedURL({
+        Bucket: 'image-sharing-project',
+        Key: `users/${result.id}/profile.jpeg`,
+      });
     } catch (err) {
       return next(new APIError());
     }
@@ -111,7 +118,67 @@ const User = {
       ));
     }
 
-    return res.status(200).send(result.toJSON());
+    const retVal = result.toJSON();
+    retVal.imgURL = imgURL;
+
+    return res.status(200).send(retVal);
+  },
+
+  update: async (req, res, next) => {
+    const { id } = req.params;
+    let result;
+
+    try {
+      result = await UserModel.findByIdAndUpdate(id, req.body, { new: true }).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    if (!result) {
+      return next(new APIError(
+        'User could not be found',
+        `User with id ${id} was not found`,
+        404,
+        `users/${id}`,
+      ));
+    }
+
+    // If there was no file attached we're done.
+    if (!req.file) {
+      return res.status(200).send(result.toJSON());
+    }
+
+    const imageBuffer = await sharp(req.file.buffer)
+      .jpeg()
+      .toBuffer();
+
+    const Key = `users/${id}/profile.jpeg`;
+
+    console.log(req.file);
+    console.log(Key);
+
+    let imgURL;
+
+    // Tack on image url
+    try {
+      await S3.uploadObject({
+        Bucket: 'image-sharing-project',
+        Key,
+        Body: imageBuffer,
+      });
+
+      imgURL = await S3.getPreSignedURL({
+        Bucket: 'image-sharing-project',
+        Key,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
+    const retVal = result.toJSON();
+    retVal.imgURL = imgURL;
+
+    return res.status(200).send(retVal);
   },
 };
 
