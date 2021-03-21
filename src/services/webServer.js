@@ -24,7 +24,7 @@ async function initWebServer() {
 
   // enable swagger
   app.use(
-    '/apidocs',
+    '/',
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpecs(), { explorer: true }),
   );

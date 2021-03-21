@@ -48,7 +48,7 @@ const router = express.Router();
  *        200:
  *          description: OK
  *        404:
- *          description: Username/password combination is incorrect
+ *          description: Username already exists
  *        500:
  *          description: Internal error
  */
@@ -93,5 +93,6 @@ router.post('/', User.register);
 router.post('/login', User.login);
 
 router.delete('/:userID', User.delete);
+router.get('/:id', User.fetch)
 
 export default router;

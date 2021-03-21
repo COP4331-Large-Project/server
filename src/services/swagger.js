@@ -18,6 +18,10 @@ const swaggerSpecs = () => {
           url: 'http://localhost:5000/',
           description: 'local server',
         },
+        {
+          url: 'https://api.imageus.io/',
+          description: 'production server',
+        }
       ],
     },
     schemes: ['http'],

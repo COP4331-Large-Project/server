@@ -35,12 +35,15 @@ const groups = express.Router();
  *      responses:
  *        200:
  *          description: OK
- *        404:
- *          description: Username/password combination is incorrect
  *        500:
  *          description: Internal error
  */
+groups.get('/:id', Group.fetch);
+
+// add a new group
 groups.post('/', Group.register);
+
+groups.delete('/:id', Group.delete);
 
 // join an existing group, given by :inviteCode
 groups.post('/join/:inviteCode', Group.join);
