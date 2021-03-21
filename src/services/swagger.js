@@ -21,7 +21,7 @@ const swaggerSpecs = () => {
         {
           url: 'https://api.imageus.io/',
           description: 'production server',
-        }
+        },
       ],
     },
     schemes: ['http'],

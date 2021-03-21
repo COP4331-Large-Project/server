@@ -93,6 +93,6 @@ router.post('/', User.register);
 router.post('/login', User.login);
 
 router.delete('/:userID', User.delete);
-router.get('/:id', User.fetch)
+router.get('/:id', User.fetch);
 
 export default router;
