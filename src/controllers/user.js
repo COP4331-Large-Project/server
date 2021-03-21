@@ -153,10 +153,6 @@ const User = {
       .toBuffer();
 
     const Key = `users/${id}/profile.jpeg`;
-
-    console.log(req.file);
-    console.log(Key);
-
     let imgURL;
 
     // Tack on image url
@@ -172,7 +168,7 @@ const User = {
         Key,
       });
     } catch (e) {
-      console.log(e);
+      next(new APIError());
     }
 
     const retVal = result.toJSON();

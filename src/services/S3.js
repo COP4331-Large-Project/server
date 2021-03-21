@@ -9,8 +9,6 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import dotenv from 'dotenv';
 import assert from 'assert';
-import fs from 'fs';
-import path from 'path';
 
 const REGION = 'us-east-1';
 const BUCKET = 'image-sharing-project';

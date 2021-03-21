@@ -26,7 +26,7 @@ describe('User API methods', () => {
   // Make sure we clean up.
   afterAll(async (done) => {
     // eslint-disable-next-line no-underscore-dangle
-    await UserModel.findOneAndDelete({ _id: expectedPayload._id });
+    await UserModel.findOneAndDelete({ _id: expectedPayload.id });
     // Shut down web server.
     await mongoose.connection.close();
     done();
@@ -45,7 +45,8 @@ describe('User API methods', () => {
       .expect(201);
 
     // eslint-disable-next-line no-underscore-dangle
-    expectedPayload._id = response.body._id;
+    expectedPayload.id = response.body.id;
+    delete response.body.imgURL;
     expect(response.body).toMatchObject(expectedPayload);
   });
 
