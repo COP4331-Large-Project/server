@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import S3 from '../services/S3';
 import { logger } from '../globals';
 
@@ -27,9 +29,9 @@ describe('Object Transfer', () => {
   // Setup: Upload file
   test('should upload file', async () => {
     await S3.uploadObject({
-      Key: 'globals.js',
-      Path: 'foo/',
-      File: '../globals.js',
+      Key: 'foo/globals.js',
+      Bucket: 'image-sharing-project',
+      Body: fs.readFileSync(path.join(__dirname, '../globals.js')),
     });
   });
 
