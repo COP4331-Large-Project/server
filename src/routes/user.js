@@ -19,7 +19,7 @@ const router = express.Router();
  * /users/:
  *    post:
  *      description: Creates a new user
- *      summary: Creates a user
+ *      summary: Creates/Registers a user
  *      tags:
  *        - User
  *
@@ -29,17 +29,23 @@ const router = express.Router();
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/User'
+ *              $ref: '#/components/schemas/UserRequest'
  *
  *      produces:
  *        - application/json
  *      responses:
  *        200:
  *          description: OK
- *        404:
- *          description: Username already exists
- *        500:
- *          description: Internal error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/UserResponse'
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
  */
 router.post('/', User.register);
 
@@ -48,24 +54,27 @@ router.post('/', User.register);
  * path:
  * /users/login:
  *    post:
- *      description: Logs in an existing user
- *      summary: Logs in a user
+ *      description: Logs an existing user in with the given username and password.
+ *      summary: Log in an existing user.
  *      tags:
  *        - User
  *
  *      requestBody:
  *        required: true
- *
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/User'
+ *              $ref: '#/components/schemas/UserLogin'
  *
  *      produces:
  *        - application/json
  *      responses:
  *        200:
  *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/UserResponse'
  *        404:
  *          description: Username/password combination is incorrect
  *        500:
@@ -73,9 +82,104 @@ router.post('/', User.register);
  */
 router.post('/login', User.login);
 
+/**
+ * @swagger
+ * path:
+ * /users/{id}:
+ *    delete:
+ *      description: Deletes a user
+ *      summary: Deletes a user with the given id
+ *      tags:
+ *        - User
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *           type: integer
+ *          description: The ID of the user to delete.
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        204:
+ *          description: No Content
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
 router.delete('/:userID', User.delete);
+
+/**
+ * @swagger
+ * path:
+ * /users/{id}:
+ *    get:
+ *      description: Fetches a User
+ *      summary: Fetches a user with the given id
+ *      tags:
+ *        - User
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *           type: integer
+ *          description: The ID of the user to fetch.
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        200:
+ *          description: OK
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/UserResponse'
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
 router.get('/:id', User.fetch);
 
+/**
+ * @swagger
+ * path:
+ * /users/login:
+ *    put:
+ *      description: Logs an existing user in with the given username and password.
+ *      summary: Log in an existing user.
+ *      tags:
+ *        - User
+ *
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          multipart/form-data:
+ *            schema:
+ *              $ref: '#/components/schemas/UserUpdate'
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        200:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/UserResponse'
+ *        404:
+ *          description: Username/password combination is incorrect
+ *        500:
+ *          description: Internal error
+ */
 router.put('/:id', upload.single('avatar'), User.update);
 
 export default router;
