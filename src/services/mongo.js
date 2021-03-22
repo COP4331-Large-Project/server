@@ -25,13 +25,17 @@ const connectToDB = async () => {
     throw new Error(error);
   }
 
-  const jsonOptions = {
+  // Set options
+  mongoose.set('toJSON', {
     versionKey: false,
     useProjection: true,
-  };
-
-  // Set options
-  mongoose.set('toJSON', jsonOptions);
+    virtuals: true,
+    /* eslint-disable no-param-reassign */
+    /* eslint-disable no-underscore-dangle */
+    transform: (doc, ret) => {
+      delete ret._id;
+    },
+  });
 
   // Log the values.
   if (process.env.NODE_ENV !== 'production') {

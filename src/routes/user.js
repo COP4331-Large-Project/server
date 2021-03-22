@@ -6,7 +6,10 @@
  */
 
 import express from 'express';
+import multer from 'multer';
 import User from '../controllers/user';
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 
@@ -72,5 +75,7 @@ router.post('/login', User.login);
 
 router.delete('/:userID', User.delete);
 router.get('/:id', User.fetch);
+
+router.put('/:id', upload.single('avatar'), User.update);
 
 export default router;
