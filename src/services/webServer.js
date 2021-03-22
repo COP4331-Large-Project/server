@@ -22,10 +22,14 @@ async function initWebServer() {
     ErrorHandler,
   );
 
-  // enable swagger
+  // Enable swagger
   app.use(
     '/',
     swaggerUi.serve,
+  );
+
+  app.get(
+    '/',
     swaggerUi.setup(swaggerSpecs(), { explorer: true }),
   );
 

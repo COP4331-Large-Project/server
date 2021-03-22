@@ -137,9 +137,10 @@ router.delete('/:userID', User.delete);
  *      responses:
  *        200:
  *          description: OK
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/UserResponse'
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/UserResponse'
  *        default:
  *          description: Unexpected Error
  *          content:

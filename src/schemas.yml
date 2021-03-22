@@ -42,6 +42,9 @@ UserResponse:
     lastName:
       type: string
       example: Brown
+    email:
+      type: string
+      example: jbrown@email.com
     username:
       type: string
       example: JBrown
@@ -60,6 +63,10 @@ UserRequest:
     lastName:
       type: string
       example: Brown
+      required: true
+    email:
+      type: string
+      example: jbrown@email.com
       required: true
     username:
       type: string

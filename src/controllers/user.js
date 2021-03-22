@@ -7,7 +7,7 @@ import S3 from '../services/S3';
 const User = {
   register: async (req, res, next) => {
     const {
-      firstName, lastName, username, password,
+      firstName, lastName, email, username, password,
     } = req.body;
 
     // Hash password
@@ -18,6 +18,7 @@ const User = {
       {
         firstName,
         lastName,
+        email,
         username,
         password: hashedPassword,
       },
@@ -30,8 +31,8 @@ const User = {
       // Duplicate Key Error
       if (err.code === 11000) {
         return next(new APIError(
-          'Username taken',
-          'Another username with the same name is already in use.',
+          'Username or email taken',
+          'Another username or email with the same name is already in use.',
           409,
         ));
       }
@@ -101,18 +102,20 @@ const User = {
 
     try {
       result = await UserModel.findOne({ _id: id }).exec();
+
+      if (!result) {
+        return next(new APIError(
+          'Could not find User',
+          `User with id ${id} could not be found.`,
+          404,
+          `/users/${id}`,
+        ));
+      }
+
       imgURL = await S3.getPreSignedURL(`users/${result.id}/profile.jpeg`);
     } catch (err) {
+      console.log(err);
       return next(new APIError());
-    }
-
-    if (!result) {
-      return next(new APIError(
-        'Could not find User',
-        `User with id ${id} could not be found.`,
-        404,
-        `/users/${id}`,
-      ));
     }
 
     const retVal = result.toJSON();
