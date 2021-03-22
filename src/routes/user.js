@@ -21,26 +21,12 @@ const router = express.Router();
  *        - User
  *
  *      requestBody:
- *        description:
  *        required: true
  *
  *        content:
  *          application/json:
  *            schema:
- *              type: object
- *              properties:
- *                username:
- *                  type: string
- *                  example: jbrown
- *                password:
- *                  type: string
- *                  example: password12345
- *                firstName:
- *                  type: string
- *                  example: John
- *                lastName:
- *                  type: string
- *                  example: Brown
+ *              $ref: '#/components/schemas/User'
  *
  *      produces:
  *        - application/json
@@ -65,20 +51,12 @@ router.post('/', User.register);
  *        - User
  *
  *      requestBody:
- *        description:
  *        required: true
  *
  *        content:
  *          application/json:
  *            schema:
- *              type: object
- *              properties:
- *                username:
- *                  type: string
- *                  example: jbrown
- *                password:
- *                  type: string
- *                  example: password12345
+ *              $ref: '#/components/schemas/User'
  *
  *      produces:
  *        - application/json

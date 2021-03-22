@@ -1,0 +1,35 @@
+User:
+  type: object
+  properties: 
+    first_name: 
+      type: string
+      example: John
+    last_name:
+      type: string
+      example: Brown
+    username:
+      type: string
+      example: JBrown
+      required: true
+    password:
+      type: string
+      example: worstPasswordOutHere
+      required: true
+Group:
+  description: A group object
+  type: object
+  properties:
+    inviteCode:
+      type: string
+    users:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
+    creator:
+      $ref: '#/components/schemas/User'
+    invitedUsers:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
+    publicGroup:
+      type: boolean
