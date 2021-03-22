@@ -152,12 +152,20 @@ router.get('/:id', User.fetch);
 /**
  * @swagger
  * path:
- * /users/login:
+ * /users/{id}:
  *    put:
- *      description: Logs an existing user in with the given username and password.
- *      summary: Log in an existing user.
+ *      description: Updates an existing user.
+ *      summary: Update an existing user.
  *      tags:
  *        - User
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *           type: integer
+ *          description: The ID of the user to update.
  *
  *      requestBody:
  *        required: true
