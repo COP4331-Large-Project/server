@@ -33,12 +33,12 @@ const swaggerSpecs = () => {
           description: 'production server',
         },
       ],
-    },
-    components: {
-      schemas: schema,
+      components: {
+        schemas: schema,
+      },
     },
     schemes: ['http'],
-    apis: ['./src/routes/user.js', './src/routes/group.js'],
+    apis: ['./src/routes/*.js'],
   };
 
   return swaggerJsdoc(options);
