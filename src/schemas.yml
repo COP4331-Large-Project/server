@@ -1,0 +1,98 @@
+APIError:
+  type: object
+  properties:
+    status:
+      type: int
+      example: 500
+    title:
+      type: string
+      example: An Unknown Error Occurred
+    description:
+      type: string
+      example: An server error occurred please try again later.
+    instance:
+      type: string
+      example: /path/to/resource
+UserUpdate:
+  type: object
+  properties:
+    body:
+      type: object
+      format: json
+      $ref: '#/components/schemas/UserRequest'
+    avatar:
+      type: string
+      format: binary
+UserLogin:
+  properties:
+    username:
+      type: string
+      example: JBrown
+      required: true
+    password:
+      type: string
+      example: worstPasswordOutHere
+      required: true
+UserResponse:
+  type: object
+  properties:
+    firstName:
+      type: string
+      example: John
+    lastName:
+      type: string
+      example: Brown
+    username:
+      type: string
+      example: JBrown
+    id:
+      type: string
+      example: 5424dfae4eb45345bc13b778
+    imgURL:
+      type: string
+UserRequest:
+  type: object
+  properties:
+    firstName:
+      type: string
+      example: John
+      required: true
+    lastName:
+      type: string
+      example: Brown
+      required: true
+    username:
+      type: string
+      example: JBrown
+      required: true
+    password:
+      type: string
+      example: worstPasswordOutHere
+      required: true
+Group:
+  description: A group object
+  type: object
+  properties:
+    id:
+      type: string
+      example: 7834dfae4eb89145bc13b559
+    inviteCode:
+      type: string
+    users:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserResponse'
+    creator:
+      $ref: '#/components/schemas/UserResponse'
+    invitedUsers:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserResponse'
+    publicGroup:
+      type: boolean
+GroupRequest:
+  type: object
+  properties:
+    creator:
+      type: string
+      required: true

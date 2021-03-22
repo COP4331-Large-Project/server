@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import requestSanitizer from 'express-mongo-sanitize';
+import swaggerUi from 'swagger-ui-express';
 import { connectToDB } from './mongo';
 import router from '../routes';
 import ErrorHandler from './ErrorHandler';
+import swaggerSpecs from './swagger';
 
 async function initWebServer() {
   const app = express();
@@ -18,6 +20,13 @@ async function initWebServer() {
     requestSanitizer(),
     router,
     ErrorHandler,
+  );
+
+  // enable swagger
+  app.use(
+    '/',
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpecs(), { explorer: true }),
   );
 
   return app;
