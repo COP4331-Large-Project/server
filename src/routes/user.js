@@ -129,7 +129,7 @@ router.delete('/:userID', User.delete);
  *          name: id
  *          required: true
  *          schema:
- *           type: integer
+ *           type: string
  *          description: The ID of the user to fetch.
  *
  *      produces:

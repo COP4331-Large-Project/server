@@ -47,6 +47,7 @@ UserResponse:
       example: JBrown
     id:
       type: string
+      example: 5424dfae4eb45345bc13b778
     imgURL:
       type: string
 UserRequest:
@@ -72,6 +73,9 @@ Group:
   description: A group object
   type: object
   properties:
+    id:
+      type: string
+      example: 7834dfae4eb89145bc13b559
     inviteCode:
       type: string
     users:
@@ -86,3 +90,9 @@ Group:
         $ref: '#/components/schemas/UserResponse'
     publicGroup:
       type: boolean
+GroupRequest:
+  type: object
+  properties:
+    creator:
+      type: string
+      required: true
