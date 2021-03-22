@@ -102,18 +102,20 @@ const User = {
 
     try {
       result = await UserModel.findOne({ _id: id }).exec();
+
+      if (!result) {
+        return next(new APIError(
+          'Could not find User',
+          `User with id ${id} could not be found.`,
+          404,
+          `/users/${id}`,
+        ));
+      }
+
       imgURL = await S3.getPreSignedURL(`users/${result.id}/profile.jpeg`);
     } catch (err) {
+      console.log(err);
       return next(new APIError());
-    }
-
-    if (!result) {
-      return next(new APIError(
-        'Could not find User',
-        `User with id ${id} could not be found.`,
-        404,
-        `/users/${id}`,
-      ));
     }
 
     const retVal = result.toJSON();
