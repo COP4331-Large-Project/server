@@ -7,7 +7,7 @@ import S3 from '../services/S3';
 const User = {
   register: async (req, res, next) => {
     const {
-      firstName, lastName, username, password,
+      firstName, lastName, email, username, password,
     } = req.body;
 
     // Hash password
@@ -18,6 +18,7 @@ const User = {
       {
         firstName,
         lastName,
+        email,
         username,
         password: hashedPassword,
       },
@@ -30,8 +31,8 @@ const User = {
       // Duplicate Key Error
       if (err.code === 11000) {
         return next(new APIError(
-          'Username taken',
-          'Another username with the same name is already in use.',
+          'Username or email taken',
+          'Another username or email with the same name is already in use.',
           409,
         ));
       }
