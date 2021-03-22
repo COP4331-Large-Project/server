@@ -20,6 +20,7 @@ describe('User API methods', () => {
   const expectedPayload = {
     firstName: 'test123',
     lastName: 'test456',
+    email: '1234@email.com',
     username,
   };
 
@@ -35,8 +36,9 @@ describe('User API methods', () => {
     const response = await request(app)
       .post('/users')
       .send({
-        firstName: 'test123',
-        lastName: 'test456',
+        firstName: expectedPayload.firstName,
+        lastName: expectedPayload.lastName,
+        email: expectedPayload.email,
         username,
         password,
       })
