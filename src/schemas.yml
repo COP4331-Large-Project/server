@@ -19,8 +19,7 @@ UserUpdate:
     body:
       type: object
       format: json
-      properties:
-        $ref: '#/components/schemas/User'
+      $ref: '#/components/schemas/UserRequest'
     avatar:
       type: string
       format: binary
