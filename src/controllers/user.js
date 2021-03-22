@@ -101,10 +101,7 @@ const User = {
 
     try {
       result = await UserModel.findOne({ _id: id }).exec();
-      imgURL = await S3.getPreSignedURL({
-        Bucket: 'image-sharing-project',
-        Key: `users/${result.id}/profile.jpeg`,
-      });
+      imgURL = await S3.getPreSignedURL(`users/${result.id}/profile.jpeg`);
     } catch (err) {
       return next(new APIError());
     }
