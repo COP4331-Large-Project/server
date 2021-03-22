@@ -9,8 +9,6 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import dotenv from 'dotenv';
 import assert from 'assert';
-import fs from 'fs';
-import path from 'path';
 
 const REGION = 'us-east-1';
 const BUCKET = 'image-sharing-project';
@@ -59,86 +57,65 @@ const S3 = {
   /**
    * Uploads a file to the bucket.
    *
-   * @param {Payload} payload
+   * @param {string} key
+   * @param {Buffer} buffer
    * @returns {Promise<PutObjectCommandOutput>}
    */
-  uploadObject: async (payload) => {
-    assert(payload.Key !== undefined);
-    assert(payload.File !== undefined);
-    const contents = fs.readFileSync(path.resolve(__dirname, payload.File));
-    const filePath = payload.Path || '';
-    // TODO filePath validation
-    const input = {
-      Bucket: payload.Bucket || BUCKET,
-      Key: `${filePath}${payload.Key}`,
-      Body: contents,
-    };
-    return s3Client.send(new PutObjectCommand(input));
+  uploadObject: async (key, buffer) => {
+    assert(key);
+    assert(buffer);
+
+    return s3Client.send(new PutObjectCommand({
+      Key: key,
+      Bucket: BUCKET,
+      Body: buffer,
+    }));
   },
 
   /**
    * Delete an object with the given key and bucket.
    *
-   * @param {Payload} payload
+   * @param {String} key
    * @returns {Promise<DeleteObjectOutput & MetadataBearer>}
    */
-  deleteObject: async (payload) => {
-    assert(payload);
-    assert(payload.Key !== undefined);
-    const input = {
-      Bucket: payload.Bucket || BUCKET,
-      Key: payload.Key,
-    };
-    return s3Client.send(new DeleteObjectCommand(input));
+  deleteObject: async (key) => {
+    assert(key);
+    return s3Client.send(new DeleteObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+    }));
   },
 
   /**
    * Gets the object file for the given key.
    *
-   * @param {Payload} payload
+   * @param {string} key
    * @returns {Promise<GetObjectOutput & MetadataBearer>}
    */
-  getObject: async (payload) => {
-    assert(payload);
-    assert(payload.Key);
-    const input = {
-      Bucket: payload.Bucket || BUCKET,
-      Key: payload.Key,
-    };
-    return s3Client.send(new GetObjectCommand(input));
+  getObject: async (key) => {
+    assert(key);
+
+    return s3Client.send(new GetObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+    }));
   },
 
   /**
    * Perform a Get command for the specified Key and return
    * a pre-signed URL for the object
    *
-   * @param {Payload} payload
+   * @param {string} key
    * @returns {Promise<string>}
    */
-  getPreSignedURL: async (payload) => {
-    assert(payload);
-    assert(payload.Key);
-    assert(payload.Bucket);
+  getPreSignedURL: async (key) => {
+    assert(key);
 
-    const getCommand = new GetObjectCommand(payload);
+    const getCommand = new GetObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+    });
     return getSignedUrl(s3Client, getCommand);
-  },
-
-  /**
-   * Perform a Put command and return the pre-signed URL for the object
-   * that was uploaded
-   *
-   * @param {Payload} payload
-   * @returns {Promise<string>}
-   */
-  putPreSignedURL: async (payload) => {
-    assert(payload);
-    assert(payload.Key);
-    assert(payload.Bucket);
-    assert(payload.Body);
-
-    const putCommand = new PutObjectCommand(payload);
-    return getSignedUrl(s3Client, putCommand);
   },
 
   destroy: () => s3Client.destroy(),
