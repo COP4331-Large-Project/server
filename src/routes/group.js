@@ -6,8 +6,10 @@
  */
 
 import express from 'express';
+import multer from 'multer';
 import Group from '../controllers/group';
 
+const upload = multer({ storage: multer.memoryStorage() });
 const groups = express.Router();
 
 /**
@@ -162,5 +164,31 @@ groups.delete('/:id', Group.delete);
  *                $ref: '#/components/schemas/APIError'
  */
 groups.post('/join/:inviteCode', Group.join);
+
+/**
+ * @swagger
+ * path:
+ * /groups/{id}:
+ *   post:
+ *     description: Uploads an image to a group
+ *     summary: Upload an image to a group
+ *     tags:
+ *     - Group
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *          type: string
+ *         description: The ID of the group to upload the picture to
+ *
+ *       requestBody:
+ *        required: true
+ *        content:
+ *            multipart/form-data:
+ *                schema:
+ */
+groups.post('/:id', upload.single('picture'), Group.upload);
 
 export default groups;
