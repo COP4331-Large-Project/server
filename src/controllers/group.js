@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
+import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import GroupModel from '../models/group';
 import APIError from '../services/APIError';
+import S3 from '../services/S3';
 
 const { ObjectId } = mongoose.Types;
 
@@ -111,6 +113,40 @@ const Group = {
     }
 
     return res.status(204).send();
+  },
+
+  upload: async (req, res, next) => {
+    const { id } = req.params;
+    let result;
+
+    try {
+      // TODO: Update image list in group
+      result = await GroupModel.findByIdAndUpdate(id, req.body, { new: true }).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
+    if (!req.file) {
+      return next(new APIError(
+        'Group Could not upload file',
+        'No file provided',
+        500,
+        `/groups/${id}`,
+      ));
+    }
+
+    const imageBuffer = await sharp(req.file.buffer)
+      .jpeg()
+      .toBuffer();
+    const fileName = `${uuidv4()}.jpeg`;
+    const key = `groups/${id}/${fileName}`;
+
+    try {
+      await S3.uploadObject(key, imageBuffer);
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    return res.status(200).send(result.toJSON());
   },
 };
 
