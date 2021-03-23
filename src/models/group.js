@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import Image from './image';
 import User from './user';
 
 const modelName = 'Group';
@@ -8,6 +9,7 @@ const groupSchema = new mongoose.Schema({
   users: [{ type: mongoose.Schema.Types.ObjectId, ref: User }],
   creator: { type: mongoose.Schema.Types.ObjectId, ref: User, required: true },
   invitedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: User }],
+  images: [{ type: mongoose.Schema.Types.ObjectId, ref: Image }],
   publicGroup: { type: Boolean, default: false },
 });
 
