@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import GroupModel from '../models/group';
+import ImageModel from '../models/image';
 import APIError from '../services/APIError';
 import S3 from '../services/S3';
 
@@ -116,14 +117,18 @@ const Group = {
   },
 
   upload: async (req, res, next) => {
-    const { id } = req.params;
+    const { id, userId } = req.params;
     let result;
 
     try {
-      // TODO: Update image list in group
-      result = await GroupModel.findByIdAndUpdate(id, req.body, { new: true }).exec();
+      result = await GroupModel.findById(id).exec();
     } catch (err) {
-      return next(new APIError());
+      return next(new APIError(
+        'Group could not find a group with ID',
+        'Invalid ID provided',
+        404,
+        `/groups/${id}`,
+      ));
     }
     if (!req.file) {
       return next(new APIError(
@@ -145,6 +150,15 @@ const Group = {
     } catch (err) {
       return next(new APIError());
     }
+
+    const image = new ImageModel(
+      fileName, userId, new Date(),
+    );
+
+    result = await GroupModel.update(
+      { _id: result.id },
+      { $push: { images: image } },
+    );
 
     return res.status(200).send(result.toJSON());
   },
