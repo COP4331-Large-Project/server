@@ -95,6 +95,10 @@ Group:
       type: array
       items:
         $ref: '#/components/schemas/UserResponse'
+    images:
+      type: array
+      items:
+        $ref: '#/components/schemas/Image'
     publicGroup:
       type: boolean
 GroupRequest:
@@ -103,3 +107,25 @@ GroupRequest:
     creator:
       type: string
       required: true
+GroupUpload:
+  type: object
+  properties:
+    body:
+      type: object
+      format: json
+      $ref: '#/components/schemas/Group'
+    picture:
+      type: string
+      format: binary
+Image:
+  description: An Image object
+  type: object
+  properties:
+    fileName:
+      type: string
+      required: true
+    creator:
+      type: string
+    dateUploaded:
+      type: string
+      format: date
