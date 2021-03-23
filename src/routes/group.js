@@ -188,6 +188,21 @@ groups.post('/join/:inviteCode', Group.join);
  *        content:
  *            multipart/form-data:
  *                schema:
+ *                  $ref: #/components/schemas/GroupUpload
+ *
+ *        produces:
+ *          - application/json
+ *        responses:
+ *          200:
+ *            description: OK
+ *            content:
+ *              application/json:
+ *                schema:
+ *                  $ref: '#/components/schemas/Group
+ *          404:
+ *            description: Invalid Group ID
+ *          500:
+ *            description: Internal error
  */
 groups.post('/:id', upload.single('picture'), Group.upload);
 
