@@ -3,6 +3,7 @@ import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import PasswordHasher from '../services/PasswordHasher';
 import S3 from '../services/S3';
+import { logger } from '../globals';
 
 const User = {
   register: async (req, res, next) => {
@@ -114,7 +115,7 @@ const User = {
 
       imgURL = await S3.getPreSignedURL(`users/${result.id}/profile.jpeg`);
     } catch (err) {
-      console.log(err);
+      logger.error(err);
       return next(new APIError());
     }
 
