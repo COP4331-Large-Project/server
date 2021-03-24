@@ -9,17 +9,6 @@ const imageSchema = new mongoose.Schema({
   dateUploaded: { type: Date, required: true },
 });
 
-const populateFields = 'fileName dateUploaded';
-
-const autoPopulate = async function populator(doc) {
-  await doc.populate(populateFields).execPopulate();
-};
-
-imageSchema
-  .pre('find', function populate() { this.populate(populateFields); })
-  .post('findOne', autoPopulate)
-  .post('save', autoPopulate);
-
 const Image = mongoose.model(modelName, imageSchema);
 
 export default Image;
