@@ -120,16 +120,6 @@ const Group = {
     const { id, userId } = req.params;
     let result;
 
-    try {
-      result = await GroupModel.findById(id).exec();
-    } catch (err) {
-      return next(new APIError(
-        'Group could not find a group with ID',
-        'Invalid ID provided',
-        404,
-        `/groups/${id}`,
-      ));
-    }
     if (!req.file) {
       return next(new APIError(
         'Group Could not upload file',
@@ -155,10 +145,15 @@ const Group = {
       fileName, userId, new Date(),
     );
 
-    result = await GroupModel.update(
-      { _id: result.id },
-      { $push: { images: image } },
-    );
+    try {
+      result = await GroupModel.findByIdAndUpdate(
+        id,
+        { $push: { images: image } },
+        { new: true },
+      ).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
 
     return res.status(200).send(result.toJSON());
   },
