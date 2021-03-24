@@ -169,40 +169,40 @@ groups.post('/join/:inviteCode', Group.join);
  * @swagger
  * path:
  * /groups/{id}:
- *   post:
- *     description: Uploads an image to a group
- *     summary: Upload an image to a group
- *     tags:
- *     - Group
+ *    post:
+ *      description: Uploads an image to a group
+ *      summary: Upload an image to a group
+ *      tags:
+ *      - Group
  *
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *          type: string
- *         description: The ID of the group to upload the picture to
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *            type: string
+ *          description: The ID of the group to upload the picture to
  *
- *       requestBody:
+ *      requestBody:
  *        required: true
  *        content:
- *            multipart/form-data:
- *                schema:
- *                  $ref: #/components/schemas/GroupUpload
+ *          multipart/form-data:
+ *            schema:
+ *              $ref: '#/components/schemas/GroupUpload'
  *
- *        produces:
- *          - application/json
- *        responses:
- *          200:
- *            description: OK
- *            content:
- *              application/json:
- *                schema:
- *                  $ref: '#/components/schemas/Group
- *          404:
- *            description: Invalid Group ID
- *          500:
- *            description: Internal error
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        200:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/Group'
+ *        404:
+ *          description: Invalid Group ID
+ *        500:
+ *          description: Internal error
  */
 groups.post('/:id', upload.single('picture'), Group.upload);
 
