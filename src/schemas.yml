@@ -113,8 +113,11 @@ GroupUpload:
     body:
       type: object
       format: json
-      $ref: '#/components/schemas/Group'
-    picture:
+      properties:
+        userId:
+          type: string
+          example: 7834dfae4eb89145bc13b559
+    groupPicture:
       type: string
       format: binary
 Image:
@@ -123,9 +126,10 @@ Image:
   properties:
     fileName:
       type: string
+      format: uuid
       required: true
     creator:
       type: string
     dateUploaded:
       type: string
-      format: date
+      format: date-time
