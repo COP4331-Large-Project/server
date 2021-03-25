@@ -9,7 +9,7 @@ let app;
 // Initialize the web app.
 beforeAll(async () => {
   app = await initWebServer(app);
-});
+}, 10000);
 
 describe('User API methods', () => {
   // Random username generation
