@@ -1,11 +1,7 @@
-import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { logger } from '../globals';
 
 const connectToDB = async () => {
-  // Load in environment variables from file.
-  dotenv.config();
-
   // Connection options
   const connectionOptions = {
     useNewUrlParser: true,

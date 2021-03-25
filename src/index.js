@@ -1,7 +1,10 @@
+import dotenv from 'dotenv';
 import { logger } from './globals';
 import initWebServer from './services/webServer';
 
 (async function main() {
+  // Load in environment variables from file.
+  dotenv.config();
   const app = await initWebServer();
 
   // Log host
