@@ -117,14 +117,15 @@ const Group = {
   },
 
   upload: async (req, res, next) => {
-    const { id, userId } = req.params;
+    const { id } = req.params;
+    const { userId } = req.body;
     let result;
 
     if (!req.file) {
       return next(new APIError(
         'Group Could not upload file',
         'No file provided',
-        500,
+        415,
         `/groups/${id}`,
       ));
     }
@@ -141,9 +142,11 @@ const Group = {
       return next(new APIError());
     }
 
-    const image = new ImageModel(
-      fileName, userId, new Date(),
-    );
+    const image = new ImageModel({
+      fileName,
+      creator: userId,
+      dateUploaded: new Date(),
+    });
 
     try {
       result = await GroupModel.findByIdAndUpdate(
