@@ -8,6 +8,7 @@
 import express from 'express';
 import multer from 'multer';
 import User from '../controllers/user';
+import { authenticate } from '../services/JWTAuthentication';
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -112,7 +113,7 @@ router.post('/login', User.login);
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-router.delete('/:userID', User.delete);
+router.delete('/:userID', authenticate, User.delete);
 
 /**
  * @swagger
@@ -148,7 +149,7 @@ router.delete('/:userID', User.delete);
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-router.get('/:id', User.fetch);
+router.get('/:id', authenticate, User.fetch);
 
 /**
  * @swagger
@@ -189,6 +190,6 @@ router.get('/:id', User.fetch);
  *        500:
  *          description: Internal error
  */
-router.put('/:id', upload.single('avatar'), User.update);
+router.put('/:id', authenticate, upload.single('avatar'), User.update);
 
 export default router;
