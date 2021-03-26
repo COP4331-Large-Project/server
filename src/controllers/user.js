@@ -71,7 +71,7 @@ const User = {
     // Strip sensitive info
     const reifiedUser = user.toJSON();
     delete reifiedUser.password;
-    reifiedUser.token = createToken(reifiedUser.id);
+    reifiedUser.token = createToken({ id: reifiedUser.id }, 1);
 
     return res.status(200).send(reifiedUser);
   },
