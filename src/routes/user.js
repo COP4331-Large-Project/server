@@ -113,7 +113,7 @@ router.post('/login', User.login);
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-router.delete('/:userID', authenticate, User.delete);
+router.delete('/:id', authenticate, User.delete);
 
 /**
  * @swagger
