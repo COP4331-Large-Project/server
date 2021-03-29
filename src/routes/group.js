@@ -143,7 +143,7 @@ groups.delete('/:id', Group.delete);
  *            schema:
  *              type: object
  *              properties:
- *                userID:
+ *                user:
  *                  type: String
  *                  example: 5424dfae4eb45345bc13b778
  *
