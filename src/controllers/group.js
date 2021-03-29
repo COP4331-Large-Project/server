@@ -1,7 +1,10 @@
 import mongoose from 'mongoose';
+import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import GroupModel from '../models/group';
+import ImageModel from '../models/image';
 import APIError from '../services/APIError';
+import S3 from '../services/S3';
 
 const { ObjectId } = mongoose.Types;
 
@@ -19,7 +22,7 @@ const Group = {
     try {
       newGroup.inviteCode = uuidv4();
       const group = await newGroup.save();
-      return res.send(group.toJSON());
+      return res.status(200).send(group.toJSON());
     } catch (err) {
       return next(new APIError());
     }
@@ -42,7 +45,7 @@ const Group = {
       );
     }
 
-    const group = groupResult.toJSON();
+    const group = groupResult;
 
     // Check if user is authorized to join.
     if (!ObjectId.isValid(req.body.user)) {
@@ -104,6 +107,60 @@ const Group = {
     if (!result) {
       return next(new APIError(
         'Group Could not be deleted',
+        'No such Group exists',
+        404,
+        `/groups/${id}/`,
+      ));
+    }
+
+    return res.status(204).send();
+  },
+
+  upload: async (req, res, next) => {
+    const { id } = req.params;
+    const { userId } = req.body;
+    let result;
+
+    if (!req.file) {
+      return next(new APIError(
+        'Group Could not upload file',
+        'No file provided',
+        415,
+        `/groups/${id}`,
+      ));
+    }
+
+    const imageBuffer = await sharp(req.file.buffer)
+      .jpeg()
+      .toBuffer();
+    const fileName = `${uuidv4()}.jpeg`;
+    const key = `groups/${id}/${fileName}`;
+
+    try {
+      await S3.uploadObject(key, imageBuffer);
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    const image = new ImageModel({
+      fileName,
+      creator: userId,
+      dateUploaded: new Date(),
+    });
+
+    try {
+      result = await GroupModel.findByIdAndUpdate(
+        id,
+        { $push: { images: image } },
+        { new: true },
+      ).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    if (!result) {
+      return next(new APIError(
+        'Group photo could not be uploaded.',
         'No such Group exists',
         404,
         `/groups/${id}/`,

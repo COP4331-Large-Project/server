@@ -6,8 +6,10 @@
  */
 
 import express from 'express';
+import multer from 'multer';
 import Group from '../controllers/group';
 
+const upload = multer({ storage: multer.memoryStorage() });
 const groups = express.Router();
 
 /**
@@ -141,7 +143,7 @@ groups.delete('/:id', Group.delete);
  *            schema:
  *              type: object
  *              properties:
- *                userID:
+ *                user:
  *                  type: String
  *                  example: 5424dfae4eb45345bc13b778
  *
@@ -162,5 +164,46 @@ groups.delete('/:id', Group.delete);
  *                $ref: '#/components/schemas/APIError'
  */
 groups.post('/join/:inviteCode', Group.join);
+
+/**
+ * @swagger
+ * path:
+ * /groups/{id}:
+ *    put:
+ *      description: Uploads an image to a group
+ *      summary: Upload an image to a group
+ *      tags:
+ *      - Group
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *            type: string
+ *          description: The ID of the group to upload the picture to
+ *
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          multipart/form-data:
+ *            schema:
+ *              $ref: '#/components/schemas/GroupUpload'
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        200:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/Group'
+ *        404:
+ *          description: Invalid Group ID
+ *        415:
+ *          description: File not provided
+ */
+groups.put('/:id', upload.single('groupPicture'), Group.upload);
 
 export default groups;
