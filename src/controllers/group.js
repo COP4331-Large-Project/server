@@ -158,7 +158,16 @@ const Group = {
       return next(new APIError());
     }
 
-    return res.status(200).send(result.toJSON());
+    if (!result) {
+      return next(new APIError(
+        'Group photo could not be uploaded.',
+        'No such Group exists',
+        404,
+        `/groups/${id}/`,
+      ));
+    }
+
+    return res.status(204).send();
   },
 };
 
