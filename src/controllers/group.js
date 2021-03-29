@@ -22,7 +22,7 @@ const Group = {
     try {
       newGroup.inviteCode = uuidv4();
       const group = await newGroup.save();
-      return res.send(group.toJSON());
+      return res.status(200).send(group.toJSON());
     } catch (err) {
       return next(new APIError());
     }
@@ -45,7 +45,7 @@ const Group = {
       );
     }
 
-    const group = groupResult.toJSON();
+    const group = groupResult;
 
     // Check if user is authorized to join.
     if (!ObjectId.isValid(req.body.user)) {
