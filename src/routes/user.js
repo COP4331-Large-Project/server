@@ -113,7 +113,7 @@ router.post('/login', User.login);
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-router.delete('/:id', authenticate, User.delete);
+router.delete('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, User.delete);
 
 /**
  * @swagger
@@ -149,7 +149,7 @@ router.delete('/:id', authenticate, User.delete);
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-router.get('/:id', authenticate, User.fetch);
+router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, User.fetch);
 
 /**
  * @swagger
@@ -190,6 +190,6 @@ router.get('/:id', authenticate, User.fetch);
  *        500:
  *          description: Internal error
  */
-router.put('/:id', authenticate, upload.single('avatar'), User.update);
+router.put('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, upload.single('avatar'), User.update);
 
 export default router;
