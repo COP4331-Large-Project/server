@@ -63,4 +63,4 @@ const authenticate = (req, res, next, toCheck) => {
   return next();
 };
 
-export default { createToken, authenticate };
+export { createToken, authenticate };
