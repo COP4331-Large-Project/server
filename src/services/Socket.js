@@ -1,5 +1,20 @@
+import http from 'http';
 import socket from 'socket.io';
 
-const io = socket({ path: '/groups' });
+const Socket = {
+  initSocket: (app) => {
+    const httpServer = http.createServer(app);
+    this.server = socket(httpServer);
 
-export default io;
+    this.server.on('connection', (client) => {
+      client.on('fetch', async (groupId) => {
+        client.rooms.clear();
+        client.join(groupId);
+      });
+    });
+
+    httpServer.listen(3000);
+  },
+};
+
+export default Socket;
