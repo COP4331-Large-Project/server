@@ -4,7 +4,9 @@ import APIError from './APIError';
 // 15 minutes
 const defaultExpireTime = 1000 * 60 * 15;
 
-const createToken = (payload, expiresIn = defaultExpireTime) => jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
+const createToken = (payload, expiresIn = defaultExpireTime) => jwt.sign(
+  payload, process.env.JWT_SECRET, { expiresIn },
+);
 
 /**
  * Gets token from header and returns the decoded value if it validates
