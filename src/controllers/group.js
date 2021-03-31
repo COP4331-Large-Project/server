@@ -22,7 +22,7 @@ const Group = {
     try {
       newGroup.inviteCode = uuidv4();
       const group = await newGroup.save();
-      return res.send(group.toJSON());
+      return res.status(200).send(group.toJSON());
     } catch (err) {
       return next(new APIError());
     }
@@ -45,7 +45,7 @@ const Group = {
       );
     }
 
-    const group = groupResult.toJSON();
+    const group = groupResult;
 
     // Check if user is authorized to join.
     if (!ObjectId.isValid(req.body.user)) {
@@ -117,14 +117,15 @@ const Group = {
   },
 
   upload: async (req, res, next) => {
-    const { id, userId } = req.params;
+    const { id } = req.params;
+    const { userId } = req.body;
     let result;
 
     if (!req.file) {
       return next(new APIError(
         'Group Could not upload file',
         'No file provided',
-        500,
+        415,
         `/groups/${id}`,
       ));
     }
@@ -141,9 +142,11 @@ const Group = {
       return next(new APIError());
     }
 
-    const image = new ImageModel(
-      fileName, userId, new Date(),
-    );
+    const image = new ImageModel({
+      fileName,
+      creator: userId,
+      dateUploaded: new Date(),
+    });
 
     try {
       result = await GroupModel.findByIdAndUpdate(
@@ -155,7 +158,16 @@ const Group = {
       return next(new APIError());
     }
 
-    return res.status(200).send(result.toJSON());
+    if (!result) {
+      return next(new APIError(
+        'Group photo could not be uploaded.',
+        'No such Group exists',
+        404,
+        `/groups/${id}/`,
+      ));
+    }
+
+    return res.status(204).send();
   },
 };
 

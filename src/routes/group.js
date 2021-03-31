@@ -143,7 +143,7 @@ groups.delete('/:id', Group.delete);
  *            schema:
  *              type: object
  *              properties:
- *                userID:
+ *                user:
  *                  type: String
  *                  example: 5424dfae4eb45345bc13b778
  *
@@ -169,7 +169,7 @@ groups.post('/join/:inviteCode', Group.join);
  * @swagger
  * path:
  * /groups/{id}:
- *    post:
+ *    put:
  *      description: Uploads an image to a group
  *      summary: Upload an image to a group
  *      tags:
@@ -201,9 +201,9 @@ groups.post('/join/:inviteCode', Group.join);
  *                $ref: '#/components/schemas/Group'
  *        404:
  *          description: Invalid Group ID
- *        500:
- *          description: Internal error
+ *        415:
+ *          description: File not provided
  */
-groups.post('/:id', upload.single('picture'), Group.upload);
+groups.put('/:id', upload.single('groupPicture'), Group.upload);
 
 export default groups;
