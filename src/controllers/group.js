@@ -5,6 +5,7 @@ import GroupModel from '../models/group';
 import ImageModel from '../models/image';
 import APIError from '../services/APIError';
 import S3 from '../services/S3';
+import Socket from "../services/Socket";
 
 const { ObjectId } = mongoose.Types;
 
@@ -166,6 +167,8 @@ const Group = {
         `/groups/${id}/`,
       ));
     }
+
+    Socket.server.to(id).emit('picture uploaded', { group_id: id, url: await S3.getPreSignedURL(key) });
 
     return res.status(204).send();
   },
