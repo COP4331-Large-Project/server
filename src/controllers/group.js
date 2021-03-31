@@ -5,7 +5,7 @@ import GroupModel from '../models/group';
 import ImageModel from '../models/image';
 import APIError from '../services/APIError';
 import S3 from '../services/S3';
-import Socket from "../services/Socket";
+import Socket from '../services/Socket';
 
 const { ObjectId } = mongoose.Types;
 
