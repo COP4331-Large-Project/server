@@ -190,6 +190,50 @@ router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  *        500:
  *          description: Internal error
  */
-router.put('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, upload.single('avatar'), User.update);
+router.put('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, User.update);
+
+/**
+ * @swagger
+ * path:
+ * /users/{id}/profile:
+ *    put:
+ *      description: Updates an existing user.
+ *      summary: Update an existing user.
+ *      tags:
+ *        - User
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *           type: integer
+ *          description: The ID of the user to upload the profile image to.
+ *
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          multipart/form-data:
+ *            schema:
+ *              type: string
+ *              format: binary
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        204:
+ *          description: Successfully Updated
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/UserResponse'
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
+router.put('/:id/profile', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, upload.single('avatar'), User.uploadProfile);
 
 export default router;

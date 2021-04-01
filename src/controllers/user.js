@@ -146,9 +146,17 @@ const User = {
       ));
     }
 
+    return res.status(200).send(result.toJSON());
+  },
+  uploadProfile: async (req, res, next) => {
+    const { id } = req.params;
+
     // If there was no file attached we're done.
     if (!req.file) {
-      return res.status(200).send(result.toJSON());
+      return next(new APIError(
+        'Could not upload profile photo',
+        'The image payload is empty',
+      ));
     }
 
     const imageBuffer = await sharp(req.file.buffer)
@@ -166,10 +174,7 @@ const User = {
       next(new APIError());
     }
 
-    const retVal = result.toJSON();
-    retVal.imgURL = imgURL;
-
-    return res.status(200).send(retVal);
+    return res.status(200).send({ imgURL });
   },
 };
 
