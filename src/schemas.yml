@@ -13,16 +13,6 @@ APIError:
     instance:
       type: string
       example: /path/to/resource
-UserUpdate:
-  type: object
-  properties:
-    body:
-      type: object
-      format: json
-      $ref: '#/components/schemas/UserRequest'
-    avatar:
-      type: string
-      format: binary
 UserLogin:
   properties:
     username:

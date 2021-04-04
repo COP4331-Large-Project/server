@@ -172,9 +172,9 @@ router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  *      requestBody:
  *        required: true
  *        content:
- *          multipart/form-data:
+ *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/UserUpdate'
+ *              $ref: '#/components/schemas/UserRequest'
  *
  *      produces:
  *        - application/json
@@ -186,9 +186,13 @@ router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  *              schema:
  *                $ref: '#/components/schemas/UserResponse'
  *        404:
- *          description: Username/password combination is incorrect
- *        500:
- *          description: Internal error
+ *          description: User not found
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
  */
 router.put('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, User.update);
 
