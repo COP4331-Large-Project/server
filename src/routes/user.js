@@ -98,7 +98,7 @@ router.post('/login', User.login);
  *          name: id
  *          required: true
  *          schema:
- *           type: integer
+ *           type: string
  *          description: The ID of the user to delete.
  *
  *      produces:
@@ -166,7 +166,7 @@ router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  *          name: id
  *          required: true
  *          schema:
- *           type: integer
+ *           type: string
  *          description: The ID of the user to update.
  *
  *      requestBody:
@@ -197,8 +197,8 @@ router.put('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  * path:
  * /users/{id}/profile:
  *    put:
- *      description: Updates an existing user.
- *      summary: Update an existing user.
+ *      description: Upload profile picture to user.
+ *      summary: Update an existing user with a new profile picture.
  *      tags:
  *        - User
  *
@@ -207,7 +207,7 @@ router.put('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  *          name: id
  *          required: true
  *          schema:
- *           type: integer
+ *           type: string
  *          description: The ID of the user to upload the profile image to.
  *
  *      requestBody:
@@ -215,18 +215,25 @@ router.put('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  *        content:
  *          multipart/form-data:
  *            schema:
- *              type: string
- *              format: binary
+ *              type: object
+ *              properties:
+ *                avatar:
+ *                  type: string
+ *                  format: binary
  *
  *      produces:
  *        - application/json
  *      responses:
- *        204:
- *          description: Successfully Updated
+ *        200:
+ *          description: Successfully Uploaded Profile Image
  *          content:
  *            application/json:
  *              schema:
- *                $ref: '#/components/schemas/UserResponse'
+ *                type: object
+ *                properties:
+ *                  imgURL:
+ *                      type: string
+ *                      example: "https://url/to/profile/image.jpeg"
  *        default:
  *          description: Unexpected Error
  *          content:
