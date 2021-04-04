@@ -4,6 +4,7 @@ import APIError from '../services/APIError';
 import PasswordHasher from '../services/PasswordHasher';
 import S3 from '../services/S3';
 import { logger } from '../globals';
+import { createToken } from '../services/JWTAuthentication';
 
 const User = {
   register: async (req, res, next) => {
@@ -70,6 +71,7 @@ const User = {
     // Strip sensitive info
     const reifiedUser = user.toJSON();
     delete reifiedUser.password;
+    reifiedUser.token = createToken({ id: reifiedUser.id });
 
     return res.status(200).send(reifiedUser);
   },
