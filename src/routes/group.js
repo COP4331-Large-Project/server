@@ -95,13 +95,13 @@ groups.post('/', Group.register);
  *      tags:
  *        - Group
  *
- *      requestBody:
- *        required: true
- *
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/GroupRequest'
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *           type: string
+ *          description: The ID of the group to delete.
  *
  *      produces:
  *        - application/json
