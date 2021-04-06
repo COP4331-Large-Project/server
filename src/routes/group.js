@@ -204,7 +204,7 @@ groups.post('/join/:inviteCode', Group.join);
 /**
  * @swagger
  * path:
- * /groups/{id}:
+ * /groups/{id}/uploadImage:
  *    put:
  *      description: Uploads an image to a group
  *      summary: Upload an image to a group
@@ -239,7 +239,54 @@ groups.post('/join/:inviteCode', Group.join);
  *          description: Invalid Group ID
  *        415:
  *          description: File not provided
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
  */
-groups.put('/:id', upload.single('groupPicture'), Group.upload);
+groups.put('/:id/uploadImage', upload.single('groupPicture'), Group.upload);
+
+/**
+ * @swagger
+ * path:
+ * /groups/{id}:
+ *    put:
+ *      description: Updates a group
+ *      summary: Updates the content of a group
+ *      tags:
+ *      - Group
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *            type: string
+ *          description: The ID of the group to update
+ *
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/GroupUpdate'
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        204:
+ *          description: OK
+ *        409:
+ *          description: Name taken
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
+groups.put('/:id', Group.update);
 
 export default groups;

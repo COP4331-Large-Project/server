@@ -13,11 +13,11 @@ const { ObjectId } = mongoose.Types;
 const Group = {
   register: async (req, res, next) => {
     const {
-      users, creator, invitedUsers, publicGroup, images,
+      users, creator, invitedUsers, publicGroup, name,
     } = req.body;
     const newGroup = new GroupModel(
       {
-        users, creator, invitedUsers, publicGroup, images,
+        users, creator, invitedUsers, publicGroup, name,
       },
     );
 
@@ -186,6 +186,29 @@ const Group = {
     image.URL = await S3.getPreSignedURL(key);
 
     return res.status(204).send(image);
+  },
+
+  update: async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+      await GroupModel.findByIdAndUpdate(
+        id,
+        req.body,
+      );
+    } catch (err) {
+      if (err.code === 11000) {
+        return next(new APIError(
+          'Name is taken',
+          'The name you provided is already taken.',
+          409,
+        ));
+      }
+
+      return next(new APIError());
+    }
+
+    return res.status(204).send();
   },
 };
 

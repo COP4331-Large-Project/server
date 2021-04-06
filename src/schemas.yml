@@ -97,6 +97,15 @@ GroupRequest:
     creator:
       type: string
       required: true
+    name:
+      type: string
+      required: true
+GroupUpdate:
+  type: object
+  properties:
+    name:
+      type: string
+      required: true
 GroupUpload:
   type: object
   properties:
