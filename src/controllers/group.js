@@ -107,7 +107,8 @@ const Group = {
     for (let i = 0; i < result.images.length; i += 1) {
       result.images[i].URL = await S3.getPreSignedURL(`groups/${result._id}/${result.images[i].fileName}`);
     }
-    result = { result, thumbnail: result.images[0] };
+    result = result.toJSON();
+    [result.thumbnail] = result.images;
     return res.status(200).send(result);
   },
 
