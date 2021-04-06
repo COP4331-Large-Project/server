@@ -30,12 +30,12 @@ const Group = {
 
   join: async (req, res, next) => {
     const { inviteCode } = req.params;
-    const groupResult = (await GroupModel
+    const group = (await GroupModel
       .findOne({ inviteCode })
       .exec());
 
     // Check if group is found.
-    if (groupResult === null) {
+    if (group === null) {
       return next(
         new APIError(
           'Group not found',
@@ -44,8 +44,6 @@ const Group = {
         ),
       );
     }
-
-    const group = groupResult;
 
     // Check if user is authorized to join.
     if (!ObjectId.isValid(req.body.user)) {
@@ -59,9 +57,10 @@ const Group = {
     const user = ObjectId(req.body.user);
     const authorizedUser = (group.users).some(x => x.equals(user));
 
+    // if the user is authorized, send the auto-populated group
     // eslint-disable-next-line no-underscore-dangle
     if (group.creator._id.equals(user._id) || authorizedUser) {
-      return res.status(204).send();
+      return res.status(204).send(group);
     }
 
     return next(new APIError(
