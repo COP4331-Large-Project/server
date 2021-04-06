@@ -1,8 +1,9 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
-import GroupModel from '../models/group';
-import ImageModel from '../models/image';
+import { Image as ImageModel, Group as GroupModel } from '../models/group';
 import APIError from '../services/APIError';
 import S3 from '../services/S3';
 
@@ -89,7 +90,10 @@ const Group = {
         `/groups/${id}`,
       ));
     }
-
+    // eslint-disable-next-line max-len
+    for (let i = 0; i < result.images.length; i += 1) {
+      result.images[i].URL = await S3.getPreSignedURL(`groups/${result._id}/${result.images[i].fileName}`);
+    }
     return res.status(200).send(result.toJSON());
   },
 
@@ -166,7 +170,9 @@ const Group = {
       ));
     }
 
-    return res.status(204).send();
+    image.URL = await S3.getPreSignedURL(key);
+
+    return res.status(204).send(image);
   },
 };
 

@@ -4,6 +4,9 @@ import User from './user';
 const modelName = 'Group';
 
 const imageSchema = new mongoose.Schema({
+  // This field will always be empty in the database
+  // It is just a field that will be used manually
+  URL: String,
   fileName: { type: String, required: true, unique: true },
   creator: { type: mongoose.Schema.Types.ObjectId, ref: User },
   dateUploaded: { type: Date, required: true },
@@ -32,4 +35,6 @@ groupSchema
 
 const Group = mongoose.model(modelName, groupSchema);
 
-export default Group;
+const Image = mongoose.model('Image', imageSchema);
+
+export { Group, Image };
