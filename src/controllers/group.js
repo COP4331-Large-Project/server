@@ -210,6 +210,39 @@ const Group = {
 
     return res.status(204).send();
   },
+
+  thumbnail: async (req, res, next) => {
+    const { id } = req.params;
+    let group;
+
+    try {
+      group = await GroupModel.findOne({ _id: id }).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    if (!group) {
+      return next(new APIError(
+        'Could not find Group',
+        `Group with id ${id} could not be found.`,
+        404,
+        `/groups/${id}`,
+      ));
+    }
+
+    if (group.images.length === 0) {
+      return next(new APIError(
+        'No image to show',
+        `Group with id ${id} does not have any images.`,
+        404,
+        `/groups/${id}`,
+      ));
+    }
+    // eslint-disable-next-line max-len
+    const image = group.images[0];
+    image.URL = await S3.getPreSignedURL(`groups/${group._id}/${image.fileName}`);
+    return res.status(200).send(image);
+  },
 };
 
 export default Group;

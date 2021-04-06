@@ -82,7 +82,7 @@ groups.get('/:id', Group.fetch);
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-// groups.get(':/thumbnail/:id', Group.thumbnail);
+groups.get('/thumbnail/:id', Group.thumbnail);
 
 /**
  * @swagger
