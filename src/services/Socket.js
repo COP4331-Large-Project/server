@@ -6,11 +6,7 @@ let httpServer;
 
 const Socket = {
   createServer: (app) => {
-    if (!app) {
-      httpServer = http.createServer();
-    } else {
-      httpServer = http.createServer(app);
-    }
+    httpServer = app ? http.createServer(app) : http.createServer();
 
     if (!io) {
       io = new socket.Server(httpServer);
