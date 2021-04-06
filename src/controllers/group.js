@@ -168,7 +168,7 @@ const Group = {
       ));
     }
 
-    Socket.server.to(id).emit('picture uploaded', { group_id: id, url: await S3.getPreSignedURL(key) });
+    Socket.getSocketServer().to(id).emit('picture uploaded', { group_id: id, url: await S3.getPreSignedURL(key) });
 
     return res.status(204).send();
   },
