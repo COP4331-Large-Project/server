@@ -1,9 +1,11 @@
 import request from 'supertest';
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
+import Client from 'socket.io-client';
 import initWebServer from '../services/webServer';
 import UserModel from '../models/user';
 import GroupModel from '../models/group';
+import { SocketInstance } from '../globals';
 
 let app;
 
@@ -20,17 +22,31 @@ const userPayload = {
 };
 
 let groupPayload;
+let server;
+let serverSocket;
+let clientSocket;
 
 // Initialize the web app.
-beforeAll(async () => {
+beforeAll(async (done) => {
   app = await initWebServer(app);
-}, 20000);
+  server = SocketInstance().getInstance(app);
+  server.httpServer.listen(3000, () => {
+    const { port } = server.httpServer.address();
+    clientSocket = new Client(`https://localhost:${port}`);
+    server.io.on('connection', (socket) => {
+      serverSocket = socket;
+    });
+    clientSocket.on('connect', done);
+  });
+}, 30000);
 
 afterAll(async (done) => {
   await UserModel.findOneAndDelete({ _id: userPayload.id });
   await GroupModel.findOneAndDelete({ inviteCode: groupPayload.inviteCode });
   // Shut down web server.
   await mongoose.connection.close();
+  server.io.close();
+  clientSocket.close();
   done();
 });
 
@@ -89,5 +105,25 @@ describe('Group API Methods', () => {
       .expect(204);
 
     groupPayload.invitedUsers = res.body.invitedUsers;
+  });
+});
+
+describe('Socket test', () => {
+  test('should work', (done) => {
+    clientSocket.on('hello', (arg) => {
+      expect(arg).toBe('world');
+      done();
+    });
+    serverSocket.emit('hello', 'world');
+  });
+
+  test('should work (with ack)', (done) => {
+    serverSocket.on('hi', (cb) => {
+      cb('hola');
+    });
+    clientSocket.emit('hi', (arg) => {
+      expect(arg).toBe('hola');
+      done();
+    });
   });
 });
