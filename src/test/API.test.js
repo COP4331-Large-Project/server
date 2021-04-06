@@ -8,6 +8,7 @@ import UserModel from '../models/user';
 import GroupModel from '../models/group';
 
 let app;
+jest.setTimeout(20000);
 
 // Random username generation
 const username = uuidv4();
@@ -75,7 +76,7 @@ describe('Group API Methods', () => {
   test('Creating new group', async () => {
     const res = await request(app)
       .post('/groups')
-      .send({ creator: userPayload.id })
+      .send({ creator: userPayload.id, name: 'My group name' })
       .expect('Content-Type', /json/)
       .expect(200);
 
