@@ -1,13 +1,26 @@
 import http from 'http';
-import socketio from 'socket.io';
+import socket from 'socket.io';
 
-class Socket {
-  constructor(app) {
-    this.httpServer = http.createServer(app);
-    this.io = new socketio.Server(this.httpServer);
+let io;
+let httpServer;
 
-    this.httpServer.listen(3000);
-  }
-}
+const Socket = {
+  createServer: (app) => {
+    if (!app) {
+      httpServer = http.createServer();
+    } else {
+      httpServer = http.createServer(app);
+    }
+
+    if (!io) {
+      io = new socket.Server(httpServer);
+    }
+
+    return io;
+  },
+
+  getSocketServer: () => io,
+  getHttpServer: () => httpServer,
+};
 
 export default Socket;
