@@ -11,7 +11,7 @@ const groupSchema = new mongoose.Schema({
   invitedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: User }],
   images: [{ type: mongoose.Schema.Types.ObjectId, ref: Image }],
   publicGroup: { type: Boolean, default: false },
-  name: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
 });
 
 const populateFields = 'users creator invitedUsers';
