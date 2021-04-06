@@ -98,7 +98,7 @@ router.post('/login', User.login);
  *          name: id
  *          required: true
  *          schema:
- *           type: integer
+ *           type: string
  *          description: The ID of the user to delete.
  *
  *      produces:
@@ -166,15 +166,15 @@ router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  *          name: id
  *          required: true
  *          schema:
- *           type: integer
+ *           type: string
  *          description: The ID of the user to update.
  *
  *      requestBody:
  *        required: true
  *        content:
- *          multipart/form-data:
+ *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/UserUpdate'
+ *              $ref: '#/components/schemas/UserRequest'
  *
  *      produces:
  *        - application/json
@@ -186,10 +186,65 @@ router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  *              schema:
  *                $ref: '#/components/schemas/UserResponse'
  *        404:
- *          description: Username/password combination is incorrect
- *        500:
- *          description: Internal error
+ *          description: User not found
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
  */
-router.put('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, upload.single('avatar'), User.update);
+router.put('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, User.update);
+
+/**
+ * @swagger
+ * path:
+ * /users/{id}/profile:
+ *    put:
+ *      description: Upload profile picture to user.
+ *      summary: Update an existing user with a new profile picture.
+ *      tags:
+ *        - User
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *           type: string
+ *          description: The ID of the user to upload the profile image to.
+ *
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          multipart/form-data:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                avatar:
+ *                  type: string
+ *                  format: binary
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        200:
+ *          description: Successfully Uploaded Profile Image
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  imgURL:
+ *                      type: string
+ *                      example: "https://url/to/profile/image.jpeg"
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
+router.put('/:id/profile', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, upload.single('avatar'), User.uploadProfile);
 
 export default router;
