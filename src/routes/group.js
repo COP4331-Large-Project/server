@@ -51,6 +51,42 @@ groups.get('/:id', Group.fetch);
 /**
  * @swagger
  * path:
+ * /groups/thumbnail/{id}:
+ *    get:
+ *      description: Gets a group thumnail
+ *      summary: Fetches the most recently uploaded picture
+ *      tags:
+ *        - Group
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *           type: string
+ *          description: The ID of the group to fetch from
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        200:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/Image'
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
+// groups.get(':/thumbnail/:id', Group.thumbnail);
+
+/**
+ * @swagger
+ * path:
  * /groups/:
  *    post:
  *      description: Creates a new group

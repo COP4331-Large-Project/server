@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import { Image as ImageModel, Group as GroupModel } from '../models/group';
+import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import S3 from '../services/S3';
 
@@ -12,11 +13,11 @@ const { ObjectId } = mongoose.Types;
 const Group = {
   register: async (req, res, next) => {
     const {
-      users, creator, invitedUsers, publicGroup,
+      users, creator, invitedUsers, publicGroup, images,
     } = req.body;
     const newGroup = new GroupModel(
       {
-        users, creator, invitedUsers, publicGroup,
+        users, creator, invitedUsers, publicGroup, images,
       },
     );
 
@@ -56,11 +57,16 @@ const Group = {
       ));
     }
     const user = ObjectId(req.body.user);
-    const authorizedUser = (group.users).some(x => x.equals(user));
+    const authorizedUser = (group.invitedUsers).some(x => x.equals(user));
 
     // if the user is authorized, send the auto-populated group
     // eslint-disable-next-line no-underscore-dangle
     if (group.creator._id.equals(user._id) || authorizedUser) {
+      await UserModel.findByIdAndUpdate(user, { $push: { groups: group._id } }).exec();
+      // remove user from group's invited users array
+      await group.update({ $pull: { invitedUsers: user } });
+      // put user into group's user array
+      await group.update({ $push: { users: user } });
       return res.status(204).send(group);
     }
 
@@ -94,7 +100,7 @@ const Group = {
     for (let i = 0; i < result.images.length; i += 1) {
       result.images[i].URL = await S3.getPreSignedURL(`groups/${result._id}/${result.images[i].fileName}`);
     }
-    return res.status(200).send(result.toJSON());
+    return res.status(200).send(result);
   },
 
   delete: async (req, res, next) => {

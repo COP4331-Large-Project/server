@@ -123,3 +123,5 @@ Image:
     dateUploaded:
       type: string
       format: date-time
+    URL:
+      type: string
