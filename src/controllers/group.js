@@ -32,7 +32,7 @@ const Group = {
 
   join: async (req, res, next) => {
     const { inviteCode } = req.params;
-    const group = (await GroupModel
+    let group = (await GroupModel
       .findOne({ inviteCode })
       .exec());
 
@@ -57,17 +57,24 @@ const Group = {
       ));
     }
     const user = ObjectId(req.body.user);
+
+    if (group.creator._id.equals(user._id)) {
+      return res.status(204).send(group.toJSON());
+    }
+
     const authorizedUser = (group.invitedUsers).some(x => x.equals(user));
 
-    // if the user is authorized, send the auto-populated group
-    // eslint-disable-next-line no-underscore-dangle
-    if (group.creator._id.equals(user._id) || authorizedUser) {
+    if (authorizedUser) {
       await UserModel.findByIdAndUpdate(user, { $push: { groups: group._id } }).exec();
       // remove user from group's invited users array
       await group.update({ $pull: { invitedUsers: user } });
       // put user into group's user array
       await group.update({ $push: { users: user } });
-      return res.status(204).send(group);
+      // get updated group information
+      group = (await GroupModel
+        .findOne({ inviteCode })
+        .exec());
+      return res.status(200).send(group.toJSON());
     }
 
     return next(new APIError(
