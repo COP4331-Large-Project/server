@@ -1,6 +1,6 @@
-import { logger } from './globals';
+import dotenv from 'dotenv';
+import { logger, SocketInstance } from './globals';
 import initWebServer from './services/webServer';
-import Socket from './services/Socket';
 
 (async function main() {
   // Load in environment variables from file.
@@ -16,5 +16,5 @@ import Socket from './services/Socket';
   app.listen(process.env.PORT || 5000);
 
   // Initialize socket
-  Socket.initSocket(app);
+  SocketInstance().getInstance(app);
 }());

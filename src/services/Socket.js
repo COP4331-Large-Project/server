@@ -1,20 +1,13 @@
 import http from 'http';
-import socket from 'socket.io';
+import socketio from 'socket.io';
 
-const Socket = {
-  initSocket: (app) => {
-    const httpServer = http.createServer(app);
-    this.server = socket(httpServer);
+class Socket {
+  constructor(app) {
+    this.httpServer = http.createServer(app);
+    this.io = new socketio.Server(this.httpServer);
 
-    this.server.on('connection', (client) => {
-      client.on('fetch', async (groupId) => {
-        client.rooms.clear();
-        client.join(groupId);
-      });
-    });
-
-    httpServer.listen(3000);
-  },
-};
+    this.httpServer.listen(3000);
+  }
+}
 
 export default Socket;
