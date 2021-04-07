@@ -195,7 +195,7 @@ router.put('/:id', upload.single('avatar'), User.update);
  * @swagger
  *  path:
  *  /users/verify/{id}:
- *    get:
+ *    post:
  *      description: This route verifies the user
  *      summary: Update the user by changing the verified to true
  *      tags:
@@ -210,7 +210,13 @@ router.put('/:id', upload.single('avatar'), User.update);
  *          description: The id of the user to be verified
  *
  *      requestBody:
- *        required: false
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              verificationCode:
+ *                type: string
+ *                format: uuid
  *
  *      produces:
  *        - application/json
@@ -224,6 +230,6 @@ router.put('/:id', upload.single('avatar'), User.update);
  *        404:
  *          description: Could not find user
  */
-router.get('verify/:id', User.verify);
+router.post('verify/:id', User.verify);
 
 export default router;
