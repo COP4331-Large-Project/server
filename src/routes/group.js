@@ -82,7 +82,7 @@ groups.get('/:id', Group.fetch);
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-groups.get('/thumbnail/:id', Group.thumbnail);
+groups.get('/:id/thumbnail/', Group.thumbnail);
 
 /**
  * @swagger
@@ -199,7 +199,9 @@ groups.delete('/:id', Group.delete);
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-groups.post('/join/:inviteCode', Group.join);
+groups.post('/:inviteCode/join/', Group.join);
+
+groups.post('/:id/invite', Group.inviteUsers);
 
 /**
  * @swagger

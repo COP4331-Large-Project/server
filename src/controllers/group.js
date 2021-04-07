@@ -1,3 +1,4 @@
+/* eslint-disable no-return-await */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
@@ -260,6 +261,44 @@ const Group = {
     const image = group.images[0];
     image.URL = await S3.getPreSignedURL(`groups/${group._id}/${image.fileName}`);
     return res.status(200).send(image);
+  },
+
+  inviteUsers: async (req, res, next) => {
+    const { id } = req.params;
+    const { invitedEmails } = req.body;
+    const group = (await GroupModel
+      .findById(id)
+      .exec());
+
+    // Check if group is found.
+    if (group === null) {
+      return next(
+        new APIError(
+          'Group not found',
+          'Group does not exist',
+          404,
+        ),
+      );
+    }
+
+    // get object ID of invited users based on given email
+    // if the email wasnt found, return null
+    let invitedUserIds = await Promise.all(
+      invitedEmails.map(
+        async (x) => {
+          const user = await UserModel.findOne({ email: x }).exec();
+          if (!user) return null;
+          return ObjectId(user._id);
+        },
+      ),
+    );
+
+    // if null, the user wasnt found, so just forget about them
+    invitedUserIds = invitedUserIds.filter((x) => x !== null);
+
+    await group.updateOne({ $push: { invitedUsers: invitedUserIds } });
+
+    return res.status(204).send();
   },
 };
 
