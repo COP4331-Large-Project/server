@@ -90,8 +90,7 @@ Group:
       items:
         $ref: '#/components/schemas/Image'
     thumbnail:
-      type: object
-        $ref: '#/components/schemas/Image'
+      $ref: '#/components/schemas/Image'
     publicGroup:
       type: boolean
 GroupRequest:

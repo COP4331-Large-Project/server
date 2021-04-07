@@ -201,6 +201,51 @@ groups.delete('/:id', Group.delete);
  */
 groups.post('/:inviteCode/join/', Group.join);
 
+/**
+ * @swagger
+ * path:
+ * /groups/{id}/invite:
+ *    post:
+ *      description: Invite users to a group
+ *      summary: Send an invitation email to each invited member and add a reference to the invited users in the group
+ *      tags:
+ *        - Group
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *           type: string
+ *          description: The id of the group that users are being invited to
+ *
+ *      requestBody:
+ *        required: true
+ *
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                invitedEmails:
+ *                  type: array
+ *                  items:
+ *                    type: string
+ *                    format: email
+ *                  example: ["john@gmail.com", "bob@yahoo.com"]
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        204:
+ *          description: OK
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
 groups.post('/:id/invite', Group.inviteUsers);
 
 /**
