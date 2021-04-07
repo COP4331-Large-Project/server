@@ -165,7 +165,7 @@ router.get('/:id', User.fetch);
  *          name: id
  *          required: true
  *          schema:
- *           type: integer
+ *           type: string
  *          description: The ID of the user to update.
  *
  *      requestBody:
@@ -190,5 +190,40 @@ router.get('/:id', User.fetch);
  *          description: Internal error
  */
 router.put('/:id', upload.single('avatar'), User.update);
+
+/**
+ * @swagger
+ *  path:
+ *  /users/verify/{id}:
+ *    get:
+ *      description: This route verifies the user
+ *      summary: Update the user by changing the verified to true
+ *      tags:
+ *      - Users
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *            type: string
+ *          description: The id of the user to be verified
+ *
+ *      requestBody:
+ *        required: false
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        200:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/UserResponse'
+ *        404:
+ *          description: Could not find user
+ */
+router.get('verify/:id', User.verify);
 
 export default router;

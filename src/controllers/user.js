@@ -3,6 +3,7 @@ import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import PasswordHasher from '../services/PasswordHasher';
 import S3 from '../services/S3';
+import SendGrid from '../services/SendGrid';
 import { logger } from '../globals';
 
 const User = {
@@ -38,6 +39,16 @@ const User = {
         ));
       }
 
+      const link = `http://imageus.io/users/verify/${user.toJSON().id}`;
+
+      await SendGrid.sendMessage({
+        to: email,
+        from: 'no-reply@imageus.io',
+        subject: 'Please Verify Your Account for ImageUs',
+        text: `${firstName} ${lastName},
+        Please verify your account by clicking the link below:
+        ${link}`,
+      });
       return next(new APIError());
     }
 
@@ -168,6 +179,28 @@ const User = {
     retVal.imgURL = imgURL;
 
     return res.status(200).send(retVal);
+  },
+
+  verify: async (req, res, next) => {
+    const { id } = req.params;
+    let result;
+
+    try {
+      result = await UserModel.findOneAndUpdate(id, { verified: true }).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    if (!result) {
+      return next(new APIError(
+        'User could not be found',
+        `User with id ${id} was not found`,
+        404,
+        `users/${id}`,
+      ));
+    }
+
+    return res.send(200).send(result.toJSON());
   },
 };
 
