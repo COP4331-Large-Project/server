@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
   // We set select to false here because we don't want to return the password in the response.
   password: { type: String, required: true, select: false },
   verified: { type: Boolean, required: true, default: false },
+  verificationCode: { type: String, required: true },
 });
 
 const User = mongoose.model(modelName, userSchema);
