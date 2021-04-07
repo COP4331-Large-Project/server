@@ -24,6 +24,7 @@ const Group = {
     try {
       newGroup.inviteCode = uuidv4();
       const group = await newGroup.save();
+      UserModel.findByIdAndUpdate(creator, { $push: { groups: group } });
       return res.status(200).send(group.toJSON());
     } catch (err) {
       return next(new APIError());
@@ -114,22 +115,35 @@ const Group = {
 
   delete: async (req, res, next) => {
     const { id } = req.params;
-    let result;
+    const user = ObjectId(req.body.user);
+    const group = await GroupModel.findOne({ _id: id }).exec();
 
-    try {
-      result = await GroupModel.findOneAndDelete({ _id: id }).exec();
-    } catch (err) {
-      return next(new APIError());
-    }
-
-    if (!result) {
+    if (!group) {
       return next(new APIError(
-        'Group Could not be deleted',
+        'Group could not be deleted',
         'No such Group exists',
         404,
         `/groups/${id}/`,
       ));
     }
+
+    // if the group creator is not truthy, they probably dont exist anymore
+    // just let anyone delete the group at that point
+    if (group.creator === 'undefined' || group.creator === null) {
+      await group.delete();
+      return res.status(204).send();
+    }
+
+    if (!group.creator._id.equals(user._id)) {
+      return next(new APIError(
+        'Group could not be deleted',
+        'User is not permitted',
+        403,
+        `/groups/${id}/`,
+      ));
+    }
+
+    await group.delete();
 
     return res.status(204).send();
   },
