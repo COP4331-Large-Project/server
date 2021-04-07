@@ -1,4 +1,5 @@
 import sharp from 'sharp';
+import { v4 as uuidv4 } from 'uuid';
 import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import PasswordHasher from '../services/PasswordHasher';
@@ -15,6 +16,8 @@ const User = {
     // Hash password
     const hashedPassword = await PasswordHasher.hash(password);
 
+    // Verification code
+    const verificationCode = uuidv4();
     // create new user model with given request body
     const newUser = new UserModel(
       {
@@ -23,6 +26,7 @@ const User = {
         email,
         username,
         password: hashedPassword,
+        verificationCode,
       },
     );
 
@@ -38,9 +42,16 @@ const User = {
           409,
         ));
       }
+      return next(new APIError());
+    }
 
-      const link = `http://imageus.io/users/verify/${user.toJSON().id}`;
+    // Strip sensitive info
+    const reifiedUser = user.toJSON();
+    delete reifiedUser.password;
 
+    const link = `http://imageus.io/verify/?id=${user.toJSON().id}&verificationCode=${verificationCode}`;
+
+    try {
       await SendGrid.sendMessage({
         to: email,
         from: 'no-reply@imageus.io',
@@ -49,12 +60,14 @@ const User = {
         Please verify your account by clicking the link below:
         ${link}`,
       });
-      return next(new APIError());
+    } catch (err) {
+      return next(new APIError(
+        'Failed to send email',
+        'An error occured while trying to send the email',
+        503,
+        err,
+      ));
     }
-
-    // Strip sensitive info
-    const reifiedUser = user.toJSON();
-    delete reifiedUser.password;
 
     return res.status(201).send(reifiedUser);
   },
