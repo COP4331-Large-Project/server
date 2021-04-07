@@ -160,8 +160,10 @@ const Group = {
       return next(new APIError());
     }
 
+    const { caption } = req.body;
     const image = new ImageModel({
       fileName,
+      caption,
       creator: userId,
       dateUploaded: new Date(),
     });
