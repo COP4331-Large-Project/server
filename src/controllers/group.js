@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-return-await */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
@@ -14,18 +15,19 @@ const { ObjectId } = mongoose.Types;
 const Group = {
   register: async (req, res, next) => {
     const {
-      users, creator, invitedUsers, publicGroup, name,
+      creator, publicGroup, name,
     } = req.body;
     const newGroup = new GroupModel(
       {
-        users, creator, invitedUsers, publicGroup, name,
+        creator, publicGroup, name,
       },
     );
-
     try {
       newGroup.inviteCode = uuidv4();
       const group = await newGroup.save();
-      UserModel.findByIdAndUpdate(creator, { $push: { groups: group } });
+      req.params.id = group._id;
+      // req.body.emails is used here!
+      await Group.inviteUsers(true)(req, res, next);
       return res.status(200).send(group.toJSON());
     } catch (err) {
       return next(new APIError());
@@ -117,7 +119,7 @@ const Group = {
   delete: async (req, res, next) => {
     const { id } = req.params;
     const user = ObjectId(req.body.user);
-    const group = await GroupModel.findOne({ _id: id }).exec();
+    const group = await GroupModel.findById(id).exec();
 
     if (!group) {
       return next(new APIError(
@@ -144,14 +146,14 @@ const Group = {
       ));
     }
 
-    await group.delete();
+    await group.deleteOne();
 
     return res.status(204).send();
   },
 
   upload: async (req, res, next) => {
     const { id } = req.params;
-    const { userId } = req.body;
+    const { userId, caption } = req.body;
     let result;
 
     if (!req.file) {
@@ -175,12 +177,10 @@ const Group = {
       return next(new APIError());
     }
 
-    const { caption } = req.body;
     const image = new ImageModel({
       fileName,
       caption,
       creator: userId,
-      dateUploaded: new Date(),
     });
 
     try {
@@ -263,9 +263,10 @@ const Group = {
     return res.status(200).send(image);
   },
 
-  inviteUsers: async (req, res, next) => {
+  // internalCall is used for the register endpoint so that a http response isnt sent
+  inviteUsers: (internalCall = false) => async (req, res, next) => {
     const { id } = req.params;
-    const { invitedEmails } = req.body;
+    const { emails } = req.body;
     const group = (await GroupModel
       .findById(id)
       .exec());
@@ -284,7 +285,7 @@ const Group = {
     // get object ID of invited users based on given email
     // if the email wasnt found, return null
     let invitedUserIds = await Promise.all(
-      invitedEmails.map(
+      emails.map(
         async (x) => {
           const user = await UserModel.findOne({ email: x }).exec();
           if (!user) return null;
@@ -297,6 +298,44 @@ const Group = {
     invitedUserIds = invitedUserIds.filter((x) => x !== null);
 
     await group.updateOne({ $push: { invitedUsers: invitedUserIds } });
+
+    if (!internalCall) return res.status(204).send();
+  },
+
+  removeUsers: async (req, res, next) => {
+    const { id } = req.params;
+    const users = req.body.users.map((x) => ObjectId(x));
+    const group = (await GroupModel
+      .findById(id)
+      .exec());
+
+    // Check if group is found.
+    if (group === null) {
+      return next(
+        new APIError(
+          'User not removed from group',
+          'Group does not exist',
+          404,
+        ),
+      );
+    }
+
+    // remove user refernces from this group
+    await group.updateOne(
+      {
+        $pull:
+        {
+          invitedUsers: { $in: users },
+          users: { $in: users },
+        },
+      },
+    );
+
+    // remove reference to this group from users
+    await UserModel.updateMany(
+      { groups: { $in: group._id } },
+      { $pull: { groups: group._id } },
+    );
 
     return res.status(204).send();
   },

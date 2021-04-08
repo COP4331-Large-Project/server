@@ -128,7 +128,7 @@ groups.post('/', Group.register);
  * /groups/{id}:
  *    delete:
  *      description: Deletes a group
- *      summary: Deletes a group with the given id
+ *      summary: Deletes a group with the given id, also deleting its own reference from involved users
  *      tags:
  *        - Group
  *
@@ -153,6 +153,47 @@ groups.post('/', Group.register);
  *                $ref: '#/components/schemas/APIError'
  */
 groups.delete('/:id', Group.delete);
+
+/**
+ * @swagger
+ * path:
+ * /groups/{id}/removeUsers:
+ *    delete:
+ *      description: Remove users from a group
+ *      summary: Removes users from a group, also removing the reference to this group in those users
+ *      tags:
+ *        - Group
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *           type: string
+ *          description: The ID of the group to delete from
+ *
+ *      requestBody:
+ *        description:
+ *        required: true
+ *
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/RemoveUsers'
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        204:
+ *          description: Successfully Removed
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
+groups.delete('/:id/removeUsers', Group.removeUsers);
 
 /**
  * @swagger
@@ -228,7 +269,7 @@ groups.post('/:inviteCode/join/', Group.join);
  *            schema:
  *              type: object
  *              properties:
- *                invitedEmails:
+ *                emails:
  *                  type: array
  *                  items:
  *                    type: string
