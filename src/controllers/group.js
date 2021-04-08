@@ -1,3 +1,4 @@
+/* eslint-disable import/no-duplicates */
 /* eslint-disable consistent-return */
 /* eslint-disable no-return-await */
 /* eslint-disable no-await-in-loop */
@@ -5,7 +6,8 @@
 import mongoose from 'mongoose';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
-import { Image as ImageModel, Group as GroupModel } from '../models/group';
+import GroupModel from '../models/group';
+import { Image as ImageModel } from '../models/group';
 import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import S3 from '../services/S3';

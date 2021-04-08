@@ -48,4 +48,5 @@ const Group = mongoose.model(modelName, groupSchema);
 
 const Image = mongoose.model('Image', imageSchema);
 
-export { Group, Image };
+export default Group;
+export { Image };
