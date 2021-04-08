@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-return-await */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
@@ -269,7 +270,6 @@ const Group = {
     const group = (await GroupModel
       .findById(id)
       .exec());
-    console.log(`id ${id} emails ${emails}`);
 
     // Check if group is found.
     if (group === null) {
@@ -293,7 +293,6 @@ const Group = {
         },
       ),
     );
-    console.log(`user ids ${invitedUserIds}`);
 
     // if null, the user wasnt found, so just forget about them
     invitedUserIds = invitedUserIds.filter((x) => x !== null);
