@@ -123,3 +123,6 @@ build/
 
 # Ignore IDEA
 .idea/
+
+# Ignore VSCode
+.vscode/
