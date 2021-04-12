@@ -6,7 +6,6 @@ import UserModel from '../models/user';
 import GroupModel from '../models/group';
 
 let app;
-jest.setTimeout(20000);
 
 // Random username generation
 const username = uuidv4();
@@ -28,6 +27,7 @@ beforeAll(async () => {
 }, 20000);
 
 afterAll(async () => {
+  console.log(groupPayload);
   await UserModel.findOneAndDelete({ _id: userPayload.id });
   await GroupModel.findOneAndDelete({ inviteCode: groupPayload.inviteCode });
   // Shut down web server.
