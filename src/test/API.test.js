@@ -7,6 +7,8 @@ import GroupModel from '../models/group';
 
 let app;
 
+jest.setTimeout(30000);
+
 // Random username generation
 const username = uuidv4();
 const password = 'test';
