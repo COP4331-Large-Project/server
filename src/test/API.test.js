@@ -77,7 +77,7 @@ describe('Group API Methods', () => {
     const res = await request(app)
       .post('/groups')
       .send({
-        creator: userPayload.id, name: 'My group name', publicGroup: true, emails: [],
+        creator: userPayload.id, publicGroup: true, emails: [],
       })
       .expect('Content-Type', /json/)
       .expect(200);
