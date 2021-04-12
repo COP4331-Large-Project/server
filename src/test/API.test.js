@@ -6,7 +6,8 @@ import UserModel from '../models/user';
 import GroupModel from '../models/group';
 
 let app;
-jest.setTimeout(20000);
+
+jest.setTimeout(30000);
 
 // Random username generation
 const username = uuidv4();
@@ -25,14 +26,13 @@ let groupPayload;
 // Initialize the web app.
 beforeAll(async () => {
   app = await initWebServer(app);
-}, 20000);
+});
 
-afterAll(async (done) => {
+afterAll(async () => {
   await UserModel.findOneAndDelete({ _id: userPayload.id });
   await GroupModel.findOneAndDelete({ inviteCode: groupPayload.inviteCode });
   // Shut down web server.
   await mongoose.connection.close();
-  done();
 });
 
 describe('User API methods', () => {
@@ -74,7 +74,9 @@ describe('Group API Methods', () => {
   test('Creating new group', async () => {
     const res = await request(app)
       .post('/groups')
-      .send({ creator: userPayload.id, name: 'My group name' })
+      .send({
+        creator: userPayload.id, name: 'My group Name', publicGroup: true, emails: [],
+      })
       .expect('Content-Type', /json/)
       .expect(200);
 
@@ -85,7 +87,7 @@ describe('Group API Methods', () => {
 
   test('Join new group', async () => {
     const res = await request(app)
-      .post(`/groups/join/${groupPayload.inviteCode}`)
+      .post(`/groups/${groupPayload.inviteCode}/join`)
       .send({ user: userPayload.id })
       .expect(204);
 

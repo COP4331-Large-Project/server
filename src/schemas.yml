@@ -89,6 +89,8 @@ Group:
       type: array
       items:
         $ref: '#/components/schemas/Image'
+    thumbnail:
+      $ref: '#/components/schemas/Image'
     publicGroup:
       type: boolean
 GroupRequest:
@@ -97,8 +99,19 @@ GroupRequest:
     creator:
       type: string
       required: true
+      example: 6054efc382a29147557b6b14
     name:
       type: string
+      required: true
+      example: My Wonderful Group
+    invitedUsers:
+      type: array
+      required: false
+      items:
+        type: string
+        example: 6054f640197f5b1ff87610da
+    publicGroup:
+      type: boolean
       required: true
 GroupUpdate:
   type: object
@@ -132,3 +145,14 @@ Image:
     dateUploaded:
       type: string
       format: date-time
+    URL:
+      type: string
+RemoveUsers:
+  type: object
+  properties:
+    users:
+      type: array
+      required: true
+      items:
+        type: string
+        example: 6054f640197f5b1ff87610da
