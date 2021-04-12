@@ -73,7 +73,9 @@ describe('Group API Methods', () => {
   test('Creating new group', async () => {
     const res = await request(app)
       .post('/groups')
-      .send({ creator: userPayload.id, name: 'My group name' })
+      .send({
+        creator: userPayload.id, name: 'My group name', publicGroup: true, emails: [],
+      })
       .expect('Content-Type', /json/)
       .expect(200);
 
@@ -84,7 +86,7 @@ describe('Group API Methods', () => {
 
   test('Join new group', async () => {
     const res = await request(app)
-      .post(`/groups/join/${groupPayload.inviteCode}`)
+      .post(`/groups/${groupPayload.inviteCode}/join`)
       .send({ user: userPayload.id })
       .expect(204);
 

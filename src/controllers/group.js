@@ -16,6 +16,7 @@ const { ObjectId } = mongoose.Types;
 
 const Group = {
   register: async (req, res, next) => {
+    // We will still use req.body.emails!
     const {
       creator, publicGroup, name,
     } = req.body;
