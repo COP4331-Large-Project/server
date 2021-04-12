@@ -26,12 +26,13 @@ beforeAll(async () => {
   app = await initWebServer(app);
 }, 20000);
 
-afterAll(async () => {
+afterAll(async (done) => {
   console.log(groupPayload);
   await UserModel.findOneAndDelete({ _id: userPayload.id });
   await GroupModel.findOneAndDelete({ inviteCode: groupPayload.inviteCode });
   // Shut down web server.
   await mongoose.connection.close();
+  done();
 });
 
 describe('User API methods', () => {
