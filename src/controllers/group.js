@@ -29,6 +29,7 @@ const Group = {
       await Group.inviteUsers(true)(req, res, next);
       return res.status(200).send(group.toJSON());
     } catch (err) {
+      console.log(err);
       return next(new APIError());
     }
   },
