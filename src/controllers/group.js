@@ -1,13 +1,9 @@
-/* eslint-disable import/no-duplicates */
 /* eslint-disable consistent-return */
-/* eslint-disable no-return-await */
-/* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
-import GroupModel from '../models/group';
-import { Image as ImageModel } from '../models/group';
+import GroupModel, { Image as ImageModel } from '../models/group';
 import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import S3 from '../services/S3';
@@ -110,10 +106,19 @@ const Group = {
         `/groups/${id}`,
       ));
     }
-    // eslint-disable-next-line max-len
-    for (let i = 0; i < result.images.length; i += 1) {
-      result.images[i].URL = await S3.getPreSignedURL(`groups/${result._id}/${result.images[i].fileName}`);
-    }
+
+    // We need to use Promise.all() here because it's more performant than using a for
+    // loop with `await` on each iteration. In a for-loop with await on every iteration,
+    // *each* iteration waits on the prior one to complete. This is slower than making each
+    // iteration asynchronous and then waiting for *all* of them to resolve *after* they're
+    // all added.
+    //
+    // source: https://eslint.org/docs/rules/no-await-in-loop
+    await Promise.all(result.images.map(async (item) => {
+      const itemCpy = item;
+      itemCpy.URL = await S3.getPreSignedURL(`groups/${result._id}/${item.fileName}`);
+    }));
+
     result = result.toJSON();
     [result.thumbnail] = result.images;
     return res.status(200).send(result);
