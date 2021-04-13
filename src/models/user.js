@@ -13,6 +13,9 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true, select: false },
   verified: { type: Boolean, required: true, default: false },
   verificationCode: { type: String, required: true },
+  // We specify the reference by giving the model name rather than a refernce to the model
+  // because it would create a circular dependency
+  groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
 });
 
 const User = mongoose.model(modelName, userSchema);
