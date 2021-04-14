@@ -7,6 +7,7 @@ import GroupModel, { Image as ImageModel } from '../models/group';
 import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import S3 from '../services/S3';
+import SendGrid from "../services/SendGrid";
 
 const { ObjectId } = mongoose.Types;
 
@@ -292,20 +293,36 @@ const Group = {
 
     // get object ID of invited users based on given email
     // if the email wasnt found, return null
-    let invitedUserIds = await Promise.all(
+    let invitedUser = await Promise.all(
       emails.map(
         async (x) => {
           const user = await UserModel.findOne({ email: x }).exec();
           if (!user) return null;
-          return ObjectId(user._id);
+          return user;
         },
       ),
     );
 
     // if null, the user wasnt found, so just forget about them
-    invitedUserIds = invitedUserIds.filter((x) => x !== null);
+    invitedUser = invitedUser.filter((x) => x !== null);
 
-    await group.updateOne({ $push: { invitedUsers: invitedUserIds } });
+    await group.updateOne({ $push: { invitedUsers: invitedUser } });
+
+    invitedUser.forEach((user) => {
+      const link = `http://imageus.io/groups/invite/?inviteCode=${group.inviteCode}&userId=${user._id}`;
+      SendGrid.sendMessage({
+        to: user.email,
+        from: 'no-reply@imageus.io',
+        subject: `You have been invited to join ${group.name}`,
+        text: `To accept your invite to the group, click the link below:
+      ${link}`,
+      }).catch((err) => next(new APIError(
+        'Failed to send email',
+        'An error occurred while trying to send the email',
+        503,
+        err,
+      )));
+    });
 
     if (!internalCall) return res.status(204).send();
   },
