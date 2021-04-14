@@ -227,7 +227,7 @@ const User = {
         'User could not be found',
         `User with id ${id} was not found`,
         404,
-        `users/${id}`,
+        `users/${id}/verify`,
       ));
     }
 
