@@ -233,6 +233,43 @@ const User = {
 
     return res.send(200).send(result.toJSON());
   },
+
+  emailPasswordRecovery: async (req, res, next) => {
+    const { id } = req.params;
+    let result;
+    const verificationCode = uuidv4();
+    try {
+      result = await UserModel.findOneAndUpdate({_id: id}, verificationCode);
+    } catch (err) {
+      return next(new APIError());
+    }
+    if (!result) {
+      return next(new APIError(
+        'User could not be found',
+        `User with ${id} could not be found`,
+        404,
+        `users/${id}/passwordRecovery`,
+      ));
+    }
+
+    const link = `http://imageus.io/users/passwordReset/?id=${id}&verificationCode=${verificationCode}`;
+
+    SendGrid.sendMessage({
+      to: result.email,
+      from: 'no-reply@imageus.io',
+      subject: 'Password Reset for ImageUs',
+      text: 'Please visit the link below to reset your password, if you did not attempt to change your password you can'
+          + ' ignore this email.:'
+          + `${link}`,
+    }).catch((err) => next(new APIError(
+      'Failed to send email',
+      'An error occured while trying to send the email',
+      503,
+      err,
+    )));
+
+    return res.send(200).send(result.toJSON());
+  },
 };
 
 export default User;
