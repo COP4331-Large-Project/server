@@ -119,6 +119,6 @@ describe('SendGrid Test', () => {
   test('Send mail', async () => {
     const response = await SendGrid.sendMessage(message);
 
-    expect(response);
+    expect(response).toBeTruthy();
   });
 });
