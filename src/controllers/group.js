@@ -7,7 +7,7 @@ import GroupModel, { Image as ImageModel } from '../models/group';
 import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import S3 from '../services/S3';
-import SendGrid from "../services/SendGrid";
+import SendGrid from '../services/SendGrid';
 
 const { ObjectId } = mongoose.Types;
 
