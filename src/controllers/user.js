@@ -252,7 +252,7 @@ const User = {
       ));
     }
 
-    const link = `http://imageus.io/users/passwordReset/?id=${id}&verificationCode=${verificationCode}`;
+    const link = `http://imageus.io/users/${result.id}/password-reset/?verificationCode=${verificationCode}`;
 
     SendGrid.sendMessage({
       to: result.email,

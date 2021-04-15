@@ -312,7 +312,7 @@ const Group = {
     await group.updateOne({ $push: { invitedUsers: invitedUser } });
 
     invitedUser.forEach((user) => {
-      const link = `http://imageus.io/groups/invite/?inviteCode=${group.inviteCode}&userId=${user._id}`;
+      const link = `http://imageus.io/invite/${group.inviteCode}?userId=${user.id}&groupId=${group.id}`;
       SendGrid.sendMessage({
         to: user.email,
         from: 'no-reply@imageus.io',
