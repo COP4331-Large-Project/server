@@ -71,18 +71,5 @@
     "nodemon": "^2.0.7",
     "npm": "^7.6.3",
     "regenerator-runtime": "^0.13.7"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "./src/**/*{.js,.jsx}": [
-      "npm run lint"
-    ],
-    "./src/**/*{.scss,.js,.jsx}": [
-      "prettier --write"
-    ]
   }
 }
