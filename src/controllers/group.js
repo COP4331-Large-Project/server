@@ -30,7 +30,10 @@ const Group = {
       await Group.inviteUsers(true)(req, res, next);
       return res.status(200).send(group.toJSON());
     } catch (err) {
-      return next(new APIError());
+      return next(new APIError('Group Creation Failed',
+        'Failed to create the group',
+        500,
+        err));
     }
   },
 
