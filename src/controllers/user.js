@@ -231,7 +231,7 @@ const User = {
       ));
     }
 
-    return res.send(200).send(result.toJSON());
+    return res.status(200).send(result.toJSON());
   },
 
   emailPasswordRecovery: async (req, res, next) => {
@@ -239,7 +239,7 @@ const User = {
     let result;
     const verificationCode = uuidv4();
     try {
-      result = await UserModel.findOneAndUpdate({_id: id}, verificationCode);
+      result = await UserModel.findOneAndUpdate({ _id: id }, verificationCode);
     } catch (err) {
       return next(new APIError());
     }
