@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js | pino-pretty",
-    "test": "jest --runInBand --forceExit src/test",
+    "test": "jest --runInBand --forceExit --skipFilter=Email.test.js src/test",
     "lint": "eslint .",
     "deploy": "node build/index.js",
     "heroku-postinstall": "npm install --only-dev && npm run build",

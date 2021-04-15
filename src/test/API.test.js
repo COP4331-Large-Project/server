@@ -2,7 +2,6 @@ import request from 'supertest';
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
 import initWebServer from '../services/webServer';
-import SendGrid from '../services/SendGrid';
 import UserModel from '../models/user';
 import GroupModel from '../models/group';
 
@@ -106,19 +105,5 @@ describe('Group API Methods', () => {
       .expect(204);
 
     groupPayload.invitedUsers = res.body.invitedUsers;
-  });
-});
-
-describe('SendGrid Test', () => {
-  const message = {
-    to: 'no-reply@imageus.io',
-    from: 'no-reply@imageus.io',
-    subject: 'Test',
-    text: 'This is a test email',
-  };
-  test('Send mail', async () => {
-    const response = await SendGrid.sendMessage(message);
-
-    expect(response).toBeTruthy();
   });
 });

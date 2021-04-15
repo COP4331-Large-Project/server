@@ -288,40 +288,5 @@ router.put('/:id/profile', (req, res, next) => { authenticate(req, res, next, { 
  */
 router.post('/:id/verify', User.verify);
 
-/**
- * @swagger
- * path:
- * /users/{id}/passwordRecovery:
- *   post:
- *     description: Send the password recovery link to user's email
- *     summary: Send password recovery link
- *     tags:
- *     - Users
- *
- *   parameters:
- *     - in: path
- *       name: id
- *       required: true
- *       schema:
- *         type: string
- *       description: The id of the user
- *
- *   requestBody:
- *     required: false
- *
- *    produces:
- *      - application/json
- *    responses:
- *      200:
- *        description: OK
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/UserResponse'
- *      404:
- *        description: Could not find user
- *      503:
- *        description: Failure to send email
- */
 router.post('/:id/passwordRecovery', User.emailPasswordRecovery);
 export default router;
