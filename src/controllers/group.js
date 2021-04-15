@@ -61,18 +61,18 @@ const Group = {
     }
     const user = ObjectId(req.body.user);
 
-    if (group.creator._id.equals(user._id)) {
+    if (group.creator && group.creator._id.equals(user._id)) {
       return res.status(204).send(group.toJSON());
     }
 
     const authorizedUser = (group.invitedUsers).some(x => x.equals(user));
 
-    if (authorizedUser) {
+    if (authorizedUser || group.publicGroup) {
       await UserModel.findByIdAndUpdate(user, { $push: { groups: group._id } }).exec();
       // remove user from group's invited users array
-      await group.update({ $pull: { invitedUsers: user } });
+      await group.updateOne({ $pull: { invitedUsers: user } });
       // put user into group's user array
-      await group.update({ $push: { users: user } });
+      await group.updateOne({ $push: { users: user } });
       // get updated group information
       group = (await GroupModel
         .findOne({ inviteCode })
