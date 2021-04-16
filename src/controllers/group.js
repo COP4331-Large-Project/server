@@ -3,7 +3,8 @@
 import mongoose from 'mongoose';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
-import GroupModel, { Image as ImageModel } from '../models/group';
+import GroupModel from '../models/group';
+import ImageModel from '../models/image';
 import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import S3 from '../services/S3';
@@ -141,7 +142,7 @@ const Group = {
     // if the group creator is not truthy, they probably dont exist anymore
     // just let anyone delete the group at that point
     if (group.creator === 'undefined' || group.creator === null) {
-      await group.delete();
+      await group.deleteOne();
       return res.status(204).send();
     }
 
