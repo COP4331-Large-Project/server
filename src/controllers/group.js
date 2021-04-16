@@ -141,7 +141,7 @@ const Group = {
 
     // if the group creator is not truthy, they probably dont exist anymore
     // just let anyone delete the group at that point
-    if (group.creator === 'undefined' || group.creator === null) {
+    if (group.creator === 'undefined' || group.creator === null || !Object.prototype.hasOwnProperty.call(group, 'creator')) {
       await group.deleteOne();
       return res.status(204).send();
     }

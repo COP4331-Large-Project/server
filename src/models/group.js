@@ -19,7 +19,7 @@ const deepDelete = async function deepDelete() {
     { groups: { $in: this._id } },
     { $pull: { groups: this._id } },
   );
-  await mongoose.model('image').deleteMany(
+  await mongoose.connection.db.collection('images').deleteMany(
     { groupID: this._id },
   );
 };
