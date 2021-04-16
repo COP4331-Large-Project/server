@@ -163,7 +163,6 @@ const Group = {
   upload: async (req, res, next) => {
     const { id } = req.params;
     const { userId, caption } = req.body;
-    let result;
 
     if (!req.file) {
       return next(new APIError(
@@ -171,6 +170,18 @@ const Group = {
         'No file provided',
         415,
         `/groups/${id}`,
+      ));
+    }
+
+    const groupID = ObjectId(id);
+    const group = await GroupModel.findById(groupID);
+
+    if (!group) {
+      return next(new APIError(
+        'Group photo could not be uploaded.',
+        'No such Group exists',
+        404,
+        `/groups/${id}/`,
       ));
     }
 
@@ -190,30 +201,27 @@ const Group = {
       fileName,
       caption,
       creator: userId,
+      groupID,
     });
 
     try {
-      result = await GroupModel.findByIdAndUpdate(
-        id,
-        { $push: { images: image } },
+      await group.updateOne(
+        { $push: { images: image._id } },
         { new: true },
       ).exec();
+      await image.save();
     } catch (err) {
-      return next(new APIError());
-    }
-
-    if (!result) {
       return next(new APIError(
-        'Group photo could not be uploaded.',
-        'No such Group exists',
-        404,
-        `/groups/${id}/`,
+        undefined,
+        undefined,
+        undefined,
+        err,
       ));
     }
 
     image.URL = await S3.getPreSignedURL(key);
 
-    return res.status(204).send(image);
+    return res.status(200).send(image);
   },
 
   update: async (req, res, next) => {
@@ -242,6 +250,7 @@ const Group = {
   thumbnail: async (req, res, next) => {
     const { id } = req.params;
     let group;
+    let thumbnailDoc;
 
     try {
       group = await GroupModel.findOne({ _id: id }).exec();
@@ -267,9 +276,48 @@ const Group = {
       ));
     }
     // eslint-disable-next-line max-len
-    const image = group.images[0];
-    image.URL = await S3.getPreSignedURL(`groups/${group._id}/${image.fileName}`);
-    return res.status(200).send(image);
+    try {
+      const imageID = group.images[group.images.length - 1];
+      thumbnailDoc = await ImageModel.findOne({ _id: imageID }).exec();
+      if (thumbnailDoc === null) return res.status(200).send();
+      thumbnailDoc.URL = await S3.getPreSignedURL(`groups/${group._id}/${thumbnailDoc.fileName}`);
+    } catch (err) {
+      return next(new APIError(
+        undefined,
+        undefined,
+        undefined,
+        err,
+      ));
+    }
+
+    return res.status(200).send(thumbnailDoc);
+  },
+
+  getImages: async (req, res, next) => {
+    const { id } = req.params;
+    const groupID = ObjectId(id);
+    let images;
+
+    try {
+      const imageRefs = await ImageModel.find({ groupID });
+      if (!imageRefs) return res.status(200).send();
+      images = await Promise.all(
+        imageRefs.map(async (x) => {
+          // eslint-disable-next-line no-param-reassign
+          const image = x;
+          image.URL = await S3.getPreSignedURL(`groups/${image.groupID}/${image.fileName}`);
+          return image;
+        }),
+      );
+    } catch (err) {
+      return next(new APIError(
+        undefined,
+        undefined,
+        undefined,
+        err,
+      ));
+    }
+    return res.status(201).send(images);
   },
 
   // internalCall is used for the register endpoint so that a http response isnt sent

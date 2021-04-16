@@ -378,4 +378,6 @@ groups.put('/:id/uploadImage', upload.single('groupPicture'), Group.upload);
  */
 groups.put('/:id', Group.update);
 
+groups.get('/:id/images', Group.getImages);
+
 export default groups;
