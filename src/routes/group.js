@@ -83,7 +83,7 @@ groups.get('/:id', Group.fetch);
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-groups.get('/:id/thumbnail/', Group.thumbnail);
+groups.get('/:id/thumbnail/', Group.thumbnail(false));
 
 /**
  * @swagger
@@ -377,5 +377,7 @@ groups.put('/:id/uploadImage', upload.single('groupPicture'), Group.upload);
  *                $ref: '#/components/schemas/APIError'
  */
 groups.put('/:id', Group.update);
+
+groups.get('/:id/images', Group.getImages);
 
 export default groups;

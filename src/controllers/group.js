@@ -3,7 +3,8 @@
 import mongoose from 'mongoose';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
-import GroupModel, { Image as ImageModel } from '../models/group';
+import GroupModel from '../models/group';
+import ImageModel from '../models/image';
 import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import S3 from '../services/S3';
@@ -61,6 +62,14 @@ const Group = {
     }
     const user = ObjectId(req.body.user);
 
+    if (group.users.some((x) => x.equals(user))) {
+      return next(new APIError(
+        'Failed to join group',
+        'User is already in this group',
+        418,
+      ));
+    }
+
     if (group.creator && group.creator._id.equals(user._id)) {
       return res.status(204).send(group.toJSON());
     }
@@ -107,20 +116,8 @@ const Group = {
       ));
     }
 
-    // We need to use Promise.all() here because it's more performant than using a for
-    // loop with `await` on each iteration. In a for-loop with await on every iteration,
-    // *each* iteration waits on the prior one to complete. This is slower than making each
-    // iteration asynchronous and then waiting for *all* of them to resolve *after* they're
-    // all added.
-    //
-    // source: https://eslint.org/docs/rules/no-await-in-loop
-    await Promise.all(result.images.map(async (item) => {
-      const itemCpy = item;
-      itemCpy.URL = await S3.getPreSignedURL(`groups/${result._id}/${item.fileName}`);
-    }));
-
     result = result.toJSON();
-    [result.thumbnail] = result.images;
+    result.thumbnail = await Group.thumbnail(true)(req, res, next);
     return res.status(200).send(result);
   },
 
@@ -140,8 +137,8 @@ const Group = {
 
     // if the group creator is not truthy, they probably dont exist anymore
     // just let anyone delete the group at that point
-    if (group.creator === 'undefined' || group.creator === null) {
-      await group.delete();
+    if (group.creator === 'undefined' || group.creator === null || !Object.prototype.hasOwnProperty.call(group, 'creator')) {
+      await group.deleteOne();
       return res.status(204).send();
     }
 
@@ -162,7 +159,6 @@ const Group = {
   upload: async (req, res, next) => {
     const { id } = req.params;
     const { userId, caption } = req.body;
-    let result;
 
     if (!req.file) {
       return next(new APIError(
@@ -170,6 +166,18 @@ const Group = {
         'No file provided',
         415,
         `/groups/${id}`,
+      ));
+    }
+
+    const groupID = ObjectId(id);
+    const group = await GroupModel.findById(groupID);
+
+    if (!group) {
+      return next(new APIError(
+        'Group photo could not be uploaded.',
+        'No such Group exists',
+        404,
+        `/groups/${id}/`,
       ));
     }
 
@@ -189,30 +197,27 @@ const Group = {
       fileName,
       caption,
       creator: userId,
+      groupID,
     });
 
     try {
-      result = await GroupModel.findByIdAndUpdate(
-        id,
-        { $push: { images: image } },
-        { new: true },
-      ).exec();
-    } catch (err) {
-      return next(new APIError());
-    }
+      await group.updateOne(
+        { thumbnail: image._id },
 
-    if (!result) {
+      ).exec();
+      await image.save();
+    } catch (err) {
       return next(new APIError(
-        'Group photo could not be uploaded.',
-        'No such Group exists',
-        404,
-        `/groups/${id}/`,
+        undefined,
+        undefined,
+        undefined,
+        err,
       ));
     }
 
     image.URL = await S3.getPreSignedURL(key);
 
-    return res.status(204).send(image);
+    return res.status(200).send(image);
   },
 
   update: async (req, res, next) => {
@@ -238,9 +243,10 @@ const Group = {
     return res.status(204).send();
   },
 
-  thumbnail: async (req, res, next) => {
+  thumbnail: (internalCall = false) => async (req, res, next) => {
     const { id } = req.params;
     let group;
+    let thumbnailDoc;
 
     try {
       group = await GroupModel.findOne({ _id: id }).exec();
@@ -257,7 +263,7 @@ const Group = {
       ));
     }
 
-    if (group.images.length === 0) {
+    if (!group.thumbnail) {
       return next(new APIError(
         'No image to show',
         `Group with id ${id} does not have any images.`,
@@ -266,9 +272,51 @@ const Group = {
       ));
     }
     // eslint-disable-next-line max-len
-    const image = group.images[0];
-    image.URL = await S3.getPreSignedURL(`groups/${group._id}/${image.fileName}`);
-    return res.status(200).send(image);
+    try {
+      thumbnailDoc = await ImageModel.findById(group.thumbnail);
+      if (!thumbnailDoc) {
+        if (!internalCall) return res.status(200).send();
+        return undefined;
+      }
+      thumbnailDoc.URL = await S3.getPreSignedURL(`groups/${group._id}/${thumbnailDoc.fileName}`);
+    } catch (err) {
+      return next(new APIError(
+        undefined,
+        undefined,
+        undefined,
+        err,
+      ));
+    }
+
+    if (!internalCall) return res.status(200).send(thumbnailDoc);
+    return thumbnailDoc;
+  },
+
+  getImages: async (req, res, next) => {
+    const { id } = req.params;
+    const groupID = ObjectId(id);
+    let images;
+
+    try {
+      const imageRefs = await ImageModel.find({ groupID });
+      if (!imageRefs) return res.status(200).send();
+      images = await Promise.all(
+        imageRefs.map(async (x) => {
+          // eslint-disable-next-line no-param-reassign
+          const image = x;
+          image.URL = await S3.getPreSignedURL(`groups/${image.groupID}/${image.fileName}`);
+          return image;
+        }),
+      );
+    } catch (err) {
+      return next(new APIError(
+        undefined,
+        undefined,
+        undefined,
+        err,
+      ));
+    }
+    return res.status(201).send(images);
   },
 
   // internalCall is used for the register endpoint so that a http response isnt sent
