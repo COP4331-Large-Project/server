@@ -16,6 +16,14 @@ const userSchema = new mongoose.Schema({
   groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
 });
 
+const populateFields = 'groups';
+
+const autoPopulate = async function populator(doc) {
+  await doc.populate(populateFields).execPopulate();
+};
+
+userSchema.post('findOne', autoPopulate);
+
 const User = mongoose.model(modelName, userSchema);
 
 export default User;
