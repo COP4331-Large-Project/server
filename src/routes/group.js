@@ -288,7 +288,7 @@ groups.post('/:inviteCode/join/', Group.join);
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-groups.post('/:id/invite', Group.inviteUsers);
+groups.post('/:id/invite', Group.inviteUsers(false));
 
 /**
  * @swagger

@@ -247,4 +247,124 @@ router.put('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  */
 router.put('/:id/profile', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, upload.single('avatar'), User.uploadProfile);
 
+/**
+ * @swagger
+ * path:
+ * /users/{id}/verify:
+ *   post:
+ *     description: This route verifies the user
+ *     summary: Update the user by changing the verified to true
+ *     tags:
+ *     - User
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The id of the user to be verified
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               verificationCode:
+ *                 type: string
+ *                 format: uuid
+ *
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponse'
+ *       404:
+ *         description: Could not find user
+ */
+router.post('/:id/verify', User.verify);
+
+/**
+ * @swagger
+ * path:
+ * /users/{id}/passwordRecovery:
+ *   post:
+ *     description: Send the password recovery link to user's email
+ *     summary: Send password recovery link
+ *     tags:
+ *     - User
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The id of the user
+ *
+ *     requestBody:
+ *       required: false
+ *
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponse'
+ *       404:
+ *         description: Could not find user
+ *       503:
+ *         description: Failure to send email
+ */
+router.post('/passwordRecovery', User.emailPasswordRecovery);
+
+/**
+ * @swagger
+ * path:
+ * /users/resendVerificationEmail:
+ *   post:
+ *     description: Sends a verification link to user's email
+ *     summary: Send a verification link
+ *     tags:
+ *     - User
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponse'
+ *       404:
+ *         description: Could not find user
+ *       503:
+ *         description: Failure to send email
+ *       default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
+router.post('/resendVerificationEmail', User.resendVerificationEmail);
 export default router;

@@ -43,6 +43,11 @@ UserResponse:
       example: 5424dfae4eb45345bc13b778
     imgURL:
       type: string
+    verified:
+      type: boolean
+    verificationCode:
+      type: string
+      format: uuid
 UserRequest:
   type: object
   properties:

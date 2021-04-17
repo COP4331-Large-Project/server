@@ -52,7 +52,20 @@ describe('User API methods', () => {
       .expect(201);
 
     userPayload.id = response.body.id;
+    userPayload.verificationCode = response.body.verificationCode;
     delete response.body.imgURL;
+    expect(response.body).toMatchObject(userPayload);
+  });
+
+  test('Verifying user', async () => {
+    const response = await request(app)
+      .post(`/users/${userPayload.id}/verify`)
+      .send({
+        verificationCode: userPayload.verificationCode,
+      })
+      .expect('Content-Type', /json/)
+      .expect(200);
+
     expect(response.body).toMatchObject(userPayload);
   });
 
