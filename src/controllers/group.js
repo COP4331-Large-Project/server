@@ -62,6 +62,14 @@ const Group = {
     }
     const user = ObjectId(req.body.user);
 
+    if (group.users.some((x) => x.equals(user))) {
+      return next(new APIError(
+        'Failed to join group',
+        'User is already in this group',
+        418,
+      ));
+    }
+
     if (group.creator && group.creator._id.equals(user._id)) {
       return res.status(204).send(group.toJSON());
     }
@@ -122,6 +130,7 @@ const Group = {
 
     result = result.toJSON();
     [result.thumbnail] = result.images;
+    result.populate('thumbnail').execPopulate();
     return res.status(200).send(result);
   },
 
@@ -206,8 +215,14 @@ const Group = {
 
     try {
       await group.updateOne(
-        { $push: { images: image._id } },
-        { new: true },
+        {
+          $push: {
+            images: {
+              $each: [image._id],
+              $position: 0,
+            },
+          },
+        },
       ).exec();
       await image.save();
     } catch (err) {
@@ -277,7 +292,7 @@ const Group = {
     }
     // eslint-disable-next-line max-len
     try {
-      const imageID = group.images[group.images.length - 1];
+      const imageID = group.images[0];
       thumbnailDoc = await ImageModel.findOne({ _id: imageID }).exec();
       if (thumbnailDoc === null) return res.status(200).send();
       thumbnailDoc.URL = await S3.getPreSignedURL(`groups/${group._id}/${thumbnailDoc.fileName}`);
