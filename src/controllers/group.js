@@ -27,8 +27,13 @@ const Group = {
       newGroup.inviteCode = uuidv4();
       const group = await newGroup.save();
       req.params.id = group._id;
+
       // req.body.emails is used here!
       await Group.inviteUsers(true)(req, res, next);
+      // Add the creator to the group.
+      await GroupModel.findByIdAndUpdate(group, { $push: { users: creator } }).exec();
+      // Push the ID on the user model.
+      await UserModel.findByIdAndUpdate(creator, { $push: { groups: group._id } }).exec();
       return res.status(200).send(group.toJSON());
     } catch (err) {
       return next(new APIError('Group Creation Failed',
