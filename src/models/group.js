@@ -12,6 +12,7 @@ const groupSchema = new mongoose.Schema({
   invitedUsers: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: User }], default: [] },
   publicGroup: { type: Boolean, default: false },
   name: { type: String, required: true, default: 'New Group' },
+  thumbnail: { type: mongoose.Schema.Types.ObjectId, required: true, default: null },
 });
 
 const deepDelete = async function deepDelete() {

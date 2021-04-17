@@ -202,14 +202,8 @@ const Group = {
 
     try {
       await group.updateOne(
-        {
-          $push: {
-            images: {
-              $each: [image._id],
-              $position: 0,
-            },
-          },
-        },
+        { thumbnail: image._id },
+
       ).exec();
       await image.save();
     } catch (err) {
@@ -269,7 +263,7 @@ const Group = {
       ));
     }
 
-    if (group.images.length === 0) {
+    if (!group.thumbnail) {
       return next(new APIError(
         'No image to show',
         `Group with id ${id} does not have any images.`,
@@ -279,9 +273,8 @@ const Group = {
     }
     // eslint-disable-next-line max-len
     try {
-      const imageID = group.images[0];
-      thumbnailDoc = await ImageModel.findOne({ _id: imageID }).exec();
-      if (thumbnailDoc === null) {
+      thumbnailDoc = await ImageModel.findById(group.thumbnail);
+      if (!thumbnailDoc) {
         if (!internalCall) return res.status(200).send();
         return undefined;
       }
