@@ -116,21 +116,8 @@ const Group = {
       ));
     }
 
-    // We need to use Promise.all() here because it's more performant than using a for
-    // loop with `await` on each iteration. In a for-loop with await on every iteration,
-    // *each* iteration waits on the prior one to complete. This is slower than making each
-    // iteration asynchronous and then waiting for *all* of them to resolve *after* they're
-    // all added.
-    //
-    // source: https://eslint.org/docs/rules/no-await-in-loop
-    await Promise.all(result.images.map(async (item) => {
-      const itemCpy = item;
-      itemCpy.URL = await S3.getPreSignedURL(`groups/${result._id}/${item.fileName}`);
-    }));
-
     result = result.toJSON();
-    [result.thumbnail] = result.images;
-    result.populate('thumbnail').execPopulate();
+    result.thumbnail = await Group.thumbnail(true)(req, res, next);
     return res.status(200).send(result);
   },
 
@@ -262,7 +249,7 @@ const Group = {
     return res.status(204).send();
   },
 
-  thumbnail: async (req, res, next) => {
+  thumbnail: (internalCall = false) => async (req, res, next) => {
     const { id } = req.params;
     let group;
     let thumbnailDoc;
@@ -294,7 +281,10 @@ const Group = {
     try {
       const imageID = group.images[0];
       thumbnailDoc = await ImageModel.findOne({ _id: imageID }).exec();
-      if (thumbnailDoc === null) return res.status(200).send();
+      if (thumbnailDoc === null) {
+        if (!internalCall) return res.status(200).send();
+        return undefined;
+      }
       thumbnailDoc.URL = await S3.getPreSignedURL(`groups/${group._id}/${thumbnailDoc.fileName}`);
     } catch (err) {
       return next(new APIError(
@@ -305,7 +295,8 @@ const Group = {
       ));
     }
 
-    return res.status(200).send(thumbnailDoc);
+    if (!internalCall) return res.status(200).send(thumbnailDoc);
+    return thumbnailDoc;
   },
 
   getImages: async (req, res, next) => {
