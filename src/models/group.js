@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
 import User from './user';
+import Image from './image';
 
 const modelName = 'Group';
 
@@ -9,7 +10,6 @@ const groupSchema = new mongoose.Schema({
   users: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: User }], default: [] },
   creator: { type: mongoose.Schema.Types.ObjectId, ref: User, required: true },
   invitedUsers: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: User }], default: [] },
-  images: { type: [mongoose.Schema.Types.ObjectId], ref: 'Image', default: [] },
   publicGroup: { type: Boolean, default: false },
   name: { type: String, required: true, default: 'New Group' },
 });
@@ -19,7 +19,7 @@ const deepDelete = async function deepDelete() {
     { groups: { $in: this._id } },
     { $pull: { groups: this._id } },
   );
-  await mongoose.connection.db.collection('images').deleteMany(
+  await Image.deleteMany(
     { groupID: this._id },
   );
 };
