@@ -324,5 +324,47 @@ router.post('/:id/verify', User.verify);
  *       503:
  *         description: Failure to send email
  */
-router.post('/:id/passwordRecovery', User.emailPasswordRecovery);
+router.post('/passwordRecovery', User.emailPasswordRecovery);
+
+/**
+ * @swagger
+ * path:
+ * /users/resendVerificationEmail:
+ *   post:
+ *     description: Sends a verification link to user's email
+ *     summary: Send a verification link
+ *     tags:
+ *     - User
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponse'
+ *       404:
+ *         description: Could not find user
+ *       503:
+ *         description: Failure to send email
+ *       default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
+router.post('/resendVerificationEmail', User.resendVerificationEmail);
 export default router;
