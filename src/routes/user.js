@@ -292,23 +292,22 @@ router.post('/:id/verify', User.verify);
 /**
  * @swagger
  * path:
- * /users/{id}/passwordRecovery:
+ * /users/passwordRecovery:
  *   post:
  *     description: Send the password recovery link to user's email
  *     summary: Send password recovery link
  *     tags:
  *     - User
  *
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The id of the user
- *
  *     requestBody:
- *       required: false
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
  *
  *     produces:
  *       - application/json
