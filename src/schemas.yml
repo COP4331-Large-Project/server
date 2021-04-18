@@ -80,20 +80,12 @@ Group:
       example: 7834dfae4eb89145bc13b559
     inviteCode:
       type: string
-    users:
-      type: array
-      items:
-        $ref: '#/components/schemas/UserResponse'
     creator:
       $ref: '#/components/schemas/UserResponse'
     invitedUsers:
       type: array
       items:
         $ref: '#/components/schemas/UserResponse'
-    images:
-      type: array
-      items:
-        $ref: '#/components/schemas/Image'
     thumbnail:
       $ref: '#/components/schemas/Image'
     publicGroup:

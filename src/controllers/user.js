@@ -166,6 +166,18 @@ const User = {
     return res.status(200).send(retVal);
   },
 
+  fetchGroups: async (req, res, next) => {
+    const { id } = req.params;
+    let user;
+    try {
+      user = await UserModel.findById(id).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    return res.status(200).send(user.toJSON().groups);
+  },
+
   update: async (req, res, next) => {
     const { id } = req.params;
     let result;

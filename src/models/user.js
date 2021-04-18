@@ -21,6 +21,9 @@ const userSchema = new mongoose.Schema({
 const populateFields = 'groups';
 
 const autoPopulate = async function populator(doc) {
+  if (!doc) {
+    return;
+  }
   await doc.populate(populateFields).execPopulate();
 };
 

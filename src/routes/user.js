@@ -366,4 +366,41 @@ router.post('/passwordRecovery', User.emailPasswordRecovery);
  *                $ref: '#/components/schemas/APIError'
  */
 router.post('/resendVerificationEmail', User.resendVerificationEmail);
+
+/**
+ * @swagger
+ * path:
+ * /users/{id}/groups:
+ *   get:
+ *     description: Gets the groups associated with the user.
+ *     summary: Get the User's groups
+ *     tags:
+ *     - User
+ *
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 groups:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Group'
+ *       404:
+ *         description: Could not find user
+ *       503:
+ *         description: Failure to send email
+ *       default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
+router.get('/:id/groups', User.fetchGroups);
 export default router;
