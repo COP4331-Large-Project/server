@@ -151,6 +151,8 @@ router.delete('/:id', (req, res, next) => { authenticate(req, res, next, { id: r
  */
 router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, User.fetch);
 
+router.put('/resetPassword', User.resetPassword);
+
 /**
  * @swagger
  * path:
@@ -366,4 +368,5 @@ router.post('/passwordRecovery', User.emailPasswordRecovery);
  *                $ref: '#/components/schemas/APIError'
  */
 router.post('/resendVerificationEmail', User.resendVerificationEmail);
+
 export default router;
