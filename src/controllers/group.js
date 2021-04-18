@@ -303,7 +303,7 @@ const Group = {
 
     try {
       const imageRefs = await ImageModel.find({ groupID });
-      if (!imageRefs) return res.status(200).send();
+      if (!imageRefs) return res.status(201).send({ images });
       images = await Promise.all(
         imageRefs.map(async (x) => {
           // eslint-disable-next-line no-param-reassign
@@ -320,7 +320,7 @@ const Group = {
         err,
       ));
     }
-    return res.status(201).send(images);
+    return res.status(201).send({ images });
   },
 
   // internalCall is used for the register endpoint so that a http response isnt sent

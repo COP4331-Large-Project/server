@@ -90,10 +90,6 @@ Group:
       type: array
       items:
         $ref: '#/components/schemas/UserResponse'
-    images:
-      type: array
-      items:
-        $ref: '#/components/schemas/Image'
     thumbnail:
       $ref: '#/components/schemas/Image'
     publicGroup:

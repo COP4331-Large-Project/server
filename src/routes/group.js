@@ -378,6 +378,44 @@ groups.put('/:id/uploadImage', upload.single('groupPicture'), Group.upload);
  */
 groups.put('/:id', Group.update);
 
+/**
+ * @swagger
+ * path:
+ * /groups/{id}/images:
+ *    get:
+ *      description: Fetch images
+ *      summary: Fetches images from a group
+ *      tags:
+ *        - Group
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *           type: string
+ *          description: The ID of the group to fetch from
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        201:
+ *          description: OK
+ *          content:
+ *            application/json:
+ *              schema:
+ *                properties:
+ *                  images:
+ *                    type: array
+ *                    items:
+ *                      $ref: '#/components/schemas/Image'
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
 groups.get('/:id/images', Group.getImages);
 
 export default groups;

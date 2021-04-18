@@ -301,7 +301,7 @@ const User = {
 
       const hashedPassword = await PasswordHasher.hash(password);
       await user.updateOne({ password: hashedPassword }).exec();
-      return res.status(200).send();
+      return res.status(204).send();
     } catch (err) {
       return next(new APIError(undefined, undefined, undefined, err));
     }
