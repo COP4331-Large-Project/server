@@ -154,6 +154,44 @@ router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
 /**
  * @swagger
  * path:
+ * /users/resetPassword:
+ *   post:
+ *     description: Reset the password of the user
+ *     summary: 'Given a valid verification code and user attached to the given email,
+ *       the user''s password will be reset'
+ *     tags:
+ *     - User
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               verificationCode:
+ *                 type: string
+ *                 format: uuid
+ *               password:
+ *                 type: string
+ *
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       204:
+ *         description: OK
+ *       403:
+ *         description: Incorrect verification code
+ *       404:
+ *         description: Could not find user
+ */
+router.put('/resetPassword', User.resetPassword);
+
+/**
+ * @swagger
+ * path:
  * /users/{id}:
  *    put:
  *      description: Updates an existing user.
@@ -366,4 +404,5 @@ router.post('/passwordRecovery', User.emailPasswordRecovery);
  *                $ref: '#/components/schemas/APIError'
  */
 router.post('/resendVerificationEmail', User.resendVerificationEmail);
+
 export default router;

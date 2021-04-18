@@ -9,7 +9,7 @@ const imageSchema = new mongoose.Schema({
   caption: { type: String, default: '' },
   fileName: { type: String, required: true, unique: true },
   creator: { type: mongoose.Schema.Types.ObjectId, ref: User, required: true },
-  dateUploaded: { type: Date, required: true, default: new Date() },
+  dateUploaded: { type: Date, required: true, default: Date.now },
   groupID: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true },
 });
 
