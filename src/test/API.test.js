@@ -98,12 +98,12 @@ describe('Group API Methods', () => {
     expect(res.body).toMatchObject(groupPayload);
   });
 
-  test('Join new group', async () => {
+  test('Show Group Membership', async () => {
     const res = await request(app)
-      .post(`/groups/${groupPayload.inviteCode}/join`)
-      .send({ user: userPayload.id })
-      .expect(204);
+      .get(`/users/${userPayload.id}/groups`)
+      .expect('Content-Type', /json/)
+      .expect(200);
 
-    groupPayload.invitedUsers = res.body.invitedUsers;
+    expect(res.body[0].id === groupPayload.id);
   });
 });
