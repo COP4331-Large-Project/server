@@ -124,6 +124,7 @@ const Group = {
     }
 
     result = result.toJSON();
+    result.thumbnail = await Group.thumbnail(true)(req, res, next) ?? null;
     return res.status(200).send(result);
   },
 
