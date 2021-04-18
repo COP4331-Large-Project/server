@@ -9,7 +9,7 @@ import { logger } from '../globals';
 import { createToken } from '../services/JWTAuthentication';
 
 async function sendVerificationEmail(user) {
-  const link = `http://imageus.io/verify/?id=${user.id}&verificationCode=${user.verificationCode}`;
+  const link = `https://www.imageus.io/verify/?id=${user.id}&verificationCode=${user.verificationCode}`;
 
   try {
     await SendGrid.sendMessage({
@@ -271,7 +271,7 @@ const User = {
       ));
     }
 
-    const link = `http://imageus.io/users/${result.id}/password-reset/?verificationCode=${verificationCode}`;
+    const link = `https://www.imageus.io/users/${result.id}/password-reset/?verificationCode=${verificationCode}`;
 
     SendGrid.sendMessage({
       to: result.email,
@@ -289,6 +289,36 @@ const User = {
 
     return res.status(200).send(result.toJSON());
   },
+
+  resetPassword: async (req, res, next) => {
+    const { email, verificationCode, password } = req.body;
+    try {
+      const user = await UserModel.findOne({ email }).exec();
+
+      if (!user) {
+        return next(new APIError(
+          'Password not reset',
+          'The given email does not have an associated account',
+          404,
+        ));
+      }
+
+      if (user.verificationCode !== verificationCode) {
+        return next(new APIError(
+          'Password not reset',
+          'The verification code is invalid',
+          403,
+        ));
+      }
+
+      const hashedPassword = await PasswordHasher.hash(password);
+      await user.updateOne({ password: hashedPassword }).exec();
+      return res.status(204).send();
+    } catch (err) {
+      return next(new APIError(undefined, undefined, undefined, err));
+    }
+  },
+
   async resendVerificationEmail(req, res, next) {
     const { email } = req.body;
 
