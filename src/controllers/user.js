@@ -170,7 +170,7 @@ const User = {
     const { id } = req.params;
     let user;
     try {
-      user = await UserModel.findById(id).exec();
+      user = await (await UserModel.findById(id).populate('groups')).execPopulate();
     } catch (err) {
       return next(new APIError());
     }
