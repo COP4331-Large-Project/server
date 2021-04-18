@@ -7,7 +7,6 @@ const modelName = 'Group';
 
 const groupSchema = new mongoose.Schema({
   inviteCode: { type: String, required: true, unique: true },
-  users: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: User }], default: [] },
   creator: { type: mongoose.Schema.Types.ObjectId, ref: User, required: true },
   invitedUsers: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: User }], default: [] },
   publicGroup: { type: Boolean, default: false },
@@ -28,6 +27,9 @@ const deepDelete = async function deepDelete() {
 const populateFields = 'users creator invitedUsers';
 
 const autoPopulate = async function populator(doc) {
+  if (!doc) {
+    return;
+  }
   await doc.populate(populateFields).execPopulate();
 };
 

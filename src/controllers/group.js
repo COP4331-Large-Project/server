@@ -27,8 +27,13 @@ const Group = {
       newGroup.inviteCode = uuidv4();
       const group = await newGroup.save();
       req.params.id = group._id;
+
       // req.body.emails is used here!
       await Group.inviteUsers(true)(req, res, next);
+      // Add the creator to the group.
+      await GroupModel.findByIdAndUpdate(group, { $push: { users: creator } }).exec();
+      // Push the ID on the user model.
+      await UserModel.findByIdAndUpdate(creator, { $push: { groups: group._id } }).exec();
       return res.status(200).send(group.toJSON());
     } catch (err) {
       return next(new APIError('Group Creation Failed',
@@ -40,8 +45,12 @@ const Group = {
 
   join: async (req, res, next) => {
     const { inviteCode } = req.params;
+    const userID = req.body.user;
     let group = (await GroupModel
       .findOne({ inviteCode })
+      .exec());
+    const user = (await UserModel
+      .findById(userID)
       .exec());
 
     // Check if group is found.
@@ -55,18 +64,18 @@ const Group = {
       );
     }
 
-    // Check if user is authorized to join.
-    if (!ObjectId.isValid(req.body.user)) {
-      return next(new APIError(
-        'Bad User ObjectId',
-        'The given ObjectId for the joining user is invalid',
-        404,
-        `/groups/join/${inviteCode}`,
-      ));
+    // Check if user was found.
+    if (user === null) {
+      return next(
+        new APIError(
+          'User not found',
+          'User does not exist',
+          404,
+        ),
+      );
     }
-    const user = ObjectId(req.body.user);
 
-    if (group.users.some((x) => x.equals(user))) {
+    if (user.groups.some((x) => x.equals(group._id))) {
       return next(new APIError(
         'Failed to join group',
         'User is already in this group',
@@ -74,18 +83,12 @@ const Group = {
       ));
     }
 
-    if (group.creator && group.creator._id.equals(user._id)) {
-      return res.status(204).send(group.toJSON());
-    }
-
-    const authorizedUser = (group.invitedUsers).some(x => x.equals(user));
+    const authorizedUser = (group.invitedUsers).some(x => x.equals(user._id));
 
     if (authorizedUser || group.publicGroup) {
       await UserModel.findByIdAndUpdate(user, { $push: { groups: group._id } }).exec();
       // remove user from group's invited users array
-      await group.updateOne({ $pull: { invitedUsers: user } });
-      // put user into group's user array
-      await group.updateOne({ $push: { users: user } });
+      await group.updateOne({ $pull: { invitedUsers: user._id } });
       // get updated group information
       group = (await GroupModel
         .findOne({ inviteCode })

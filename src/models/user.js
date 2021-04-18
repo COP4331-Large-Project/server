@@ -18,13 +18,16 @@ const userSchema = new mongoose.Schema({
   groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
 });
 
-const populateFields = 'groups';
+// const populateFields = 'groups';
 
-const autoPopulate = async function populator(doc) {
-  await doc.populate(populateFields).execPopulate();
-};
+// const autoPopulate = async function populator(doc) {
+//   if (!doc) {
+//     return;
+//   }
+//   await doc.populate(populateFields).execPopulate();
+// };
 
-userSchema.post('findOne', autoPopulate);
+// userSchema.post('findOne', autoPopulate);
 
 const User = mongoose.model(modelName, userSchema);
 
