@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import UserModel from '../models/user';
@@ -175,6 +176,13 @@ const User = {
     } catch (err) {
       return next(new APIError());
     }
+
+    groups.map((group) => {
+      const copy = group;
+      copy.id = group._id;
+      delete copy._id;
+      return copy;
+    });
 
     return res.status(200).send(groups);
   },

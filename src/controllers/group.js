@@ -1,7 +1,6 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
-import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import { singleGroup } from '../aggregations';
 import GroupModel from '../models/group';
@@ -179,6 +178,15 @@ const Group = {
       ));
     }
 
+    if (!ObjectId.isValid(id)) {
+      return next(new APIError(
+        'Group photo could not be uploaded.',
+        'Bad group id given',
+        404,
+        `/groups/${id}/uploadImage`,
+      ));
+    }
+
     const groupID = ObjectId(id);
     const group = await GroupModel.findById(groupID);
 
@@ -187,13 +195,21 @@ const Group = {
         'Group photo could not be uploaded.',
         'No such Group exists',
         404,
-        `/groups/${id}/`,
+        `/groups/${id}/uploadImage`,
       ));
     }
 
-    const imageBuffer = await sharp(req.file.buffer)
-      .jpeg()
-      .toBuffer();
+    const validFileTypes = ['image/jpeg', 'image/gif', 'image/jpg', 'image/png'];
+    if (!validFileTypes.some((x) => x === req.file.mimetype)) {
+      return next(new APIError(
+        'Media not uploaded',
+        'The uploaded media is not of a supported type',
+        415,
+      ));
+    }
+
+    const imageBuffer = req.file.buffer;
+
     const fileName = `${uuidv4()}.jpeg`;
     const key = `groups/${id}/${fileName}`;
 
