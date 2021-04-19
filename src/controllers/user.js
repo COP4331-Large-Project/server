@@ -177,12 +177,15 @@ const User = {
       return next(new APIError());
     }
 
-    groups.map((group) => {
+    await Promise.all(groups.map(async group => {
       const copy = group;
       copy.id = group._id;
       delete copy._id;
+
+      copy.thumbnail.URL = await S3.getPreSignedURL(`groups/${copy.id}/${copy.thumbnail.fileName}`);
+
       return copy;
-    });
+    }));
 
     return res.status(200).send(groups);
   },
