@@ -124,6 +124,10 @@ const Group = {
       ));
     }
 
+    [result] = result;
+    result.id = result._id;
+    delete result._id;
+
     result.thumbnail = await Group.thumbnail(true)(req, res, next) ?? null;
     return res.status(200).send(result);
   },
