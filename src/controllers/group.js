@@ -110,7 +110,7 @@ const Group = {
     let result;
 
     try {
-      result = await GroupModel.aggregate(singleGroup(id)).exec();
+      [result] = await GroupModel.aggregate(singleGroup(id)).exec();
     } catch (err) {
       return next(new APIError());
     }
