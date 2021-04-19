@@ -1,7 +1,6 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
-import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import { singleGroup } from '../aggregations';
 import GroupModel from '../models/group';
@@ -188,9 +187,8 @@ const Group = {
       ));
     }
 
-    const imageBuffer = await sharp(req.file.buffer)
-      .jpeg()
-      .toBuffer();
+    const imageBuffer = req.file.buffer;
+
     const fileName = `${uuidv4()}.jpeg`;
     const key = `groups/${id}/${fileName}`;
 
