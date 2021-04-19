@@ -39,7 +39,7 @@ userSchema.pre('aggregate', function populate() {
   this.lookup({
     from: 'images', localField: 'thumbnail', foreignField: '_id', as: 'thumbnail',
   });
-  this.unwind('thumbnail');
+  this.unwind({ path: '$thumbnail', preserveNullAndEmptyArrays: true });
 });
 
 const User = mongoose.model(modelName, userSchema);

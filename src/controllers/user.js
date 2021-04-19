@@ -182,6 +182,11 @@ const User = {
       copy.id = group._id;
       delete copy._id;
 
+      if (!copy.thumbnail) {
+        copy.thumbnail = null;
+        return copy;
+      }
+
       copy.thumbnail.URL = await S3.getPreSignedURL(`groups/${copy.id}/${copy.thumbnail.fileName}`);
 
       return copy;
