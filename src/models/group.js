@@ -47,7 +47,7 @@ groupSchema
       from: 'users', localField: 'invitedUsers', foreignField: '_id', as: 'invitedUsers',
     });
     this.lookup({
-      from: 'images', localField: 'thumbnail', foreignField: '_id', as: 'images',
+      from: 'images', localField: 'thumbnail', foreignField: '_id', as: 'thumbnail',
     });
   });
 

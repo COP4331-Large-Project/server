@@ -124,7 +124,6 @@ const Group = {
       ));
     }
 
-    [result] = result;
     result.id = result._id;
     delete result._id;
 
@@ -212,10 +211,7 @@ const Group = {
     });
 
     try {
-      await group.updateOne(
-        { thumbnail: image._id },
-
-      ).exec();
+      await group.updateOne({ thumbnail: image._id }).exec();
       await image.save();
     } catch (err) {
       return next(new APIError(
