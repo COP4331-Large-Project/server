@@ -173,7 +173,6 @@ const User = {
     try {
       groups = await UserModel.aggregate(groupList(id)).exec();
     } catch (err) {
-      console.log(err);
       return next(new APIError());
     }
 
