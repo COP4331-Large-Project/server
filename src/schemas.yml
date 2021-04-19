@@ -90,6 +90,8 @@ Group:
       $ref: '#/components/schemas/Image'
     publicGroup:
       type: boolean
+    memberCount:
+      type: integer
 GroupRequest:
   type: object
   properties:
