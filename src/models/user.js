@@ -29,6 +29,19 @@ const userSchema = new mongoose.Schema({
 
 // userSchema.post('findOne', autoPopulate);
 
+userSchema.pre('aggregate', function populate() {
+  this.lookup({
+    from: 'users', localField: 'creator', foreignField: '_id', as: 'creator',
+  });
+  this.lookup({
+    from: 'users', localField: 'invitedUsers', foreignField: '_id', as: 'invitedUsers',
+  });
+  this.lookup({
+    from: 'images', localField: 'thumbnail', foreignField: '_id', as: 'thumbnail',
+  });
+  this.unwind({ path: '$thumbnail', preserveNullAndEmptyArrays: true });
+});
+
 const User = mongoose.model(modelName, userSchema);
 
 export default User;

@@ -38,7 +38,18 @@ groupSchema
   .pre('find', function populate() { this.populate(populateFields); })
   // uses regex to apply to all variants of "Document.delete-"
   .pre(/^delete/, { document: true }, deepDelete)
-  .post(['findOne', 'save'], autoPopulate);
+  .post(['findOne', 'save'], autoPopulate)
+  .pre('aggregate', function populate() {
+    this.lookup({
+      from: 'users', localField: 'creator', foreignField: '_id', as: 'creator',
+    });
+    this.lookup({
+      from: 'users', localField: 'invitedUsers', foreignField: '_id', as: 'invitedUsers',
+    });
+    this.lookup({
+      from: 'images', localField: 'thumbnail', foreignField: '_id', as: 'thumbnail',
+    });
+  });
 
 const Group = mongoose.model(modelName, groupSchema);
 
