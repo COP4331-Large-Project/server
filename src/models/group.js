@@ -24,7 +24,7 @@ const deepDelete = async function deepDelete() {
   );
 };
 
-const populateFields = 'users creator invitedUsers';
+const populateFields = 'creator invitedUsers';
 
 const autoPopulate = async function populator(doc) {
   if (!doc) {

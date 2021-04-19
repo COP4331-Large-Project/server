@@ -3,6 +3,7 @@
 import mongoose from 'mongoose';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
+import { singleGroup } from '../aggregations';
 import GroupModel from '../models/group';
 import ImageModel from '../models/image';
 import UserModel from '../models/user';
@@ -109,7 +110,7 @@ const Group = {
     let result;
 
     try {
-      result = await GroupModel.findOne({ _id: id }).exec();
+      result = await GroupModel.aggregate(singleGroup(id)).exec();
     } catch (err) {
       return next(new APIError());
     }
@@ -123,7 +124,6 @@ const Group = {
       ));
     }
 
-    result = result.toJSON();
     result.thumbnail = await Group.thumbnail(true)(req, res, next) ?? null;
     return res.status(200).send(result);
   },

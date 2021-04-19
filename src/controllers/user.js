@@ -7,6 +7,7 @@ import S3 from '../services/S3';
 import SendGrid from '../services/SendGrid';
 import { logger } from '../globals';
 import { createToken } from '../services/JWTAuthentication';
+import { groupList } from '../aggregations';
 
 async function sendVerificationEmail(user) {
   const link = `https://www.imageus.io/verify/?id=${user.id}&verificationCode=${user.verificationCode}`;
@@ -168,14 +169,15 @@ const User = {
 
   fetchGroups: async (req, res, next) => {
     const { id } = req.params;
-    let user;
+    let groups;
     try {
-      user = await (await UserModel.findById(id).populate('groups')).execPopulate();
+      groups = await UserModel.aggregate(groupList(id)).exec();
     } catch (err) {
+      console.log(err);
       return next(new APIError());
     }
 
-    return res.status(200).send(user.toJSON().groups);
+    return res.status(200).send(groups);
   },
 
   update: async (req, res, next) => {
