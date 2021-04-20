@@ -1,7 +1,10 @@
 import dotenv from 'dotenv';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import { logger } from './globals';
+import { emitter } from './controllers/group';
 import initWebServer from './services/webServer';
-import Socket from './services/Socket';
+// import Socket from './services/Socket';
 
 (async function main() {
   // Load in environment variables from file.
@@ -14,8 +17,14 @@ import Socket from './services/Socket';
   }
 
   // Start listening for webserver connections.
-  app.listen(process.env.PORT || 5000);
+  httpServer.listen(process.env.PORT || 5000);
 
-  // Initialize Socket
-  Socket.createServer(app);
+  io.on('connection', (socket) => {
+    console.log('New client connected');
+    socket.emit('joined');
+    socket.on('ping', () => {
+      console.log('pong');
+    });
+    socket.emit('joined group');
+  });
 }());

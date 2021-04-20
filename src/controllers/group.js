@@ -436,4 +436,19 @@ const Group = {
   },
 };
 
+const emitter = (io, socket) => {
+  const createOrder = (payload) => {
+    console.log('og');
+  };
+
+  const readOrder = (orderId, callback) => {
+    // ...
+  };
+
+  socket.on('create', createOrder);
+  socket.on('read', readOrder);
+};
+
 export default Group;
+
+export { emitter };
