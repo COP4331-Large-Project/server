@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-underscore-dangle */
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
@@ -186,6 +187,13 @@ const User = {
         copy.thumbnail = null;
         return copy;
       }
+
+      group.invitedUsers.map(user => {
+        const userCopy = user;
+        userCopy.id = user._id;
+        delete userCopy._id;
+        return userCopy;
+      });
 
       copy.thumbnail.URL = await S3.getPreSignedURL(`groups/${copy.id}/${copy.thumbnail.fileName}`);
 
