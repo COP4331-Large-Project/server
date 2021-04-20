@@ -1,13 +1,38 @@
+/* eslint-disable no-underscore-dangle */
 import sharp from 'sharp';
+import { v4 as uuidv4 } from 'uuid';
 import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import PasswordHasher from '../services/PasswordHasher';
 import S3 from '../services/S3';
+import SendGrid from '../services/SendGrid';
 import { logger } from '../globals';
 import { createToken } from '../services/JWTAuthentication';
+import { groupList } from '../aggregations';
+
+async function sendVerificationEmail(user) {
+  const link = `https://www.imageus.io/verify/?id=${user.id}&verificationCode=${user.verificationCode}`;
+
+  try {
+    await SendGrid.sendMessage({
+      to: user.email,
+      from: 'no-reply@imageus.io',
+      subject: 'Please Verify Your Account for ImageUs',
+      text: `${user.firstName} ${user.lastName},
+      Please verify your account by clicking the link below:
+      ${link}`,
+    });
+  } catch (err) {
+    throw new APIError(
+      'Failed to send email',
+      'An error occured while trying to send the email',
+      503,
+    );
+  }
+}
 
 const User = {
-  register: async (req, res, next) => {
+  async register(req, res, next) {
     const {
       firstName, lastName, email, username, password,
     } = req.body;
@@ -15,6 +40,8 @@ const User = {
     // Hash password
     const hashedPassword = await PasswordHasher.hash(password);
 
+    // Verification code
+    const verificationCode = uuidv4();
     // create new user model with given request body
     const newUser = new UserModel(
       {
@@ -23,6 +50,7 @@ const User = {
         email,
         username,
         password: hashedPassword,
+        verificationCode,
       },
     );
 
@@ -38,13 +66,18 @@ const User = {
           409,
         ));
       }
-
       return next(new APIError());
     }
 
     // Strip sensitive info
     const reifiedUser = user.toJSON();
     delete reifiedUser.password;
+
+    try {
+      await sendVerificationEmail(user);
+    } catch (err) {
+      return next(err);
+    }
 
     return res.status(201).send(reifiedUser);
   },
@@ -65,6 +98,14 @@ const User = {
       return next(new APIError(
         'Incorrect Credentials',
         'Cannot Log user in',
+      ));
+    }
+
+    if (!user.verified) {
+      return next(new APIError(
+        'The user is not verified',
+        'The user has not verified their email yet',
+        401,
       ));
     }
 
@@ -127,6 +168,33 @@ const User = {
     return res.status(200).send(retVal);
   },
 
+  fetchGroups: async (req, res, next) => {
+    const { id } = req.params;
+    let groups;
+    try {
+      groups = await UserModel.aggregate(groupList(id)).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    await Promise.all(groups.map(async group => {
+      const copy = group;
+      copy.id = group._id;
+      delete copy._id;
+
+      if (!copy.thumbnail) {
+        copy.thumbnail = null;
+        return copy;
+      }
+
+      copy.thumbnail.URL = await S3.getPreSignedURL(`groups/${copy.id}/${copy.thumbnail.fileName}`);
+
+      return copy;
+    }));
+
+    return res.status(200).send(groups);
+  },
+
   update: async (req, res, next) => {
     const { id } = req.params;
     let result;
@@ -148,6 +216,7 @@ const User = {
 
     return res.status(200).send(result.toJSON());
   },
+
   uploadProfile: async (req, res, next) => {
     const { id } = req.params;
 
@@ -175,6 +244,124 @@ const User = {
     }
 
     return res.status(200).send({ imgURL });
+  },
+
+  verify: async (req, res, next) => {
+    const { id } = req.params;
+    const { verificationCode } = req.body;
+    let result;
+
+    try {
+      result = await UserModel.findOneAndUpdate({ _id: id, verificationCode },
+        { verified: true }).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    if (!result) {
+      return next(new APIError(
+        'User could not be found',
+        `User with id ${id} was not found`,
+        404,
+        `users/${id}/verify`,
+      ));
+    }
+
+    return res.status(200).send(result.toJSON());
+  },
+
+  emailPasswordRecovery: async (req, res, next) => {
+    const { email } = req.body;
+    let result;
+    const verificationCode = uuidv4();
+    try {
+      result = await UserModel.findOneAndUpdate({ email }, verificationCode);
+    } catch (err) {
+      return next(new APIError());
+    }
+    if (!result) {
+      return next(new APIError(
+        'User could not be found',
+        `User with ${email} could not be found`,
+        404,
+        `users/${email}/passwordRecovery`,
+      ));
+    }
+
+    const link = `https://www.imageus.io/users/${result.id}/password-reset/?verificationCode=${verificationCode}`;
+
+    SendGrid.sendMessage({
+      to: result.email,
+      from: 'no-reply@imageus.io',
+      subject: 'Password Reset for ImageUs',
+      text: 'Please visit the link below to reset your password, if you did not attempt to change your password you can'
+          + ' ignore this email.:'
+          + `${link}`,
+    }).catch((err) => next(new APIError(
+      'Failed to send email',
+      'An error occured while trying to send the email',
+      503,
+      err,
+    )));
+
+    return res.status(200).send(result.toJSON());
+  },
+
+  resetPassword: async (req, res, next) => {
+    const { email, verificationCode, password } = req.body;
+    try {
+      const user = await UserModel.findOne({ email }).exec();
+
+      if (!user) {
+        return next(new APIError(
+          'Password not reset',
+          'The given email does not have an associated account',
+          404,
+        ));
+      }
+
+      if (user.verificationCode !== verificationCode) {
+        return next(new APIError(
+          'Password not reset',
+          'The verification code is invalid',
+          403,
+        ));
+      }
+
+      const hashedPassword = await PasswordHasher.hash(password);
+      await user.updateOne({ password: hashedPassword }).exec();
+      return res.status(204).send();
+    } catch (err) {
+      return next(new APIError(undefined, undefined, undefined, err));
+    }
+  },
+
+  async resendVerificationEmail(req, res, next) {
+    const { email } = req.body;
+
+    let user;
+
+    try {
+      user = await UserModel.findOne({ email }).exec();
+    } catch (err) {
+      return next(new APIError());
+    }
+
+    if (!user) {
+      return next(new APIError(
+        'User Could not be found',
+        'No such User exists',
+        404,
+      ));
+    }
+
+    try {
+      await sendVerificationEmail(user.toJSON());
+    } catch (err) {
+      return next(err);
+    }
+
+    return res.status(204).send();
   },
 };
 

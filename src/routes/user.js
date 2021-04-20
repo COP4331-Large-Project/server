@@ -154,6 +154,44 @@ router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
 /**
  * @swagger
  * path:
+ * /users/resetPassword:
+ *   post:
+ *     description: Reset the password of the user
+ *     summary: 'Given a valid verification code and user attached to the given email,
+ *       the user''s password will be reset'
+ *     tags:
+ *     - User
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               verificationCode:
+ *                 type: string
+ *                 format: uuid
+ *               password:
+ *                 type: string
+ *
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       204:
+ *         description: OK
+ *       403:
+ *         description: Incorrect verification code
+ *       404:
+ *         description: Could not find user
+ */
+router.put('/resetPassword', User.resetPassword);
+
+/**
+ * @swagger
+ * path:
  * /users/{id}:
  *    put:
  *      description: Updates an existing user.
@@ -247,4 +285,160 @@ router.put('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  */
 router.put('/:id/profile', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, upload.single('avatar'), User.uploadProfile);
 
+/**
+ * @swagger
+ * path:
+ * /users/{id}/verify:
+ *   post:
+ *     description: This route verifies the user
+ *     summary: Update the user by changing the verified to true
+ *     tags:
+ *     - User
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The id of the user to be verified
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               verificationCode:
+ *                 type: string
+ *                 format: uuid
+ *
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponse'
+ *       404:
+ *         description: Could not find user
+ */
+router.post('/:id/verify', User.verify);
+
+/**
+ * @swagger
+ * path:
+ * /users/passwordRecovery:
+ *   post:
+ *     description: Send the password recovery link to user's email
+ *     summary: Send password recovery link
+ *     tags:
+ *     - User
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponse'
+ *       404:
+ *         description: Could not find user
+ *       503:
+ *         description: Failure to send email
+ */
+router.post('/passwordRecovery', User.emailPasswordRecovery);
+
+/**
+ * @swagger
+ * path:
+ * /users/resendVerificationEmail:
+ *   post:
+ *     description: Sends a verification link to user's email
+ *     summary: Send a verification link
+ *     tags:
+ *     - User
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponse'
+ *       404:
+ *         description: Could not find user
+ *       503:
+ *         description: Failure to send email
+ *       default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
+router.post('/resendVerificationEmail', User.resendVerificationEmail);
+
+/**
+ * @swagger
+ * path:
+ * /users/{id}/groups:
+ *   get:
+ *     description: Gets the groups associated with the user.
+ *     summary: Get the User's groups
+ *     tags:
+ *     - User
+ *
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 groups:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Group'
+ *       404:
+ *         description: Could not find user
+ *       503:
+ *         description: Failure to send email
+ *       default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
+router.get('/:id/groups', User.fetchGroups);
 export default router;

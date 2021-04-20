@@ -43,6 +43,11 @@ UserResponse:
       example: 5424dfae4eb45345bc13b778
     imgURL:
       type: string
+    verified:
+      type: boolean
+    verificationCode:
+      type: string
+      format: uuid
 UserRequest:
   type: object
   properties:
@@ -75,30 +80,37 @@ Group:
       example: 7834dfae4eb89145bc13b559
     inviteCode:
       type: string
-    users:
-      type: array
-      items:
-        $ref: '#/components/schemas/UserResponse'
     creator:
       $ref: '#/components/schemas/UserResponse'
     invitedUsers:
       type: array
       items:
         $ref: '#/components/schemas/UserResponse'
-    images:
-      type: array
-      items:
-        $ref: '#/components/schemas/Image'
+    thumbnail:
+      $ref: '#/components/schemas/Image'
     publicGroup:
       type: boolean
+    memberCount:
+      type: integer
 GroupRequest:
   type: object
   properties:
     creator:
       type: string
       required: true
+      example: 6054efc382a29147557b6b14
     name:
       type: string
+      required: true
+      example: My Wonderful Group
+    invitedUsers:
+      type: array
+      required: false
+      items:
+        type: string
+        example: 6054f640197f5b1ff87610da
+    publicGroup:
+      type: boolean
       required: true
 GroupUpdate:
   type: object
@@ -132,3 +144,14 @@ Image:
     dateUploaded:
       type: string
       format: date-time
+    URL:
+      type: string
+RemoveUsers:
+  type: object
+  properties:
+    users:
+      type: array
+      required: true
+      items:
+        type: string
+        example: 6054f640197f5b1ff87610da

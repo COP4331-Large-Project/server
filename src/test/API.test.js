@@ -1,14 +1,13 @@
 import request from 'supertest';
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
-import Client from 'socket.io-client';
 import initWebServer from '../services/webServer';
-import Socket from '../services/Socket';
 import UserModel from '../models/user';
 import GroupModel from '../models/group';
 
 let app;
-jest.setTimeout(20000);
+
+jest.setTimeout(30000);
 
 // Random username generation
 const username = uuidv4();
@@ -27,14 +26,13 @@ let groupPayload;
 // Initialize the web app.
 beforeAll(async () => {
   app = await initWebServer(app);
-}, 30000);
+});
 
-afterAll(async (done) => {
+afterAll(async () => {
   await UserModel.findOneAndDelete({ _id: userPayload.id });
   await GroupModel.findOneAndDelete({ inviteCode: groupPayload.inviteCode });
   // Shut down web server.
   await mongoose.connection.close();
-  done();
 });
 
 describe('User API methods', () => {
@@ -54,7 +52,20 @@ describe('User API methods', () => {
       .expect(201);
 
     userPayload.id = response.body.id;
+    userPayload.verificationCode = response.body.verificationCode;
     delete response.body.imgURL;
+    expect(response.body).toMatchObject(userPayload);
+  });
+
+  test('Verifying user', async () => {
+    const response = await request(app)
+      .post(`/users/${userPayload.id}/verify`)
+      .send({
+        verificationCode: userPayload.verificationCode,
+      })
+      .expect('Content-Type', /json/)
+      .expect(200);
+
     expect(response.body).toMatchObject(userPayload);
   });
 
@@ -76,7 +87,9 @@ describe('Group API Methods', () => {
   test('Creating new group', async () => {
     const res = await request(app)
       .post('/groups')
-      .send({ creator: userPayload.id, name: 'My group name' })
+      .send({
+        creator: userPayload.id, name: 'My group Name', publicGroup: true, emails: [],
+      })
       .expect('Content-Type', /json/)
       .expect(200);
 
@@ -85,53 +98,12 @@ describe('Group API Methods', () => {
     expect(res.body).toMatchObject(groupPayload);
   });
 
-  test('Join new group', async () => {
+  test('Show Group Membership', async () => {
     const res = await request(app)
-      .post(`/groups/join/${groupPayload.inviteCode}`)
-      .send({ user: userPayload.id })
-      .expect(204);
+      .get(`/users/${userPayload.id}/groups`)
+      .expect('Content-Type', /json/)
+      .expect(200);
 
-    groupPayload.invitedUsers = res.body.invitedUsers;
-  });
-});
-
-describe('Socket test', () => {
-  let io;
-  let serverSocket;
-  let clientSocket;
-
-  beforeAll((done) => {
-    io = Socket.createServer();
-    Socket.getHttpServer().listen(() => {
-      const { port } = Socket.getHttpServer().address();
-      clientSocket = new Client(`http://localhost:${port}`);
-      io.on('connection', (socket) => {
-        serverSocket = socket;
-      });
-      clientSocket.on('connect', done);
-    });
-  });
-
-  afterAll(() => {
-    io.close();
-    clientSocket.close();
-  });
-
-  test('should work', (done) => {
-    clientSocket.on('hello', (arg) => {
-      expect(arg).toBe('world');
-      done();
-    });
-    serverSocket.emit('hello', 'world');
-  });
-
-  test('should work (with ack)', (done) => {
-    serverSocket.on('hi', (cb) => {
-      cb('hola');
-    });
-    clientSocket.emit('hi', (arg) => {
-      expect(arg).toBe('hola');
-      done();
-    });
+    expect(res.body[0].id === groupPayload.id);
   });
 });
