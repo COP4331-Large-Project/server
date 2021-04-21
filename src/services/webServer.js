@@ -4,6 +4,7 @@ import cors from 'cors';
 import requestSanitizer from 'express-mongo-sanitize';
 import swaggerUi from 'swagger-ui-express';
 import { connectToDB } from './mongo';
+import Socket from './Socket';
 import router from '../routes';
 import ErrorHandler from './ErrorHandler';
 import swaggerSpecs from './swagger';
@@ -12,12 +13,7 @@ const app = express();
 
 async function initWebServer() {
   const httpServer = createServer(app);
-  // const io = new Server(httpServer, {
-  //   cors: {
-  //     origin: 'http://localhost:3000',
-  //     methods: ['GET', 'POST'],
-  //   },
-  // });
+  Socket(httpServer);
 
   await connectToDB();
 
