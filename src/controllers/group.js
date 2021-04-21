@@ -9,6 +9,7 @@ import UserModel from '../models/user';
 import APIError from '../services/APIError';
 import S3 from '../services/S3';
 import SendGrid from '../services/SendGrid';
+import { getIo as io } from '../services/Socket';
 
 const { ObjectId } = mongoose.Types;
 
@@ -93,6 +94,8 @@ const Group = {
       group = (await GroupModel
         .findOne({ inviteCode })
         .exec());
+      // we pass 1 as the 'users joined' count just for continuity and future-proofing
+      io().to(group.id).emit('users joined', 1, group.id);
       return res.status(200).send(group.toJSON());
     }
 
@@ -114,13 +117,6 @@ const Group = {
       return next(new APIError());
     }
 
-    result.invitedUsers.map(user => {
-      const userCopy = user;
-      userCopy.id = user._id;
-      delete userCopy._id;
-      return userCopy;
-    });
-
     if (!result) {
       return next(new APIError(
         'Could not find Group',
@@ -129,6 +125,13 @@ const Group = {
         `/groups/${id}`,
       ));
     }
+
+    result.invitedUsers.map(user => {
+      const userCopy = user;
+      userCopy.id = user._id;
+      delete userCopy._id;
+      return userCopy;
+    });
 
     result.id = result._id;
     delete result._id;
@@ -247,6 +250,7 @@ const Group = {
 
     image.URL = await S3.getPreSignedURL(key);
 
+    io().in(`${group.id}`).emit('image uploaded', image, group.id);
     return res.status(200).send(image);
   },
 
@@ -439,6 +443,7 @@ const Group = {
       { $pull: { groups: group._id } },
     );
 
+    io().to(group.id).emit('users removed', users.length, group.id);
     return res.status(204).send();
   },
 };
