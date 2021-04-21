@@ -5,7 +5,7 @@ let io;
 const makeIo = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
-      origin: 'http://localhost:3000',
+      origin: true,
       methods: ['GET', 'POST'],
     },
   });
