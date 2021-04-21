@@ -168,9 +168,9 @@ router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  *         application/json:
  *           schema:
  *             properties:
- *               email:
+ *               userId:
  *                 type: string
- *                 format: email
+ *                 example: 7834dfae4eb89145bc13b559
  *               verificationCode:
  *                 type: string
  *                 format: uuid
@@ -187,7 +187,7 @@ router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.
  *       404:
  *         description: Could not find user
  */
-router.put('/resetPassword', User.resetPassword);
+router.post('/resetPassword', User.resetPassword);
 
 /**
  * @swagger

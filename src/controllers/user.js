@@ -316,14 +316,14 @@ const User = {
   },
 
   resetPassword: async (req, res, next) => {
-    const { email, verificationCode, password } = req.body;
+    const { userId, verificationCode, password } = req.body;
     try {
-      const user = await UserModel.findOne({ email }).exec();
+      const user = await UserModel.findById(userId).exec();
 
       if (!user) {
         return next(new APIError(
           'Password not reset',
-          'The given email does not have an associated account',
+          'The given id does not represent a valid user',
           404,
         ));
       }
