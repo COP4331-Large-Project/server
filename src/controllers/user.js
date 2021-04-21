@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-underscore-dangle */
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
@@ -187,6 +188,13 @@ const User = {
         return copy;
       }
 
+      group.invitedUsers.map(user => {
+        const userCopy = user;
+        userCopy.id = user._id;
+        delete userCopy._id;
+        return userCopy;
+      });
+
       copy.thumbnail.URL = await S3.getPreSignedURL(`groups/${copy.id}/${copy.thumbnail.fileName}`);
 
       return copy;
@@ -275,7 +283,7 @@ const User = {
     let result;
     const verificationCode = uuidv4();
     try {
-      result = await UserModel.findOneAndUpdate({ email }, verificationCode);
+      result = await UserModel.findOneAndUpdate({ email }, { verificationCode }).exec();
     } catch (err) {
       return next(new APIError());
     }
@@ -308,14 +316,14 @@ const User = {
   },
 
   resetPassword: async (req, res, next) => {
-    const { email, verificationCode, password } = req.body;
+    const { userId, verificationCode, password } = req.body;
     try {
-      const user = await UserModel.findOne({ email }).exec();
+      const user = await UserModel.findById(userId).exec();
 
       if (!user) {
         return next(new APIError(
           'Password not reset',
-          'The given email does not have an associated account',
+          'The given id does not represent a valid user',
           404,
         ));
       }

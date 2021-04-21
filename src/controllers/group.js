@@ -114,6 +114,13 @@ const Group = {
       return next(new APIError());
     }
 
+    result.invitedUsers.map(user => {
+      const userCopy = user;
+      userCopy.id = user._id;
+      delete userCopy._id;
+      return userCopy;
+    });
+
     if (!result) {
       return next(new APIError(
         'Could not find Group',
