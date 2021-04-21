@@ -353,6 +353,38 @@ const Group = {
     return res.status(201).send({ images });
   },
 
+  deleteImages: async (req, res, next) => {
+    // array of image ids
+    const { images } = req.body;
+    const { id } = req.params;
+    let group;
+
+    try {
+      group = GroupModel.findById(id).exec();
+    } catch (err) {
+      return next(new APIError(
+        undefined,
+        undefined,
+        undefined,
+        err,
+      ));
+    }
+
+    if (!group) {
+      return next(new APIError(
+        'Could not find Group',
+        `Group with id ${id} could not be found.`,
+        404,
+        `/groups/${id}`,
+      ));
+    }
+    images.map((image) => ObjectId(image));
+
+    // TO-DO: delete objects from S3
+    await ImageModel.deleteMany({ $and: [{ _id: { $in: images } }, { groupID: id }] }).exec();
+    res.status(200).send();
+  },
+
   // internalCall is used for the register endpoint so that a http response isnt sent
   inviteUsers: (internalCall = false) => async (req, res, next) => {
     const { id } = req.params;
