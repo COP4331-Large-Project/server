@@ -283,7 +283,7 @@ const User = {
     let result;
     const verificationCode = uuidv4();
     try {
-      result = await UserModel.findOneAndUpdate({ email }, verificationCode);
+      result = await UserModel.findOneAndUpdate({ email }, { verificationCode }).exec();
     } catch (err) {
       return next(new APIError());
     }
