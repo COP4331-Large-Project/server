@@ -1,4 +1,5 @@
 import express from 'express';
+import { createServer } from 'http';
 import cors from 'cors';
 import requestSanitizer from 'express-mongo-sanitize';
 import swaggerUi from 'swagger-ui-express';
@@ -7,10 +8,17 @@ import router from '../routes';
 import ErrorHandler from './ErrorHandler';
 import swaggerSpecs from './swagger';
 
-async function initWebServer() {
-  const app = express();
+const app = express();
 
-  // Connect to the database
+async function initWebServer() {
+  const httpServer = createServer(app);
+  // const io = new Server(httpServer, {
+  //   cors: {
+  //     origin: 'http://localhost:3000',
+  //     methods: ['GET', 'POST'],
+  //   },
+  // });
+
   await connectToDB();
 
   // Enable cross origin
@@ -33,7 +41,9 @@ async function initWebServer() {
     swaggerUi.setup(swaggerSpecs(), { explorer: true }),
   );
 
-  return app;
+  return httpServer;
 }
 
 export default initWebServer;
+
+export { app };

@@ -1,19 +1,28 @@
-import Server from 'http';
-import http from 'socket.io';
+import { Server } from 'socket.io';
 
 let io;
-let httpServer;
 
-const createServer = (app) => {
-  httpServer = http(app);
+const makeIo = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
       origin: 'http://localhost:3000',
       methods: ['GET', 'POST'],
     },
   });
+
+  // once a connection to a socket has been made
+  io.on('connection', (socket) => {
+    // get the groupId from the socket's 'join' event, and put them into a room with that groupId
+    socket.on('join', (groupId) => {
+      socket.join(groupId);
+    });
+  });
+
+  return io;
 };
 
-export default Socket;
+const getIo = () => io;
 
-export { io, httpServer, createServer };
+export default makeIo;
+
+export { getIo };
