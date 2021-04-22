@@ -3,6 +3,8 @@
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import UserModel from '../models/user';
+import GroupModel from '../models/group';
+import ImageModel from '../models/image';
 import APIError from '../services/APIError';
 import PasswordHasher from '../services/PasswordHasher';
 import S3 from '../services/S3';
@@ -124,6 +126,11 @@ const User = {
 
     try {
       result = await UserModel.findOneAndDelete({ _id: id }).exec();
+      await ImageModel.deleteMany({ creator: id }).exec();
+      await GroupModel.updateMany(
+        { invitedUsers: { $in: [id] } },
+        { $pull: { invitedUsers: id } },
+      ).exec();
     } catch (err) {
       next(new APIError());
     }
