@@ -159,7 +159,7 @@ router.delete('/:id', (req, res, next) => { authenticate(req, res, next, { id: r
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, User.fetch);
+router.get('/:id', (req, res, next) => { authenticate(req, res, next, { id: req.params.id }); }, User.fetch(false));
 
 /**
  * @swagger

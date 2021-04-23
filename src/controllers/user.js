@@ -148,7 +148,7 @@ const User = {
     return res.status(204).send();
   },
 
-  fetch: async (req, res, next) => {
+  fetch: (internalCall = false) => async (req, res, next) => {
     const { id } = req.params;
     let result;
     let imgURL;
@@ -174,7 +174,8 @@ const User = {
     const retVal = result.toJSON();
     retVal.imgURL = imgURL;
 
-    return res.status(200).send(retVal);
+    if (!internalCall) return res.status(200).send(retVal);
+    return retVal;
   },
 
   fetchGroups: async (req, res, next) => {
@@ -230,7 +231,8 @@ const User = {
       ));
     }
 
-    return res.status(200).send(result.toJSON());
+    const updatedUser = await User.fetch(true)(req, res, next);
+    return res.status(200).send(updatedUser);
   },
 
   uploadProfile: async (req, res, next) => {
