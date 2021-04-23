@@ -89,7 +89,7 @@ router.post('/login', User.login);
  * /users/{id}:
  *    delete:
  *      description: Deletes a user
- *      summary: Deletes a user with the given id
+ *      summary: Deletes a user with the given id and valid password
  *      tags:
  *        - User
  *
@@ -100,12 +100,22 @@ router.post('/login', User.login);
  *          schema:
  *           type: string
  *          description: The ID of the user to delete.
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              properties:
+ *                password:
+ *                  type: string
  *
  *      produces:
  *        - application/json
  *      responses:
  *        204:
  *          description: No Content
+ *        403:
+ *          description: Either the user does not exist or the given password is incorrect
  *        default:
  *          description: Unexpected Error
  *          content:
