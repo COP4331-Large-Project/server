@@ -313,7 +313,7 @@ const Group = {
         if (!internalCall) return res.status(200).send();
         return undefined;
       }
-      thumbnailDoc.URL = await S3.getPreSignedURL(`groups/${group._id}/${thumbnailDoc.fileName}`);
+      thumbnailDoc.URL = await S3.getPreSignedURL(thumbnailDoc.key);
     } catch (err) {
       return next(new APIError(
         undefined,
@@ -339,7 +339,7 @@ const Group = {
         imageRefs.map(async (x) => {
           // eslint-disable-next-line no-param-reassign
           const image = x;
-          image.URL = await S3.getPreSignedURL(`groups/${image.groupID}/${image.fileName}`);
+          image.URL = await S3.getPreSignedURL(image.key);
           return image;
         }),
       );
