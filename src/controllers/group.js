@@ -383,10 +383,10 @@ const Group = {
     try {
       images = await ImageModel.find({ $and: [{ _id: { $in: images } }, { groupID: id }] }).exec();
 
-      await Promise.all(images.map(async (image) => {
+      images.forEach((image) => {
         S3.deleteObject(image.key);
         image.deleteOne();
-      }));
+      });
     } catch (err) {
       return next(new APIError(
         undefined,
