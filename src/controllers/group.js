@@ -1,3 +1,4 @@
+/* eslint-disable no-return-await */
 /* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
@@ -355,12 +356,12 @@ const Group = {
 
   deleteImages: async (req, res, next) => {
     // array of image ids
-    const { images } = req.body;
+    let { images } = req.body;
     const { id } = req.params;
     let group;
 
     try {
-      group = GroupModel.findById(id).exec();
+      group = await GroupModel.findById(id).exec();
     } catch (err) {
       return next(new APIError(
         undefined,
@@ -378,10 +379,23 @@ const Group = {
         `/groups/${id}`,
       ));
     }
-    images.map((image) => ObjectId(image));
 
-    // TO-DO: delete objects from S3
-    await ImageModel.deleteMany({ $and: [{ _id: { $in: images } }, { groupID: id }] }).exec();
+    try {
+      images = await ImageModel.find({ $and: [{ _id: { $in: images } }, { groupID: id }] }).exec();
+
+      await Promise.all(images.map(async (image) => {
+        S3.deleteObject(image.key);
+        image.deleteOne();
+      }));
+    } catch (err) {
+      return next(new APIError(
+        undefined,
+        undefined,
+        undefined,
+        err,
+      ));
+    }
+
     res.status(200).send();
   },
 
