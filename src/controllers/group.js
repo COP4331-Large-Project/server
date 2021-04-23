@@ -157,12 +157,9 @@ const Group = {
 
     // if the group creator is not truthy, they probably dont exist anymore
     // just let anyone delete the group at that point
-    if (group.creator === 'undefined' || group.creator === null || !Object.prototype.hasOwnProperty.call(group, 'creator')) {
-      await group.deleteOne();
-      return res.status(204).send();
-    }
+    const hasCreator = group.creator === 'undefined' || group.creator === null || !Object.prototype.hasOwnProperty.call(group, 'creator');
 
-    if (!group.creator._id.equals(user._id)) {
+    if (hasCreator && !group.creator._id.equals(user._id)) {
       return next(new APIError(
         'Group could not be deleted',
         'User is not permitted',
