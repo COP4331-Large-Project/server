@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import User from './user';
-import S3 from '../services/S3';
 
 const imageSchema = new mongoose.Schema({
   // This field will always be empty in the database
@@ -13,12 +12,9 @@ const imageSchema = new mongoose.Schema({
   groupID: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true },
 });
 
-async function deletePhoto() {
-  const key = `groups/${this.groupID}/${this.fileName}`;
-  await S3.deleteObject(key);
-}
-
-imageSchema.pre(/^delete/, deletePhoto);
+imageSchema.virtual('key').get(function getKey() {
+  return `groups/${this.groupID}/${this.fileName}`;
+});
 
 const Image = mongoose.model('Image', imageSchema);
 

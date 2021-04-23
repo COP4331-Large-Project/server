@@ -1,3 +1,4 @@
+/* eslint-disable no-return-await */
 /* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
@@ -156,12 +157,9 @@ const Group = {
 
     // if the group creator is not truthy, they probably dont exist anymore
     // just let anyone delete the group at that point
-    if (group.creator === 'undefined' || group.creator === null || !Object.prototype.hasOwnProperty.call(group, 'creator')) {
-      await group.deleteOne();
-      return res.status(204).send();
-    }
+    const hasCreator = group.creator === 'undefined' || group.creator === null || !Object.prototype.hasOwnProperty.call(group, 'creator');
 
-    if (!group.creator._id.equals(user._id)) {
+    if (hasCreator && !group.creator._id.equals(user._id)) {
       return next(new APIError(
         'Group could not be deleted',
         'User is not permitted',
@@ -312,7 +310,7 @@ const Group = {
         if (!internalCall) return res.status(200).send();
         return undefined;
       }
-      thumbnailDoc.URL = await S3.getPreSignedURL(`groups/${group._id}/${thumbnailDoc.fileName}`);
+      thumbnailDoc.URL = await S3.getPreSignedURL(thumbnailDoc.key);
     } catch (err) {
       return next(new APIError(
         undefined,
@@ -338,7 +336,7 @@ const Group = {
         imageRefs.map(async (x) => {
           // eslint-disable-next-line no-param-reassign
           const image = x;
-          image.URL = await S3.getPreSignedURL(`groups/${image.groupID}/${image.fileName}`);
+          image.URL = await S3.getPreSignedURL(image.key);
           return image;
         }),
       );
@@ -351,6 +349,51 @@ const Group = {
       ));
     }
     return res.status(201).send({ images });
+  },
+
+  deleteImages: async (req, res, next) => {
+    // array of image ids
+    let { images } = req.body;
+    const { id } = req.params;
+    let group;
+
+    try {
+      group = await GroupModel.findById(id).exec();
+    } catch (err) {
+      return next(new APIError(
+        undefined,
+        undefined,
+        undefined,
+        err,
+      ));
+    }
+
+    if (!group) {
+      return next(new APIError(
+        'Could not find Group',
+        `Group with id ${id} could not be found.`,
+        404,
+        `/groups/${id}`,
+      ));
+    }
+
+    try {
+      images = await ImageModel.find({ $and: [{ _id: { $in: images } }, { groupID: id }] }).exec();
+
+      images.forEach((image) => {
+        S3.deleteObject(image.key);
+        image.deleteOne();
+      });
+    } catch (err) {
+      return next(new APIError(
+        undefined,
+        undefined,
+        undefined,
+        err,
+      ));
+    }
+
+    res.status(200).send();
   },
 
   // internalCall is used for the register endpoint so that a http response isnt sent
@@ -410,7 +453,7 @@ const Group = {
 
   removeUsers: async (req, res, next) => {
     const { id } = req.params;
-    const users = req.body.users.map((x) => ObjectId(x));
+    let { users } = req.body;
     const group = (await GroupModel
       .findById(id)
       .exec());
@@ -426,13 +469,14 @@ const Group = {
       );
     }
 
+    users = users.map((x) => ObjectId(x));
+
     // remove user refernces from this group
     await group.updateOne(
       {
         $pull:
         {
           invitedUsers: { $in: users },
-          users: { $in: users },
         },
       },
     );

@@ -3,6 +3,8 @@
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import UserModel from '../models/user';
+import GroupModel from '../models/group';
+import ImageModel from '../models/image';
 import APIError from '../services/APIError';
 import PasswordHasher from '../services/PasswordHasher';
 import S3 from '../services/S3';
@@ -120,21 +122,27 @@ const User = {
 
   delete: async (req, res, next) => {
     const { id } = req.params;
-    let result;
+    let user;
 
     try {
-      result = await UserModel.findOneAndDelete({ _id: id }).exec();
+      user = await UserModel.findById(id, '+password').exec();
+
+      if (!user || !await PasswordHasher.validateHash(req.body.password, user.password)) {
+        return next(new APIError(
+          'User not deleted',
+          'Either the user does not exist or the given password is incorrect',
+          403,
+          `/users/${id}/`,
+        ));
+      }
+      await user.deleteOne();
+      await ImageModel.deleteMany({ creator: id }).exec();
+      await GroupModel.updateMany(
+        { invitedUsers: { $in: [id] } },
+        { $pull: { invitedUsers: id } },
+      ).exec();
     } catch (err) {
       next(new APIError());
-    }
-
-    if (!result) {
-      return next(new APIError(
-        'User Could not be deleted',
-        'No such User exists',
-        404,
-        `/users/${id}/`,
-      ));
     }
 
     return res.status(204).send();

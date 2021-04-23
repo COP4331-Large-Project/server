@@ -340,6 +340,52 @@ groups.put('/:id/uploadImage', upload.single('groupPicture'), Group.upload);
 /**
  * @swagger
  * path:
+ * /groups/{id}/deleteImages:
+ *    put:
+ *      description: Deletes images from a group
+ *      summary: Deletes images from a group
+ *      tags:
+ *      - Group
+ *
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *            type: string
+ *          description: The ID of the group to delete images from
+ *
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          multipart/form-data:
+ *            schema:
+ *              properties:
+ *                images:
+ *                  type: array
+ *                  items:
+ *                    type: string
+ *                  example: ["607a666651911155a2b15e04", "607a666951911155a2b15e06"]
+ *
+ *      produces:
+ *        - application/json
+ *      responses:
+ *        204:
+ *          description: OK
+ *        404:
+ *          description: Invalid Group ID
+ *        default:
+ *          description: Unexpected Error
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/APIError'
+ */
+groups.post('/:id/deleteImages', Group.deleteImages);
+
+/**
+ * @swagger
+ * path:
  * /groups/{id}:
  *    put:
  *      description: Updates a group
