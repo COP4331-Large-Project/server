@@ -453,7 +453,7 @@ const Group = {
 
   removeUsers: async (req, res, next) => {
     const { id } = req.params;
-    const users = req.body.users.map((x) => ObjectId(x));
+    let { users } = req.body;
     const group = (await GroupModel
       .findById(id)
       .exec());
@@ -468,6 +468,8 @@ const Group = {
         ),
       );
     }
+
+    users = users.map((x) => ObjectId(x));
 
     // remove user refernces from this group
     await group.updateOne(
