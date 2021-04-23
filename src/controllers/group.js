@@ -464,7 +464,6 @@ const Group = {
         $pull:
         {
           invitedUsers: { $in: users },
-          users: { $in: users },
         },
       },
     );
