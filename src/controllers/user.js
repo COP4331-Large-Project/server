@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-underscore-dangle */
-import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import UserModel from '../models/user';
 import GroupModel from '../models/group';
@@ -246,9 +245,7 @@ const User = {
       ));
     }
 
-    const imageBuffer = await sharp(req.file.buffer)
-      .jpeg()
-      .toBuffer();
+    const imageBuffer = req.file.buffer;
 
     const key = `users/${id}/profile.jpeg`;
     let imgURL;
