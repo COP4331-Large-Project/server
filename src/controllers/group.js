@@ -97,7 +97,9 @@ const Group = {
         .exec());
       // we pass 1 as the 'users joined' count just for continuity and future-proofing
       io().to(group.id).emit('user joined', user.username, group.id);
-      return res.status(200).send(group.toJSON());
+      req.params.id = group.id;
+      const result = await Group.fetch(true)(req, res, next);
+      return res.status(200).send(result);
     }
 
     return next(new APIError(
@@ -108,7 +110,7 @@ const Group = {
     ));
   },
 
-  fetch: async (req, res, next) => {
+  fetch: (internalCall = false) => async (req, res, next) => {
     const { id } = req.params;
     let result;
 
@@ -138,7 +140,8 @@ const Group = {
     delete result._id;
 
     result.thumbnail = await Group.thumbnail(true)(req, res, next) ?? null;
-    return res.status(200).send(result);
+    if (!internalCall) return res.status(200).send(result);
+    return result;
   },
 
   delete: async (req, res, next) => {

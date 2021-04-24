@@ -47,7 +47,7 @@ const groups = express.Router();
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-groups.get('/:id', Group.fetch);
+groups.get('/:id', Group.fetch(false));
 
 /**
  * @swagger
