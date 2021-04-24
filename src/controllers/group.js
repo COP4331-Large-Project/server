@@ -96,7 +96,7 @@ const Group = {
         .findOne({ inviteCode })
         .exec());
       // we pass 1 as the 'users joined' count just for continuity and future-proofing
-      io().to(group.id).emit('users joined', 1, group.id);
+      io().to(group.id).emit('user joined', user.username, group.id);
       return res.status(200).send(group.toJSON());
     }
 
