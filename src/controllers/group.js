@@ -251,7 +251,9 @@ const Group = {
 
     image.URL = await S3.getPreSignedURL(key);
 
-    io().in(`${group.id}`).emit('image uploaded', image, group.id);
+    const user = await UserModel.findById(userId).exec();
+
+    io().in(`${group.id}`).emit('image uploaded', image, user.username, group.id);
     return res.status(200).send(image);
   },
 
