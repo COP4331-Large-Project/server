@@ -149,9 +149,6 @@ Image:
 RemoveUsers:
   type: object
   properties:
-    users:
-      type: array
-      required: true
-      items:
-        type: string
-        example: 6054f640197f5b1ff87610da
+    user:
+      type: string
+      example: 6054f640197f5b1ff87610da

@@ -454,9 +454,9 @@ const Group = {
     if (!internalCall) return res.status(204).send();
   },
 
-  removeUsers: async (req, res, next) => {
+  removeUser: async (req, res, next) => {
     const { id } = req.params;
-    let { users } = req.body;
+    let { user } = req.body;
     const group = (await GroupModel
       .findById(id)
       .exec());
@@ -472,28 +472,29 @@ const Group = {
       );
     }
 
-    users = users.map((x) => ObjectId(x));
+    user = await UserModel.findById(user).exec();
+
+    if (!user) {
+      return next(
+        new APIError(
+          'User not removed from group',
+          'User does not exist',
+          404,
+        ),
+      );
+    }
 
     // remove user refernces from this group
     await group.updateOne(
-      {
-        $pull:
-        {
-          invitedUsers: { $in: users },
-        },
-      },
-    );
+      { $pull: { invitedUsers: user._id } },
+    ).exec();
 
-    // remove reference to this group from users
-    await UserModel.updateMany(
-      {
-        $and:
-        [{ groups: { $in: group._id } }, { _id: { $in: users } }],
-      },
+    // remove reference to this group from the user
+    await user.updateOne(
       { $pull: { groups: group._id } },
-    );
+    ).exec();
 
-    io().to(group.id).emit('users removed', users.length, group.id);
+    io().to(group.id).emit('user removed', user.username, group.id);
     return res.status(204).send();
   },
 };

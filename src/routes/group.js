@@ -157,7 +157,7 @@ groups.delete('/:id', Group.delete);
 /**
  * @swagger
  * path:
- * /groups/{id}/removeUsers:
+ * /groups/{id}/removeUser:
  *    delete:
  *      description: Remove users from a group
  *      summary: Removes users from a group, also removing the reference to this group in those users
@@ -193,7 +193,7 @@ groups.delete('/:id', Group.delete);
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-groups.delete('/:id/removeUsers', Group.removeUsers);
+groups.delete('/:id/removeUser', Group.removeUser);
 
 /**
  * @swagger
