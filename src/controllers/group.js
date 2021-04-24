@@ -483,7 +483,10 @@ const Group = {
 
     // remove reference to this group from users
     await UserModel.updateMany(
-      { groups: { $in: group._id } },
+      {
+        $and:
+        [{ groups: { $in: group._id } }, { _id: { $in: users } }],
+      },
       { $pull: { groups: group._id } },
     );
 
