@@ -11,6 +11,7 @@ import SendGrid from '../services/SendGrid';
 import { logger } from '../globals';
 import { createToken } from '../services/JWTAuthentication';
 import { groupList } from '../aggregations';
+import Group from './group';
 
 async function sendVerificationEmail(user) {
   const link = `https://www.imageus.io/verify/?id=${user.id}&verificationCode=${user.verificationCode}`;
@@ -142,6 +143,12 @@ const User = {
           `/users/${id}/`,
         ));
       }
+      const owningGroups = await GroupModel.find({ creator: id }).exec();
+      await Promise.all(owningGroups.map(async (x) => {
+        req.params.id = x.id;
+        req.body.user = id;
+        await Group.delete(true)(req, res, next);
+      }));
       await user.deleteOne();
       await ImageModel.deleteMany({ creator: id }).exec();
       await GroupModel.updateMany(

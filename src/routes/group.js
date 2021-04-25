@@ -152,7 +152,7 @@ groups.post('/', Group.register);
  *              schema:
  *                $ref: '#/components/schemas/APIError'
  */
-groups.delete('/:id', Group.delete);
+groups.delete('/:id', Group.delete(false));
 
 /**
  * @swagger

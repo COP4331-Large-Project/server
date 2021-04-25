@@ -144,7 +144,7 @@ const Group = {
     return result;
   },
 
-  delete: async (req, res, next) => {
+  delete: (internalCall = false) => async (req, res, next) => {
     const { id } = req.params;
     const user = ObjectId(req.body.user);
     const group = await GroupModel.findById(id).exec();
@@ -173,7 +173,7 @@ const Group = {
 
     await group.deleteOne();
 
-    return res.status(204).send();
+    if (!internalCall) return res.status(204).send();
   },
 
   upload: async (req, res, next) => {
