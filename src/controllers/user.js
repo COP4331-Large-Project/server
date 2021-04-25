@@ -72,20 +72,12 @@ const User = {
       return next(new APIError());
     }
 
-    // Backdoor
-    if (user.email.includes('knights.ucf.edu')) {
-      await user.updateOne({ verified: true }).exec();
-      user = await UserModel.findById(user.id).exec();
-    }
-
     // Strip sensitive info
     const reifiedUser = user.toJSON();
     delete reifiedUser.password;
 
     try {
-      if (!user.email.includes('knights.ucf.edu')) {
-        await sendVerificationEmail(user);
-      }
+      await sendVerificationEmail(user);
     } catch (err) {
       return next(err);
     }
