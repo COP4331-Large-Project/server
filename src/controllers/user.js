@@ -149,12 +149,13 @@ const User = {
         req.body.user = id;
         await Group.delete(true)(req, res, next);
       }));
-      await user.deleteOne();
+
       await ImageModel.deleteMany({ creator: id }).exec();
       await GroupModel.updateMany(
         { invitedUsers: { $in: [id] } },
         { $pull: { invitedUsers: id } },
       ).exec();
+      await user.deleteOne();
     } catch (err) {
       next(new APIError());
     }

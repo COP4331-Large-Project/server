@@ -89,7 +89,7 @@ router.post('/login', User.login);
  * /users/{id}:
  *    delete:
  *      description: Deletes a user
- *      summary: Deletes a user with the given id and valid password
+ *      summary: Deletes a user, given their id and valid password. Also deletes their owned groups
  *      tags:
  *        - User
  *
