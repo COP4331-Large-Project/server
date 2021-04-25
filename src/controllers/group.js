@@ -383,9 +383,15 @@ const Group = {
     }
 
     try {
-      images = await ImageModel.find({ $and: [{ _id: { $in: images } }, { groupID: id }] }).exec();
+      const imageRefs = await ImageModel.find(
+        {
+          $and: [
+            { _id: { $in: images } },
+            { groupID: id }],
+        },
+      ).exec();
 
-      await Promise.all(images.map(async (image) => {
+      await Promise.all(imageRefs.map(async (image) => {
         await S3.deleteObject(image.key);
         await image.deleteOne();
       }));
@@ -396,6 +402,18 @@ const Group = {
         undefined,
         err,
       ));
+    }
+    images = images.map((x) => ObjectId(x));
+    const thumbnailDeleted = images.filter((x) => x.equals(group.thumbnail));
+
+    if (thumbnailDeleted.length === 1) {
+      const groupImages = await ImageModel.find({ groupID: id }).exec();
+      if (groupImages.length !== 0) {
+        groupImages.sort((a, b) => b.dateUploaded - a.dateUploaded);
+        await group.updateOne({ thumbnail: groupImages[0] }).exec();
+      } else {
+        await group.updateOne({ thumbnail: null }).exec();
+      }
     }
 
     res.status(200).send();
