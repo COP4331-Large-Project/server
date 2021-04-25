@@ -341,7 +341,7 @@ groups.put('/:id/uploadImage', upload.single('groupPicture'), Group.upload);
  * @swagger
  * path:
  * /groups/{id}/deleteImages:
- *    put:
+ *    post:
  *      description: Deletes images from a group
  *      summary: Deletes images from a group
  *      tags:
