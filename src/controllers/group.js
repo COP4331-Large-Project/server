@@ -172,6 +172,7 @@ const Group = {
     }
 
     await group.deleteOne();
+    io().in(`${group.id}`).emit('group deleted', group.id);
 
     if (!internalCall) return res.status(204).send();
   },
