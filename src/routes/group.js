@@ -52,7 +52,7 @@ groups.get('/:id', Group.fetch(false));
 /**
  * @swagger
  * path:
- * /groups/thumbnail/{id}:
+ * /groups/{id}/thumbnail/:
  *    get:
  *      description: Gets a group thumnail
  *      summary: Fetches the most recently uploaded picture
@@ -198,7 +198,7 @@ groups.delete('/:id/removeUser', Group.removeUser);
 /**
  * @swagger
  * path:
- * /groups/{inviteCode}:
+ * /groups/{inviteCode}/join:
  *    post:
  *      description: Joins a group
  *      summary: Join a group with the given invite code
