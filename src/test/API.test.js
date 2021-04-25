@@ -12,12 +12,13 @@ jest.setTimeout(30000);
 // Random username generation
 const username = uuidv4();
 const password = 'test';
+const email = uuidv4();
 
 // The expected body to recieve for login and register.
 const userPayload = {
   firstName: 'test123',
   lastName: 'test456',
-  email: '1234@email.com',
+  email: `${email}@email.com`,
   username,
 };
 
@@ -105,16 +106,14 @@ describe('User API methods', () => {
   });
 
   test('Reset password', async () => {
-    const res = await request(app)
+    await request(app)
       .post('/users/resetPassword')
       .send({
         userId: userPayload.id,
         verificationCode: userPayload.verificationCode,
         password: 'password',
       })
-      .expect('Content-Type', /json/)
-      .expect(200);
-    expect(res.body).toMatchObject(userPayload);
+      .expect(204);
   });
 
   test('Update user', async () => {
