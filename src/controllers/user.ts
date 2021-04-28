@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-underscore-dangle */
 import { v4 as uuidv4 } from 'uuid';
+import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import UserModel from '../models/user';
 import GroupModel from '../models/group';
 import ImageModel from '../models/image';
@@ -12,8 +14,9 @@ import { logger } from '../globals';
 import { createToken } from '../services/JWTAuthentication';
 import { groupList } from '../aggregations';
 import Group from './group';
+import { GroupDocument, UserDocument } from '../models/types';
 
-async function sendVerificationEmail(user) {
+async function sendVerificationEmail(user: UserDocument) {
   const link = `https://www.imageus.io/verify/?id=${user.id}&verificationCode=${user.verificationCode}`;
 
   try {
@@ -35,7 +38,7 @@ async function sendVerificationEmail(user) {
 }
 
 const User = {
-  async register(req, res, next) {
+  async register(req: Request, res: Response, next: Function) {
     const {
       firstName, lastName, email, username, password,
     } = req.body;
@@ -73,7 +76,7 @@ const User = {
     }
 
     // Strip sensitive info
-    const reifiedUser = user.toJSON();
+    const reifiedUser = user.toJSON<UserDocument>();
     delete reifiedUser.password;
 
     try {
@@ -85,7 +88,7 @@ const User = {
     return res.status(201).send(reifiedUser);
   },
 
-  login: async (req, res, next) => {
+  login: async (req: Request, res: Response, next: Function) => {
     let user;
 
     try {
@@ -97,7 +100,7 @@ const User = {
       return next(new APIError());
     }
 
-    if (!user || !await PasswordHasher.validateHash(req.body.password, user.password)) {
+    if (!user || !await PasswordHasher.validateHash(req.body.password, user.password!)) {
       return next(new APIError(
         'Incorrect Credentials',
         'Cannot Log user in',
@@ -120,14 +123,14 @@ const User = {
     return res.status(200).send(reifiedUser);
   },
 
-  delete: async (req, res, next) => {
+  delete: async (req: Request, res: Response, next: Function) => {
     const { id } = req.params;
     let user;
 
     try {
       user = await UserModel.findById(id, '+password').exec();
 
-      if (!user || !await PasswordHasher.validateHash(req.body.password, user.password)) {
+      if (!user || !await PasswordHasher.validateHash(req.body.password, user.password!)) {
         return next(new APIError(
           'User not deleted',
           'Either the user does not exist or the given password is incorrect',
@@ -135,7 +138,7 @@ const User = {
           `/users/${id}/`,
         ));
       }
-      const owningGroups = await GroupModel.find({ creator: id }).exec();
+      const owningGroups = await GroupModel.find({ creator: mongoose.Types.ObjectId(id) }).exec();
       await Promise.all(owningGroups.map(async (x) => {
         req.params.id = x.id;
         req.body.user = id;
@@ -155,7 +158,7 @@ const User = {
     return res.status(204).send();
   },
 
-  fetch: (internalCall = false) => async (req, res, next) => {
+  fetch: (internalCall = false) => async (req: Request, res: Response, next: Function) => {
     const { id } = req.params;
     let result;
     let imgURL;
@@ -185,11 +188,11 @@ const User = {
     return retVal;
   },
 
-  fetchGroups: async (req, res, next) => {
+  fetchGroups: async (req: Request, res: Response, next: Function) => {
     const { id } = req.params;
     let groups;
     try {
-      groups = await UserModel.aggregate(groupList(id)).exec();
+      groups = (await UserModel.aggregate(groupList(id)).exec() as GroupDocument[]);
     } catch (err) {
       return next(new APIError());
     }
@@ -219,7 +222,7 @@ const User = {
     return res.status(200).send(groups);
   },
 
-  update: async (req, res, next) => {
+  update: async (req: Request, res: Response, next: Function) => {
     const { id } = req.params;
     let result;
 
@@ -242,7 +245,7 @@ const User = {
     return res.status(200).send(updatedUser);
   },
 
-  uploadProfile: async (req, res, next) => {
+  uploadProfile: async (req: Request, res: Response, next: Function) => {
     const { id } = req.params;
 
     // If there was no file attached we're done.
@@ -269,7 +272,7 @@ const User = {
     return res.status(200).send({ imgURL });
   },
 
-  verify: async (req, res, next) => {
+  verify: async (req: Request, res: Response, next: Function) => {
     const { id } = req.params;
     const { verificationCode } = req.body;
     let result;
@@ -293,7 +296,7 @@ const User = {
     return res.status(200).send(result.toJSON());
   },
 
-  emailPasswordRecovery: async (req, res, next) => {
+  emailPasswordRecovery: async (req: Request, res: Response, next: Function) => {
     const { email } = req.body;
     let result;
     const verificationCode = uuidv4();
@@ -330,7 +333,7 @@ const User = {
     return res.status(200).send(result.toJSON());
   },
 
-  resetPassword: async (req, res, next) => {
+  resetPassword: async (req: Request, res: Response, next: Function) => {
     const { userId, verificationCode, password } = req.body;
     try {
       const user = await UserModel.findById(userId).exec();
@@ -359,7 +362,7 @@ const User = {
     }
   },
 
-  async resendVerificationEmail(req, res, next) {
+  async resendVerificationEmail(req: Request, res: Response, next: Function) {
     const { email } = req.body;
 
     let user;
@@ -379,7 +382,7 @@ const User = {
     }
 
     try {
-      await sendVerificationEmail(user.toJSON());
+      await sendVerificationEmail(user.toJSON<UserDocument>());
     } catch (err) {
       return next(err);
     }

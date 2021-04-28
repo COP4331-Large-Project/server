@@ -13,7 +13,7 @@ import { Server } from 'node:http';
 const app = express();
 
 async function initWebServer() {
-  const httpServer:Server = createServer(app);
+  const httpServer: Server = createServer(app);
   Socket(httpServer);
 
   await connectToDB();

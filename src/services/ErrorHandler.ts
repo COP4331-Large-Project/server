@@ -1,6 +1,8 @@
 import { logger } from '../globals';
+import { Request, Response } from 'express';
+import APIError from './APIError';
 
-const ErrorHandler = function handleError(err, req, res, next) {
+const ErrorHandler = function handleError(err: APIError, req: Request, res: Response, next: Function) {
   res.status(err.status).send({
     status: err.status,
     title: err.title,

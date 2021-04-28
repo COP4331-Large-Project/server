@@ -1,7 +1,7 @@
 /* eslint-disable no-return-await */
 /* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
-import mongoose, { ObjectId } from 'mongoose';
+import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import { singleGroup } from '../aggregations';
 import GroupModel from '../models/group';

@@ -1,19 +1,22 @@
 import { Document, Types } from 'mongoose'
+import { ObjectId } from Types;
 
 export type UserDocument = Document & {
   firstName: string,
   lastName: string,
   email: string,
   username: string,
-  password: string,
+  password?: string,
   verified: boolean,
   verificationCode: string,
   groups: Array<ObjectId> | Array<GroupDocument>
+  token?: string
+  imgURL?: string
 }
 
 export type GroupDocument = Document & {
   inviteCode: string,
-  creator: UserDocument,
+  creator: ObjectId | UserDocument,
   invitedUsers: (ObjectId | UserDocument)[],
   publicGroup: boolean,
   name: string,

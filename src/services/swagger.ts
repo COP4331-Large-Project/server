@@ -17,6 +17,7 @@ const swaggerSpecs = () => {
       swagger: '3.0.3',
       info: {
         title: 'ImageUs API',
+        version: '1.0',
         description: 'This is the ImageUs API documentation',
         license: {
           name: 'MIT',
