@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import { logger } from '../globals';
 
 const connectToDB = async () => {
@@ -28,7 +28,7 @@ const connectToDB = async () => {
     virtuals: true,
     /* eslint-disable no-param-reassign */
     /* eslint-disable no-underscore-dangle */
-    transform: (doc, ret) => {
+    transform: (doc: Document, ret: any) => {
       delete ret._id;
     },
   });
