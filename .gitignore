@@ -121,6 +121,10 @@ dist
 /build
 build/
 
+# TypeScript compiles
+/lib
+lib/
+
 # Ignore IDEA
 .idea/
 
