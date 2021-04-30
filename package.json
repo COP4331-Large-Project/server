@@ -4,12 +4,12 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "start": "tsc && babel-node --exec -x \".ts\" src/index.ts | pino-pretty",
+    "start": "ts-node-dev src/index.ts | pino-pretty",
     "test": "tsc && jest --runInBand --forceExit src/test",
     "lint": "eslint ./src",
-    "deploy": "node build/index.ts",
+    "deploy": "node lib/index.js",
     "heroku-postinstall": "npm install --only-dev && npm run build",
-    "build": "tsc && babel src -d build"
+    "build": "tsc"
   },
   "jest": {
     "testEnvironment": "node"
@@ -86,6 +86,7 @@
     "jest": "^26.6.3",
     "nodemon": "^2.0.7",
     "npm": "^7.6.3",
-    "regenerator-runtime": "^0.13.7"
+    "regenerator-runtime": "^0.13.7",
+    "ts-node-dev": "^1.1.6"
   }
 }
