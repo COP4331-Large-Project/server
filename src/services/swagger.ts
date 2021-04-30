@@ -1,14 +1,14 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import yaml from 'js-yaml';
 import fs from 'fs';
-import APIError from './APIError';
+import { logger } from '../globals';
 
-const swaggerSpecs = () => {
+const swaggerSpecs = (): Record<string, unknown> => {
   let schema;
   try {
     schema = yaml.load(fs.readFileSync('./src/schemas.yml', 'utf8'));
   } catch (e) {
-    return new APIError();
+    logger.error(e);
   }
 
   const options = {
@@ -42,7 +42,7 @@ const swaggerSpecs = () => {
     apis: ['./src/routes/*.js'],
   };
 
-  return swaggerJsdoc(options);
+  return swaggerJsdoc(options) as Record<string, unknown>;
 };
 
 export default swaggerSpecs;

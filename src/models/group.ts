@@ -39,7 +39,7 @@ groupSchema
   // uses regex to apply to all variants of "Document.delete-"
   .pre(/^delete/, { document: true }, deepDelete)
   .pre<GroupDocument>(['save'], autoPopulate)
-  .pre('aggregate', function populate(this: mongoose.Aggregate<any>) {
+  .pre('aggregate', function populate(this: mongoose.Aggregate<unknown>) {
     this.lookup({
       from: 'users', localField: 'creator', foreignField: '_id', as: 'creator',
     });

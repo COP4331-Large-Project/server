@@ -12,7 +12,7 @@ import { Server } from 'node:http';
 
 const app = express();
 
-async function initWebServer() {
+async function initWebServer(): Promise<Server> {
   const httpServer: Server = createServer(app);
   Socket(httpServer);
 

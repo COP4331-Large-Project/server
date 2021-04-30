@@ -28,7 +28,7 @@ const connectToDB = async (): Promise<void> => {
     virtuals: true,
     /* eslint-disable no-param-reassign */
     /* eslint-disable no-underscore-dangle */
-    transform: (doc: Document, ret: any) => {
+    transform: (doc: Document, ret: Record<string, unknown>) => {
       delete ret._id;
     },
   });

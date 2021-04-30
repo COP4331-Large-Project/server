@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema<UserDocument>({
 
 // userSchema.post('findOne', autoPopulate);
 
-userSchema.pre('aggregate', function populate(this: Aggregate<any>) {
+userSchema.pre('aggregate', function populate(this: Aggregate<unknown>) {
   this.lookup({
     from: 'users', localField: 'creator', foreignField: '_id', as: 'creator',
   });

@@ -3,7 +3,7 @@ import { Server as HTTPServer } from 'node:http';
 
 let io: Server;
 
-const makeIo = (httpServer: HTTPServer) => {
+const makeIo = (httpServer: HTTPServer): Server => {
   io = new Server(httpServer, {
     cors: {
       origin: true,
@@ -22,7 +22,7 @@ const makeIo = (httpServer: HTTPServer) => {
   return io;
 };
 
-const getIo = () => io;
+const getIo = (): Server => io;
 
 export default makeIo;
 

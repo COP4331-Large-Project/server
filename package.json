@@ -6,7 +6,7 @@
   "scripts": {
     "start": "tsc && babel-node --exec -x \".ts\" src/index.ts | pino-pretty",
     "test": "tsc && jest --runInBand --forceExit src/test",
-    "lint": "eslint .",
+    "lint": "eslint ./src",
     "deploy": "node build/index.ts",
     "heroku-postinstall": "npm install --only-dev && npm run build",
     "build": "tsc && babel src -d build"
