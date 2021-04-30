@@ -51,7 +51,7 @@ const S3 = {
    */
   listObjects: async (param: Payload = {
     Bucket: BUCKET,
-  }): Promise<object[] | undefined> => s3Client.send(new ListObjectsCommand(param)).then(result => result.Contents),
+  }): Promise<Record<string, unknown>[] | undefined> => s3Client.send(new ListObjectsCommand(param)).then(result => result.Contents as Record<string, unknown>[]),
 
   /**
    * Uploads a file to the bucket.
@@ -95,7 +95,7 @@ const S3 = {
    * Perform a Get command for the specified Key and return
    * a pre-signed URL for the object
    */
-  getPreSignedURL: async (key: string) => {
+  getPreSignedURL: async (key: string): Promise<string> => {
     assert(key);
 
     const getCommand = new GetObjectCommand({
@@ -105,8 +105,8 @@ const S3 = {
     return getSignedUrl(s3Client, getCommand);
   },
 
-  destroy: () => s3Client.destroy(),
-  getClient: () => s3Client,
+  destroy: (): void => s3Client.destroy(),
+  getClient: (): S3Client => s3Client,
 };
 
 export default S3;

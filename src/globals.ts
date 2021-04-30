@@ -5,5 +5,4 @@ import pino, { Logger } from 'pino';
  */
 const logger: Logger = pino();
 
-// eslint-disable-next-line import/prefer-default-export
 export { logger };

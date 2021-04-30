@@ -1,5 +1,4 @@
 import { Document, Types } from 'mongoose'
-import { ObjectId } from Types;
 
 export type UserDocument = Document & {
   firstName: string,
@@ -9,7 +8,7 @@ export type UserDocument = Document & {
   password?: string,
   verified: boolean,
   verificationCode: string,
-  groups: Array<ObjectId> | Array<GroupDocument>
+  groups: Array<Types.ObjectId> | Array<GroupDocument>
   token?: string
   imgURL?: string
 }
@@ -20,15 +19,15 @@ export type GroupDocument = Document & {
   invitedUsers: (ObjectId | UserDocument)[],
   publicGroup: boolean,
   name: string,
-  thumbnail: ObjectId | ImageDocument | null, 
+  thumbnail: Types.ObjectId | ImageDocument | null, 
 }
 
 export type ImageDocument = Document & {
   URL: string,
   caption: string,
   fileName: string,
-  creator: ObjectId | UserDocument,
+  creator: Types.ObjectId | UserDocument,
   dateUploaded: Date,
-  groupID: ObjectId,
+  groupID: Types.ObjectId,
   key: string,
 }

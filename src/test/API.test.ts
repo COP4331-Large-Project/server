@@ -1,11 +1,14 @@
 import request from 'supertest';
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
+import { Server } from 'node:http';
+import { User } from '../index.d';
 import initWebServer from '../services/webServer';
 import UserModel from '../models/user';
 import GroupModel from '../models/group';
+import { GroupDocument } from '../models/types';
 
-let app;
+let app: Server;
 
 jest.setTimeout(30000);
 
@@ -15,19 +18,20 @@ const password = 'test';
 const email = uuidv4();
 
 // The expected body to recieve for login and register.
-const userPayload = {
+const userPayload: User = {
   firstName: 'test123',
   lastName: 'test456',
   email: `${email}@email.com`,
   username,
+  groups: [],
 };
 
-let groupPayload;
-let jwtToken;
+let groupPayload: GroupDocument;
+let jwtToken: string;
 
 // Initialize the web app.
 beforeAll(async () => {
-  app = await initWebServer(app);
+  app = await initWebServer();
 });
 
 afterAll(async () => {

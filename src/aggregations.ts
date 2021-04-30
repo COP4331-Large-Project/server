@@ -29,7 +29,7 @@ const counter = [
   },
 ];
 
-const singleGroup = (userID: string) => [
+const singleGroup = (userID: string): unknown[] => [
   {
     $match: {
       _id: mongoose.Types.ObjectId(userID),
@@ -38,7 +38,7 @@ const singleGroup = (userID: string) => [
   ...counter,
 ];
 
-const groupList = (userId: string) => [
+const groupList = (userId: string): unknown[] => [
   {
     $match: {
       _id: mongoose.Types.ObjectId(userId),

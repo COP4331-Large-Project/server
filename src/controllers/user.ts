@@ -1,12 +1,13 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-underscore-dangle */
 import { v4 as uuidv4 } from 'uuid';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import UserModel from '../models/user';
 import GroupModel from '../models/group';
 import ImageModel from '../models/image';
 import APIError from '../services/APIError';
+import { ResponseReturn } from '../index.d';
 import PasswordHasher from '../services/PasswordHasher';
 import S3 from '../services/S3';
 import SendGrid from '../services/SendGrid';
@@ -14,7 +15,8 @@ import { logger } from '../globals';
 import { createToken } from '../services/JWTAuthentication';
 import { groupList } from '../aggregations';
 import Group from './group';
-import { GroupDocument, UserDocument } from '../models/types';
+import { GroupDocument, UserDocument, ImageDocument } from '../models/types';
+
 
 async function sendVerificationEmail(user: UserDocument) {
   const link = `https://www.imageus.io/verify/?id=${user.id}&verificationCode=${user.verificationCode}`;
@@ -38,7 +40,7 @@ async function sendVerificationEmail(user: UserDocument) {
 }
 
 const User = {
-  async register(req: Request, res: Response, next: Function) {
+  async register(req: Request, res: Response, next: NextFunction): ResponseReturn {
     const {
       firstName, lastName, email, username, password,
     } = req.body;
@@ -88,7 +90,7 @@ const User = {
     return res.status(201).send(reifiedUser);
   },
 
-  login: async (req: Request, res: Response, next: Function) => {
+  login: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
     let user;
 
     try {
@@ -100,7 +102,7 @@ const User = {
       return next(new APIError());
     }
 
-    if (!user || !await PasswordHasher.validateHash(req.body.password, user.password!)) {
+    if (!user || !await PasswordHasher.validateHash(req.body.password, user.password ?? '')) {
       return next(new APIError(
         'Incorrect Credentials',
         'Cannot Log user in',
@@ -123,14 +125,14 @@ const User = {
     return res.status(200).send(reifiedUser);
   },
 
-  delete: async (req: Request, res: Response, next: Function) => {
+  delete: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
     const { id } = req.params;
     let user;
 
     try {
       user = await UserModel.findById(id, '+password').exec();
 
-      if (!user || !await PasswordHasher.validateHash(req.body.password, user.password!)) {
+      if (!user || !await PasswordHasher.validateHash(req.body.password, user.password ?? '')) {
         return next(new APIError(
           'User not deleted',
           'Either the user does not exist or the given password is incorrect',
@@ -158,7 +160,7 @@ const User = {
     return res.status(204).send();
   },
 
-  fetch: (internalCall = false) => async (req: Request, res: Response, next: Function) => {
+  fetch: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): ResponseReturn<mongoose.LeanDocument<UserDocument>> => {
     const { id } = req.params;
     let result;
     let imgURL;
@@ -188,7 +190,7 @@ const User = {
     return retVal;
   },
 
-  fetchGroups: async (req: Request, res: Response, next: Function) => {
+  fetchGroups: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
     const { id } = req.params;
     let groups;
     try {
@@ -214,6 +216,8 @@ const User = {
         return userCopy;
       });
 
+      copy.thumbnail = copy.thumbnail as ImageDocument;
+
       copy.thumbnail.URL = await S3.getPreSignedURL(`groups/${copy.id}/${copy.thumbnail.fileName}`);
 
       return copy;
@@ -222,7 +226,7 @@ const User = {
     return res.status(200).send(groups);
   },
 
-  update: async (req: Request, res: Response, next: Function) => {
+  update: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
     const { id } = req.params;
     let result;
 
@@ -245,7 +249,7 @@ const User = {
     return res.status(200).send(updatedUser);
   },
 
-  uploadProfile: async (req: Request, res: Response, next: Function) => {
+  uploadProfile: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
     const { id } = req.params;
 
     // If there was no file attached we're done.
@@ -272,7 +276,7 @@ const User = {
     return res.status(200).send({ imgURL });
   },
 
-  verify: async (req: Request, res: Response, next: Function) => {
+  verify: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
     const { id } = req.params;
     const { verificationCode } = req.body;
     let result;
@@ -296,7 +300,7 @@ const User = {
     return res.status(200).send(result.toJSON());
   },
 
-  emailPasswordRecovery: async (req: Request, res: Response, next: Function) => {
+  emailPasswordRecovery: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
     const { email } = req.body;
     let result;
     const verificationCode = uuidv4();
@@ -333,7 +337,7 @@ const User = {
     return res.status(200).send(result.toJSON());
   },
 
-  resetPassword: async (req: Request, res: Response, next: Function) => {
+  resetPassword: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
     const { userId, verificationCode, password } = req.body;
     try {
       const user = await UserModel.findById(userId).exec();
@@ -362,7 +366,7 @@ const User = {
     }
   },
 
-  async resendVerificationEmail(req: Request, res: Response, next: Function) {
+  async resendVerificationEmail(req: Request, res: Response, next: NextFunction): ResponseReturn {
     const { email } = req.body;
 
     let user;
