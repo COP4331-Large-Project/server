@@ -80,12 +80,6 @@ const Group = {
       );
     }
 
-    function isBiggerThan10(element: number) {
-      return element > 10;
-    }
-
-    [2, 5, 8, 1, 4].some(isBiggerThan10);
-
     if ((user.groups as GroupDocument[]).some(x => x.equals(group?._id))) {
       return next(new APIError(
         'Failed to join group',
