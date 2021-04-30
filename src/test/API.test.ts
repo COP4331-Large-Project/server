@@ -2,7 +2,6 @@ import request from 'supertest';
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
 import { Server } from 'node:http';
-import { User } from '../index.d';
 import initWebServer from '../services/webServer';
 import UserModel from '../models/user';
 import GroupModel from '../models/group';
@@ -18,7 +17,7 @@ const password = 'test';
 const email = uuidv4();
 
 // The expected body to recieve for login and register.
-const userPayload: User = {
+const userPayload: Record<string, unknown> = {
   firstName: 'test123',
   lastName: 'test456',
   email: `${email}@email.com`,

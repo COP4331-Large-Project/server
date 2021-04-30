@@ -7,7 +7,6 @@ import UserModel from '../models/user';
 import GroupModel from '../models/group';
 import ImageModel from '../models/image';
 import APIError from '../services/APIError';
-import { ResponseReturn } from '../index.d';
 import PasswordHasher from '../services/PasswordHasher';
 import S3 from '../services/S3';
 import SendGrid from '../services/SendGrid';
@@ -40,7 +39,7 @@ async function sendVerificationEmail(user: UserDocument) {
 }
 
 const User = {
-  async register(req: Request, res: Response, next: NextFunction): ResponseReturn {
+  async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     const {
       firstName, lastName, email, username, password,
     } = req.body;
@@ -87,10 +86,10 @@ const User = {
       return next(err);
     }
 
-    return res.status(201).send(reifiedUser);
+    res.status(201).send(reifiedUser);
   },
 
-  login: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  login: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     let user;
 
     try {
@@ -122,10 +121,10 @@ const User = {
     delete reifiedUser.password;
     reifiedUser.token = createToken({ id: reifiedUser.id });
 
-    return res.status(200).send(reifiedUser);
+    res.status(200).send(reifiedUser);
   },
 
-  delete: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  delete: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     let user;
 
@@ -157,10 +156,10 @@ const User = {
       next(new APIError());
     }
 
-    return res.status(204).send();
+    res.status(204).send();
   },
 
-  fetch: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): ResponseReturn<mongoose.LeanDocument<UserDocument>> => {
+  fetch: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): Promise<mongoose.LeanDocument<UserDocument> | void> => {
     const { id } = req.params;
     let result;
     let imgURL;
@@ -186,11 +185,15 @@ const User = {
     const retVal = result.toJSON();
     retVal.imgURL = imgURL;
 
-    if (!internalCall) return res.status(200).send(retVal);
+    if (!internalCall) {
+      res.status(200).send(retVal);
+      return;
+    }
+
     return retVal;
   },
 
-  fetchGroups: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  fetchGroups: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     let groups;
     try {
@@ -223,10 +226,10 @@ const User = {
       return copy;
     }));
 
-    return res.status(200).send(groups);
+    res.status(200).send(groups);
   },
 
-  update: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  update: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     let result;
 
@@ -246,10 +249,10 @@ const User = {
     }
 
     const updatedUser = await User.fetch(true)(req, res, next);
-    return res.status(200).send(updatedUser);
+    res.status(200).send(updatedUser);
   },
 
-  uploadProfile: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  uploadProfile: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
 
     // If there was no file attached we're done.
@@ -270,13 +273,13 @@ const User = {
       await S3.uploadObject(key, imageBuffer);
       imgURL = await S3.getPreSignedURL(key);
     } catch (e) {
-      next(new APIError());
+      return next(new APIError());
     }
 
-    return res.status(200).send({ imgURL });
+    res.status(200).send({ imgURL });
   },
 
-  verify: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  verify: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     const { verificationCode } = req.body;
     let result;
@@ -297,10 +300,10 @@ const User = {
       ));
     }
 
-    return res.status(200).send(result.toJSON());
+    res.status(200).send(result.toJSON());
   },
 
-  emailPasswordRecovery: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  emailPasswordRecovery: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { email } = req.body;
     let result;
     const verificationCode = uuidv4();
@@ -334,10 +337,10 @@ const User = {
       err,
     )));
 
-    return res.status(200).send(result.toJSON());
+    res.status(200).send(result.toJSON());
   },
 
-  resetPassword: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  resetPassword: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { userId, verificationCode, password } = req.body;
     try {
       const user = await UserModel.findById(userId).exec();
@@ -360,13 +363,13 @@ const User = {
 
       const hashedPassword = await PasswordHasher.hash(password);
       await user.updateOne({ password: hashedPassword }).exec();
-      return res.status(204).send();
+      res.status(204).send();
     } catch (err) {
       return next(new APIError(undefined, undefined, undefined, err));
     }
   },
 
-  async resendVerificationEmail(req: Request, res: Response, next: NextFunction): ResponseReturn {
+  async resendVerificationEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { email } = req.body;
 
     let user;
@@ -391,7 +394,7 @@ const User = {
       return next(err);
     }
 
-    return res.status(204).send();
+    res.status(204).send();
   },
 };
 

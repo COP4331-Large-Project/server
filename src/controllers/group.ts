@@ -1,6 +1,3 @@
-/* eslint-disable no-return-await */
-/* eslint-disable consistent-return */
-/* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import { singleGroup } from '../aggregations';
@@ -13,12 +10,11 @@ import SendGrid from '../services/SendGrid';
 import { getIo as io } from '../services/Socket';
 import { Response, Request, NextFunction } from 'express';
 import { GroupDocument, ImageDocument, UserDocument } from '../models/types';
-import { ResponseReturn } from '../index.d'
 
 const { ObjectId } = mongoose.Types;
 
 const Group = {
-  register: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  register: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     // We will still use req.body.emails!
     const {
       creator, publicGroup, name,
@@ -39,7 +35,8 @@ const Group = {
       await GroupModel.findByIdAndUpdate(group, { $push: { users: creator } }).exec();
       // Push the ID on the user model.
       await UserModel.findByIdAndUpdate(creator, { $push: { groups: group._id } }).exec();
-      return res.status(200).send(group.toJSON());
+      res.status(200).send(group.toJSON());
+      return;
     } catch (err) {
       return next(new APIError('Group Creation Failed',
         'Failed to create the group',
@@ -48,7 +45,7 @@ const Group = {
     }
   },
 
-  join: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  join: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { inviteCode } = req.params;
     const userID = req.body.user;
     let group = (await GroupModel
@@ -102,7 +99,8 @@ const Group = {
       io().to(group?.id).emit('user joined', user.username, group?.id);
       req.params.id = group?.id;
       const result = await Group.fetch(true)(req, res, next);
-      return res.status(200).send(result);
+      res.status(200).send(result);
+      return;
     }
 
     return next(new APIError(
@@ -113,7 +111,7 @@ const Group = {
     ));
   },
 
-  fetch: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): Promise<void | Response| GroupDocument> => {
+  fetch: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): Promise<void | GroupDocument> => {
     const { id } = req.params;
     let result: GroupDocument;
 
@@ -143,11 +141,14 @@ const Group = {
     delete result._id;
 
     result.thumbnail = await Group.thumbnail(true)(req, res, next) as ImageDocument;
-    if (!internalCall) return res.status(200).send(result);
+    if (!internalCall) {
+      res.status(200).send(result);
+      return;
+    }
     return result;
   },
 
-  delete: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  delete: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     const user = ObjectId(req.body.user);
     const group = await GroupModel.findById(id).exec();
@@ -179,10 +180,12 @@ const Group = {
     await group.deleteOne();
     io().in(`${group.id}`).emit('group deleted', group.id);
 
-    if (!internalCall) return res.status(204).send();
+    if (!internalCall) {
+      res.status(204).send();
+    }
   },
 
-  upload: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  upload: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     const { userId, caption } = req.body;
 
@@ -264,10 +267,10 @@ const Group = {
     }
 
     io().in(`${group.id}`).emit('image uploaded', image, user.username, group.id);
-    return res.status(200).send(image);
+    res.status(200).send(image);
   },
 
-  update: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  update: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
 
     try {
@@ -287,10 +290,10 @@ const Group = {
       return next(new APIError());
     }
 
-    return res.status(204).send();
+    res.status(204).send();
   },
 
-  thumbnail: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): ResponseReturn<ImageDocument> => {
+  thumbnail: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): Promise<void | ImageDocument> => {
     const { id } = req.params;
     let group;
     let thumbnailDoc;
@@ -322,7 +325,10 @@ const Group = {
     try {
       thumbnailDoc = await ImageModel.findById(group.thumbnail);
       if (!thumbnailDoc) {
-        if (!internalCall) return res.status(200).send();
+        if (!internalCall) {
+          res.status(200).send();
+          return;
+        }
         return undefined;
       }
       thumbnailDoc.URL = await S3.getPreSignedURL(thumbnailDoc.key ?? '');
@@ -335,17 +341,23 @@ const Group = {
       ));
     }
 
-    if (!internalCall) return res.status(200).send(thumbnailDoc);
+    if (!internalCall) {
+      res.status(200).send(thumbnailDoc);
+      return;
+    } 
     return thumbnailDoc;
   },
 
-  getImages: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  getImages: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     let images;
 
     try {
       const imageRefs = await ImageModel.find({ groupID: id });
-      if (!imageRefs) return res.status(201).send({ images });
+      if (!imageRefs) {
+        res.status(201).send({ images });
+        return;
+      } 
       images = await Promise.all(
         imageRefs.map(async (x) => {
           // eslint-disable-next-line no-param-reassign
@@ -362,10 +374,11 @@ const Group = {
         err,
       ));
     }
-    return res.status(201).send({ images });
+
+    res.status(201).send({ images });
   },
 
-  deleteImages: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  deleteImages: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     // array of image ids
     const { images } = req.body as { images: ImageDocument[] };
     const { id } = req.params;
@@ -429,7 +442,7 @@ const Group = {
   },
 
   // internalCall is used for the register endpoint so that a http response isnt sent
-  inviteUsers: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  inviteUsers: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     const { emails }: { emails: string[] } = req.body;
     const group = (await GroupModel
@@ -480,10 +493,12 @@ const Group = {
       )));
     });
 
-    if (!internalCall) return res.status(204).send();
+    if (!internalCall) {
+      res.status(204).send();
+    }
   },
 
-  removeUser: async (req: Request, res: Response, next: NextFunction): ResponseReturn => {
+  removeUser: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     let { user } = req.body;
     const group = (await GroupModel
@@ -524,7 +539,7 @@ const Group = {
     ).exec();
 
     io().to(group.id).emit('user removed', user.username, group.id);
-    return res.status(204).send();
+    res.status(204).send();
   },
 };
 
