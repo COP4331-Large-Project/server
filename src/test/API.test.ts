@@ -5,7 +5,7 @@ import { Server } from 'node:http';
 import initWebServer from '../services/webServer';
 import UserModel from '../models/user';
 import GroupModel from '../models/group';
-import { GroupDocument } from '../models/types';
+import { GroupDocument } from '../models/doc-types';
 
 let app: Server;
 

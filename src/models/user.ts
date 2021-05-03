@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { Aggregate } from 'mongoose';
-import { UserDocument } from './types';
+import { UserDocument } from './doc-types';
 
 const modelName = 'User';
 

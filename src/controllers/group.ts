@@ -9,7 +9,7 @@ import S3 from '../services/S3';
 import SendGrid from '../services/SendGrid';
 import { getIo as io } from '../services/Socket';
 import { Response, Request, NextFunction } from 'express';
-import { GroupDocument, ImageDocument, UserDocument } from '../models/types';
+import { GroupDocument, ImageDocument, UserDocument } from '../models/doc-types';
 
 const { ObjectId } = mongoose.Types;
 

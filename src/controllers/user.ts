@@ -14,7 +14,8 @@ import { logger } from '../globals';
 import { createToken } from '../services/JWTAuthentication';
 import { groupList } from '../aggregations';
 import Group from './group';
-import { GroupDocument, UserDocument, ImageDocument } from '../models/types';
+import { GroupDocument, UserDocument, ImageDocument } from '../models/doc-types';
+import { User } from '../types';
 
 
 async function sendVerificationEmail(user: UserDocument) {
@@ -77,7 +78,7 @@ const User = {
     }
 
     // Strip sensitive info
-    const reifiedUser = user.toJSON<UserDocument>();
+    const reifiedUser = user.toJSON<User>();
     delete reifiedUser.password;
 
     try {
@@ -101,7 +102,7 @@ const User = {
       return next(new APIError());
     }
 
-    if (!user || !await PasswordHasher.validateHash(req.body.password, user.password ?? '')) {
+    if (!user || !await PasswordHasher.validateHash(req.body.password, user.password)) {
       return next(new APIError(
         'Incorrect Credentials',
         'Cannot Log user in',
@@ -117,7 +118,7 @@ const User = {
     }
 
     // Strip sensitive info
-    const reifiedUser = user.toJSON();
+    const reifiedUser = user.toJSON<User>();
     delete reifiedUser.password;
     reifiedUser.token = createToken({ id: reifiedUser.id });
 
@@ -131,7 +132,7 @@ const User = {
     try {
       user = await UserModel.findById(id, '+password').exec();
 
-      if (!user || !await PasswordHasher.validateHash(req.body.password, user.password ?? '')) {
+      if (!user || !await PasswordHasher.validateHash(req.body.password, user.password)) {
         return next(new APIError(
           'User not deleted',
           'Either the user does not exist or the given password is incorrect',
@@ -214,7 +215,8 @@ const User = {
 
       group.invitedUsers.map(user => {
         const userCopy = user;
-        userCopy.id = user._id;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        userCopy.id = user._id!;
         delete userCopy._id;
         return userCopy;
       });

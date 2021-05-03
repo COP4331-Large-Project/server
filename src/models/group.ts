@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
-import { GroupDocument } from './types';
+import { GroupDocument } from './doc-types';
 import User from './user';
 import Image from './image';
 

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { ImageDocument } from './types';
+import { ImageDocument } from './doc-types';
 import User from './user';
 
 const imageSchema = new mongoose.Schema<ImageDocument>({
