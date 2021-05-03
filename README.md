@@ -32,7 +32,7 @@ In order to use our services you'll need to create a `.env` in the root folder.
 Once created you'll populate it with secrets given to you by the repo maintainers:
 
 `.env`:
-```shell
+```properties
 # MongoDB
 MONGO_URI=YOUR MONGO URI
 
