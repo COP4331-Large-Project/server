@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
+import { Aggregate } from 'mongoose';
+import { UserDocument } from './doc-types';
 
 const modelName = 'User';
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema<UserDocument>({
   firstName: String,
   lastName: String,
   email: { type: String, required: true, unique: true },
@@ -29,7 +31,7 @@ const userSchema = new mongoose.Schema({
 
 // userSchema.post('findOne', autoPopulate);
 
-userSchema.pre('aggregate', function populate() {
+userSchema.pre('aggregate', function populate(this: Aggregate<unknown>) {
   this.lookup({
     from: 'users', localField: 'creator', foreignField: '_id', as: 'creator',
   });
@@ -42,6 +44,6 @@ userSchema.pre('aggregate', function populate() {
   this.unwind({ path: '$thumbnail', preserveNullAndEmptyArrays: true });
 });
 
-const User = mongoose.model(modelName, userSchema);
+const User = mongoose.model<UserDocument>(modelName, userSchema);
 
 export default User;

@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import { logger } from '../globals';
 
-const connectToDB = async () => {
+const connectToDB = async (): Promise<void> => {
   // Connection options
   const connectionOptions = {
     useNewUrlParser: true,
@@ -28,7 +28,7 @@ const connectToDB = async () => {
     virtuals: true,
     /* eslint-disable no-param-reassign */
     /* eslint-disable no-underscore-dangle */
-    transform: (doc, ret) => {
+    transform: (doc: Document, ret: Record<string, unknown>) => {
       delete ret._id;
     },
   });
@@ -39,7 +39,7 @@ const connectToDB = async () => {
   }
 };
 
-const disconnectFromDB = async () => {
+const disconnectFromDB = async (): Promise<void> => {
   // Close the DB connection.
   await mongoose.connection.close();
 };

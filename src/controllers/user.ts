@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-underscore-dangle */
 import { v4 as uuidv4 } from 'uuid';
+import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import UserModel from '../models/user';
 import GroupModel from '../models/group';
 import ImageModel from '../models/image';
@@ -12,8 +14,11 @@ import { logger } from '../globals';
 import { createToken } from '../services/JWTAuthentication';
 import { groupList } from '../aggregations';
 import Group from './group';
+import { GroupDocument, UserDocument, ImageDocument } from '../models/doc-types';
+import { User } from '../types';
 
-async function sendVerificationEmail(user) {
+
+async function sendVerificationEmail(user: UserDocument) {
   const link = `https://www.imageus.io/verify/?id=${user.id}&verificationCode=${user.verificationCode}`;
 
   try {
@@ -34,8 +39,8 @@ async function sendVerificationEmail(user) {
   }
 }
 
-const User = {
-  async register(req, res, next) {
+const UserController = {
+  async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     const {
       firstName, lastName, email, username, password,
     } = req.body;
@@ -73,7 +78,7 @@ const User = {
     }
 
     // Strip sensitive info
-    const reifiedUser = user.toJSON();
+    const reifiedUser = user.toJSON<User>();
     delete reifiedUser.password;
 
     try {
@@ -82,10 +87,10 @@ const User = {
       return next(err);
     }
 
-    return res.status(201).send(reifiedUser);
+    res.status(201).send(reifiedUser);
   },
 
-  login: async (req, res, next) => {
+  login: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     let user;
 
     try {
@@ -113,14 +118,14 @@ const User = {
     }
 
     // Strip sensitive info
-    const reifiedUser = user.toJSON();
+    const reifiedUser = user.toJSON<User>();
     delete reifiedUser.password;
     reifiedUser.token = createToken({ id: reifiedUser.id });
 
-    return res.status(200).send(reifiedUser);
+    res.status(200).send(reifiedUser);
   },
 
-  delete: async (req, res, next) => {
+  delete: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     let user;
 
@@ -135,7 +140,7 @@ const User = {
           `/users/${id}/`,
         ));
       }
-      const owningGroups = await GroupModel.find({ creator: id }).exec();
+      const owningGroups = await GroupModel.find({ creator: mongoose.Types.ObjectId(id) }).exec();
       await Promise.all(owningGroups.map(async (x) => {
         req.params.id = x.id;
         req.body.user = id;
@@ -152,10 +157,10 @@ const User = {
       next(new APIError());
     }
 
-    return res.status(204).send();
+    res.status(204).send();
   },
 
-  fetch: (internalCall = false) => async (req, res, next) => {
+  fetch: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): Promise<mongoose.LeanDocument<UserDocument> | void> => {
     const { id } = req.params;
     let result;
     let imgURL;
@@ -181,15 +186,19 @@ const User = {
     const retVal = result.toJSON();
     retVal.imgURL = imgURL;
 
-    if (!internalCall) return res.status(200).send(retVal);
+    if (!internalCall) {
+      res.status(200).send(retVal);
+      return;
+    }
+
     return retVal;
   },
 
-  fetchGroups: async (req, res, next) => {
+  fetchGroups: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     let groups;
     try {
-      groups = await UserModel.aggregate(groupList(id)).exec();
+      groups = (await UserModel.aggregate(groupList(id)).exec() as GroupDocument[]);
     } catch (err) {
       return next(new APIError());
     }
@@ -206,20 +215,23 @@ const User = {
 
       group.invitedUsers.map(user => {
         const userCopy = user;
-        userCopy.id = user._id;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        userCopy.id = user._id!;
         delete userCopy._id;
         return userCopy;
       });
+
+      copy.thumbnail = copy.thumbnail as ImageDocument;
 
       copy.thumbnail.URL = await S3.getPreSignedURL(`groups/${copy.id}/${copy.thumbnail.fileName}`);
 
       return copy;
     }));
 
-    return res.status(200).send(groups);
+    res.status(200).send(groups);
   },
 
-  update: async (req, res, next) => {
+  update: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     let result;
 
@@ -238,11 +250,11 @@ const User = {
       ));
     }
 
-    const updatedUser = await User.fetch(true)(req, res, next);
-    return res.status(200).send(updatedUser);
+    const updatedUser = await UserController.fetch(true)(req, res, next);
+    res.status(200).send(updatedUser);
   },
 
-  uploadProfile: async (req, res, next) => {
+  uploadProfile: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
 
     // If there was no file attached we're done.
@@ -263,13 +275,13 @@ const User = {
       await S3.uploadObject(key, imageBuffer);
       imgURL = await S3.getPreSignedURL(key);
     } catch (e) {
-      next(new APIError());
+      return next(new APIError());
     }
 
-    return res.status(200).send({ imgURL });
+    res.status(200).send({ imgURL });
   },
 
-  verify: async (req, res, next) => {
+  verify: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     const { verificationCode } = req.body;
     let result;
@@ -290,10 +302,10 @@ const User = {
       ));
     }
 
-    return res.status(200).send(result.toJSON());
+    res.status(200).send(result.toJSON());
   },
 
-  emailPasswordRecovery: async (req, res, next) => {
+  emailPasswordRecovery: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { email } = req.body;
     let result;
     const verificationCode = uuidv4();
@@ -327,10 +339,10 @@ const User = {
       err,
     )));
 
-    return res.status(200).send(result.toJSON());
+    res.status(200).send(result.toJSON());
   },
 
-  resetPassword: async (req, res, next) => {
+  resetPassword: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { userId, verificationCode, password } = req.body;
     try {
       const user = await UserModel.findById(userId).exec();
@@ -353,13 +365,13 @@ const User = {
 
       const hashedPassword = await PasswordHasher.hash(password);
       await user.updateOne({ password: hashedPassword }).exec();
-      return res.status(204).send();
+      res.status(204).send();
     } catch (err) {
       return next(new APIError(undefined, undefined, undefined, err));
     }
   },
 
-  async resendVerificationEmail(req, res, next) {
+  async resendVerificationEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { email } = req.body;
 
     let user;
@@ -379,13 +391,13 @@ const User = {
     }
 
     try {
-      await sendVerificationEmail(user.toJSON());
+      await sendVerificationEmail(user.toJSON<UserDocument>());
     } catch (err) {
       return next(err);
     }
 
-    return res.status(204).send();
+    res.status(204).send();
   },
 };
 
-export default User;
+export default UserController;

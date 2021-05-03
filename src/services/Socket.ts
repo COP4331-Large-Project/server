@@ -1,8 +1,9 @@
 import { Server } from 'socket.io';
+import { Server as HTTPServer } from 'node:http';
 
-let io;
+let io: Server;
 
-const makeIo = (httpServer) => {
+const makeIo = (httpServer: HTTPServer): Server => {
   io = new Server(httpServer, {
     cors: {
       origin: true,
@@ -21,7 +22,7 @@ const makeIo = (httpServer) => {
   return io;
 };
 
-const getIo = () => io;
+const getIo = (): Server => io;
 
 export default makeIo;
 

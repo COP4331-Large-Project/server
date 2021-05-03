@@ -1,6 +1,3 @@
-/* eslint-disable no-return-await */
-/* eslint-disable consistent-return */
-/* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import { singleGroup } from '../aggregations';
@@ -11,11 +8,13 @@ import APIError from '../services/APIError';
 import S3 from '../services/S3';
 import SendGrid from '../services/SendGrid';
 import { getIo as io } from '../services/Socket';
+import { Response, Request, NextFunction } from 'express';
+import { GroupDocument, ImageDocument, UserDocument } from '../models/doc-types';
 
 const { ObjectId } = mongoose.Types;
 
 const Group = {
-  register: async (req, res, next) => {
+  register: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     // We will still use req.body.emails!
     const {
       creator, publicGroup, name,
@@ -36,7 +35,8 @@ const Group = {
       await GroupModel.findByIdAndUpdate(group, { $push: { users: creator } }).exec();
       // Push the ID on the user model.
       await UserModel.findByIdAndUpdate(creator, { $push: { groups: group._id } }).exec();
-      return res.status(200).send(group.toJSON());
+      res.status(200).send(group.toJSON());
+      return;
     } catch (err) {
       return next(new APIError('Group Creation Failed',
         'Failed to create the group',
@@ -45,7 +45,7 @@ const Group = {
     }
   },
 
-  join: async (req, res, next) => {
+  join: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { inviteCode } = req.params;
     const userID = req.body.user;
     let group = (await GroupModel
@@ -77,7 +77,7 @@ const Group = {
       );
     }
 
-    if (user.groups.some((x) => x.equals(group._id))) {
+    if ((user.groups as GroupDocument[]).some(x => x.equals(group?._id))) {
       return next(new APIError(
         'Failed to join group',
         'User is already in this group',
@@ -85,7 +85,7 @@ const Group = {
       ));
     }
 
-    const authorizedUser = (group.invitedUsers).some(x => x.equals(user._id));
+    const authorizedUser = (group.invitedUsers as UserDocument[]).some(x => x.equals(user._id));
 
     if (authorizedUser || group.publicGroup) {
       await UserModel.findByIdAndUpdate(user, { $push: { groups: group._id } }).exec();
@@ -96,10 +96,11 @@ const Group = {
         .findOne({ inviteCode })
         .exec());
       // we pass 1 as the 'users joined' count just for continuity and future-proofing
-      io().to(group.id).emit('user joined', user.username, group.id);
-      req.params.id = group.id;
+      io().to(group?.id).emit('user joined', user.username, group?.id);
+      req.params.id = group?.id;
       const result = await Group.fetch(true)(req, res, next);
-      return res.status(200).send(result);
+      res.status(200).send(result);
+      return;
     }
 
     return next(new APIError(
@@ -110,9 +111,9 @@ const Group = {
     ));
   },
 
-  fetch: (internalCall = false) => async (req, res, next) => {
+  fetch: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): Promise<void | GroupDocument> => {
     const { id } = req.params;
-    let result;
+    let result: GroupDocument;
 
     try {
       [result] = await GroupModel.aggregate(singleGroup(id)).exec();
@@ -129,7 +130,7 @@ const Group = {
       ));
     }
 
-    result.invitedUsers.map(user => {
+    (result.invitedUsers as UserDocument[]).map(user => {
       const userCopy = user;
       userCopy.id = user._id;
       delete userCopy._id;
@@ -139,12 +140,15 @@ const Group = {
     result.id = result._id;
     delete result._id;
 
-    result.thumbnail = await Group.thumbnail(true)(req, res, next) ?? null;
-    if (!internalCall) return res.status(200).send(result);
+    result.thumbnail = await Group.thumbnail(true)(req, res, next) as ImageDocument;
+    if (!internalCall) {
+      res.status(200).send(result);
+      return;
+    }
     return result;
   },
 
-  delete: (internalCall = false) => async (req, res, next) => {
+  delete: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     const user = ObjectId(req.body.user);
     const group = await GroupModel.findById(id).exec();
@@ -160,9 +164,11 @@ const Group = {
 
     // if the group creator is not truthy, they probably dont exist anymore
     // just let anyone delete the group at that point
-    const hasCreator = group.creator === 'undefined' || group.creator === null || !Object.prototype.hasOwnProperty.call(group, 'creator');
+    const hasCreator = group.creator === undefined || group.creator === null || !Object.prototype.hasOwnProperty.call(group, 'creator');
 
-    if (hasCreator && !group.creator._id.equals(user._id)) {
+    const creator = group.creator as UserDocument;
+    
+    if (hasCreator && !creator._id.equals(user)) {
       return next(new APIError(
         'Group could not be deleted',
         'User is not permitted',
@@ -174,10 +180,12 @@ const Group = {
     await group.deleteOne();
     io().in(`${group.id}`).emit('group deleted', group.id);
 
-    if (!internalCall) return res.status(204).send();
+    if (!internalCall) {
+      res.status(204).send();
+    }
   },
 
-  upload: async (req, res, next) => {
+  upload: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     const { userId, caption } = req.body;
 
@@ -254,11 +262,15 @@ const Group = {
 
     const user = await UserModel.findById(userId).exec();
 
+    if (user === null) {
+      return next(new APIError());
+    }
+
     io().in(`${group.id}`).emit('image uploaded', image, user.username, group.id);
-    return res.status(200).send(image);
+    res.status(200).send(image);
   },
 
-  update: async (req, res, next) => {
+  update: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
 
     try {
@@ -278,10 +290,10 @@ const Group = {
       return next(new APIError());
     }
 
-    return res.status(204).send();
+    res.status(204).send();
   },
 
-  thumbnail: (internalCall = false) => async (req, res, next) => {
+  thumbnail: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): Promise<void | ImageDocument> => {
     const { id } = req.params;
     let group;
     let thumbnailDoc;
@@ -309,14 +321,17 @@ const Group = {
         `/groups/${id}`,
       ));
     }
-    // eslint-disable-next-line max-len
+
     try {
       thumbnailDoc = await ImageModel.findById(group.thumbnail);
       if (!thumbnailDoc) {
-        if (!internalCall) return res.status(200).send();
+        if (!internalCall) {
+          res.status(200).send();
+          return;
+        }
         return undefined;
       }
-      thumbnailDoc.URL = await S3.getPreSignedURL(thumbnailDoc.key);
+      thumbnailDoc.URL = await S3.getPreSignedURL(thumbnailDoc.key ?? '');
     } catch (err) {
       return next(new APIError(
         undefined,
@@ -326,23 +341,28 @@ const Group = {
       ));
     }
 
-    if (!internalCall) return res.status(200).send(thumbnailDoc);
+    if (!internalCall) {
+      res.status(200).send(thumbnailDoc);
+      return;
+    } 
     return thumbnailDoc;
   },
 
-  getImages: async (req, res, next) => {
+  getImages: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
-    const groupID = ObjectId(id);
     let images;
 
     try {
-      const imageRefs = await ImageModel.find({ groupID });
-      if (!imageRefs) return res.status(201).send({ images });
+      const imageRefs = await ImageModel.find({ groupID: id });
+      if (!imageRefs) {
+        res.status(201).send({ images });
+        return;
+      } 
       images = await Promise.all(
         imageRefs.map(async (x) => {
           // eslint-disable-next-line no-param-reassign
           const image = x;
-          image.URL = await S3.getPreSignedURL(image.key);
+          image.URL = await S3.getPreSignedURL(image.key ?? '');
           return image;
         }),
       );
@@ -354,14 +374,15 @@ const Group = {
         err,
       ));
     }
-    return res.status(201).send({ images });
+
+    res.status(201).send({ images });
   },
 
-  deleteImages: async (req, res, next) => {
+  deleteImages: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     // array of image ids
-    let { images } = req.body;
+    const { images } = req.body as { images: ImageDocument[] };
     const { id } = req.params;
-    let group;
+    let group: GroupDocument | null;
 
     try {
       group = await GroupModel.findById(id).exec();
@@ -393,7 +414,7 @@ const Group = {
       ).exec();
 
       await Promise.all(imageRefs.map(async (image) => {
-        await S3.deleteObject(image.key);
+        await S3.deleteObject(image.key ?? '');
         await image.deleteOne();
       }));
     } catch (err) {
@@ -404,13 +425,13 @@ const Group = {
         err,
       ));
     }
-    images = images.map((x) => ObjectId(x));
-    const thumbnailDeleted = images.filter((x) => x.equals(group.thumbnail));
+    const imageIDs = images.map((x) => x.id);
+    const thumbnailDeleted = imageIDs.filter((x) => x.equals(group?.thumbnail));
 
     if (thumbnailDeleted.length === 1) {
       const groupImages = await ImageModel.find({ groupID: id }).exec();
       if (groupImages.length !== 0) {
-        groupImages.sort((a, b) => b.dateUploaded - a.dateUploaded);
+        groupImages.sort((a, b) => b.dateUploaded.getTime() - a.dateUploaded.getTime());
         await group.updateOne({ thumbnail: groupImages[0] }).exec();
       } else {
         await group.updateOne({ thumbnail: null }).exec();
@@ -421,9 +442,9 @@ const Group = {
   },
 
   // internalCall is used for the register endpoint so that a http response isnt sent
-  inviteUsers: (internalCall = false) => async (req, res, next) => {
+  inviteUsers: (internalCall = false) => async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
-    const { emails } = req.body;
+    const { emails }: { emails: string[] } = req.body;
     const group = (await GroupModel
       .findById(id)
       .exec());
@@ -441,7 +462,7 @@ const Group = {
 
     // get object ID of invited users based on given email
     // if the email wasnt found, return null
-    let invitedUser = await Promise.all(
+    const invitedUsers = await Promise.all(
       emails.map(
         async (x) => {
           const user = await UserModel.findOne({ email: x }).exec();
@@ -452,14 +473,14 @@ const Group = {
     );
 
     // if null, the user wasnt found, so just forget about them
-    invitedUser = invitedUser.filter((x) => x !== null);
+    const filteredUsers = invitedUsers.filter((x) => x !== null);
 
-    await group.updateOne({ $push: { invitedUsers: invitedUser } });
+    await group.updateOne({ $push: { invitedUsers: filteredUsers } });
 
-    invitedUser.forEach((user) => {
-      const link = `https://www.imageus.io/invite/${group.inviteCode}?userId=${user.id}&groupId=${group.id}`;
+    filteredUsers.forEach((user) => {
+      const link = `https://www.imageus.io/invite/${group.inviteCode}?userId=${user?.id}&groupId=${group.id}`;
       SendGrid.sendMessage({
-        to: user.email,
+        to: user?.email,
         from: 'no-reply@imageus.io',
         subject: `You have been invited to join ${group.name}`,
         text: `To accept your invite to the group, click the link below:
@@ -472,10 +493,12 @@ const Group = {
       )));
     });
 
-    if (!internalCall) return res.status(204).send();
+    if (!internalCall) {
+      res.status(204).send();
+    }
   },
 
-  removeUser: async (req, res, next) => {
+  removeUser: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params;
     let { user } = req.body;
     const group = (await GroupModel
@@ -516,7 +539,7 @@ const Group = {
     ).exec();
 
     io().to(group.id).emit('user removed', user.username, group.id);
-    return res.status(204).send();
+    res.status(204).send();
   },
 };
 

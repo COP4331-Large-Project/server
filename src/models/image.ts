@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import { ImageDocument } from './doc-types';
 import User from './user';
 
-const imageSchema = new mongoose.Schema({
+const imageSchema = new mongoose.Schema<ImageDocument>({
   // This field will always be empty in the database
   // It is just a field that will be used manually
   URL: String,
@@ -12,10 +13,10 @@ const imageSchema = new mongoose.Schema({
   groupID: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true },
 });
 
-imageSchema.virtual('key').get(function getKey() {
+imageSchema.virtual('key').get(function getKey(this: ImageDocument) {
   return `groups/${this.groupID}/${this.fileName}`;
 });
 
-const Image = mongoose.model('Image', imageSchema);
+const Image = mongoose.model<ImageDocument>('Image', imageSchema);
 
 export default Image;

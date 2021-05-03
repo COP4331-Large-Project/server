@@ -8,11 +8,12 @@ import Socket from './Socket';
 import router from '../routes';
 import ErrorHandler from './ErrorHandler';
 import swaggerSpecs from './swagger';
+import { Server } from 'node:http';
 
 const app = express();
 
-async function initWebServer() {
-  const httpServer = createServer(app);
+async function initWebServer(): Promise<Server> {
+  const httpServer: Server = createServer(app);
   Socket(httpServer);
 
   await connectToDB();

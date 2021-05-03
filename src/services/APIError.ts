@@ -1,9 +1,9 @@
 class APIError extends Error {
   constructor(
-    title = 'Server Error',
-    description = 'An internal server error occurred',
-    status = 500,
-    instance = null,
+    readonly title = 'Server Error',
+    readonly description = 'An internal server error occurred',
+    readonly status = 500,
+    readonly instance: string | null = null,
   ) {
     super(title);
     this.title = title;
