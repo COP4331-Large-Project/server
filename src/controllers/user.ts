@@ -39,7 +39,7 @@ async function sendVerificationEmail(user: UserDocument) {
   }
 }
 
-const User = {
+const UserController = {
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     const {
       firstName, lastName, email, username, password,
@@ -250,7 +250,7 @@ const User = {
       ));
     }
 
-    const updatedUser = await User.fetch(true)(req, res, next);
+    const updatedUser = await UserController.fetch(true)(req, res, next);
     res.status(200).send(updatedUser);
   },
 
@@ -400,4 +400,4 @@ const User = {
   },
 };
 
-export default User;
+export default UserController;
