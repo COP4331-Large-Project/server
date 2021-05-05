@@ -8,7 +8,7 @@ import Socket from './Socket';
 import router from '../routes';
 import ErrorHandler from './ErrorHandler';
 import swaggerSpecs from './swagger';
-import { Server } from 'node:http';
+import { Server } from 'http';
 
 const app = express();
 

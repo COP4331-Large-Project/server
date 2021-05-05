@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
-import { Server } from 'node:http';
+import { Server } from 'http';
 import initWebServer from '../services/webServer';
 import UserModel from '../models/user';
 import GroupModel from '../models/group';
