@@ -39,7 +39,7 @@ const swaggerSpecs = (): Record<string, unknown> => {
       },
     },
     schemes: ['http'],
-    apis: ['./src/routes/*.js'],
+    apis: ['./src/routes/*.ts'],
   };
 
   return swaggerJsdoc(options) as Record<string, unknown>;
