@@ -12,7 +12,6 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import dotenv from 'dotenv';
-import assert from 'assert';
 import { MetadataBearer } from '@aws-sdk/types/dist/types/response';
 
 const REGION = 'us-east-1';
@@ -43,23 +42,23 @@ const S3 = {
   /**
    * Fetches the all of the AWS S3 buckets.
    */
-  getBuckets: async (): Promise<Bucket[] | undefined> => s3Client.send(new ListBucketsCommand({}))
-    .then(result => result.Buckets),
+  async getBuckets(): Promise<Bucket[] | undefined> {
+    return s3Client.send(new ListBucketsCommand({}))
+      .then(result => result.Buckets);
+  },
 
   /**
    * Lists all objects within a given bucket.
    */
-  listObjects: async (param: Payload = {
-    Bucket: BUCKET,
-  }): Promise<Record<string, unknown>[] | undefined> => s3Client.send(new ListObjectsCommand(param)).then(result => result.Contents as Record<string, unknown>[]),
+  async listObjects(param: Payload = { Bucket: BUCKET, }): Promise<Record<string, unknown>[] | undefined> {
+    return s3Client.send(new ListObjectsCommand(param))
+      .then(result => result.Contents as Record<string, unknown>[]);
+  },
 
   /**
    * Uploads a file to the bucket.
    */
-  uploadObject: async (key: string, buffer: Buffer): Promise<PutObjectCommandOutput> => {
-    assert(key);
-    assert(buffer);
-
+  async uploadObject(key: string, buffer: Buffer): Promise<PutObjectCommandOutput> {
     return s3Client.send(new PutObjectCommand({
       Key: key,
       Bucket: BUCKET,
@@ -70,8 +69,7 @@ const S3 = {
   /**
    * Delete an object with the given key and bucket.
    */
-  deleteObject: async (key: string): Promise<DeleteObjectOutput & MetadataBearer> => {
-    assert(key);
+  async deleteObject(key: string): Promise<DeleteObjectOutput & MetadataBearer> {
     return s3Client.send(new DeleteObjectCommand({
       Bucket: BUCKET,
       Key: key,
@@ -82,9 +80,7 @@ const S3 = {
    * Gets the object file for the given key.
    *
    */
-  getObject: async (key: string): Promise<GetObjectOutput & MetadataBearer> => {
-    assert(key);
-
+  async getObject(key: string): Promise<GetObjectOutput & MetadataBearer> {
     return s3Client.send(new GetObjectCommand({
       Bucket: BUCKET,
       Key: key,
@@ -95,9 +91,7 @@ const S3 = {
    * Perform a Get command for the specified Key and return
    * a pre-signed URL for the object
    */
-  getPreSignedURL: async (key: string): Promise<string> => {
-    assert(key);
-
+  async getPreSignedURL(key: string): Promise<string> {
     const getCommand = new GetObjectCommand({
       Bucket: BUCKET,
       Key: key,
