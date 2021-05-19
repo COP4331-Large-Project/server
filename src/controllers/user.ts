@@ -90,7 +90,7 @@ const UserController = {
     res.status(201).send(reifiedUser);
   },
 
-  login: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     let user;
 
     try {
@@ -125,7 +125,7 @@ const UserController = {
     res.status(200).send(reifiedUser);
   },
 
-  delete: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { id } = req.params;
     let user;
 
@@ -194,7 +194,7 @@ const UserController = {
     return retVal;
   },
 
-  fetchGroups: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async fetchGroups(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { id } = req.params;
     let groups;
     try {
@@ -213,7 +213,7 @@ const UserController = {
         return copy;
       }
 
-      group.invitedUsers.map(user => {
+      (<User[]> group.invitedUsers).map(user => {
         const userCopy = user;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         userCopy.id = user._id!;
@@ -231,7 +231,7 @@ const UserController = {
     res.status(200).send(groups);
   },
 
-  update: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { id } = req.params;
     let result;
 
@@ -254,7 +254,7 @@ const UserController = {
     res.status(200).send(updatedUser);
   },
 
-  uploadProfile: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async uploadProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { id } = req.params;
 
     // If there was no file attached we're done.
@@ -281,7 +281,7 @@ const UserController = {
     res.status(200).send({ imgURL });
   },
 
-  verify: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async verify(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { id } = req.params;
     const { verificationCode } = req.body;
     let result;
@@ -305,7 +305,7 @@ const UserController = {
     res.status(200).send(result.toJSON());
   },
 
-  emailPasswordRecovery: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async emailPasswordRecovery(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { email } = req.body;
     let result;
     const verificationCode = uuidv4();
@@ -342,7 +342,7 @@ const UserController = {
     res.status(200).send(result.toJSON());
   },
 
-  resetPassword: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { userId, verificationCode, password } = req.body;
     try {
       const user = await UserModel.findById(userId).exec();

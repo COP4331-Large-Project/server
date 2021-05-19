@@ -14,7 +14,7 @@ import { GroupDocument, ImageDocument, UserDocument } from '../models/doc-types'
 const { ObjectId } = mongoose.Types;
 
 const Group = {
-  register: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     // We will still use req.body.emails!
     const {
       creator, publicGroup, name,
@@ -45,7 +45,7 @@ const Group = {
     }
   },
 
-  join: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async join(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { inviteCode } = req.params;
     const userID = req.body.user;
     let group = (await GroupModel
@@ -185,7 +185,7 @@ const Group = {
     }
   },
 
-  upload: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async upload(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { id } = req.params;
     const { userId, caption } = req.body;
 
@@ -270,7 +270,7 @@ const Group = {
     res.status(200).send(image);
   },
 
-  update: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { id } = req.params;
 
     try {
@@ -348,7 +348,7 @@ const Group = {
     return thumbnailDoc;
   },
 
-  getImages: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async getImages(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { id } = req.params;
     let images;
 
@@ -378,7 +378,7 @@ const Group = {
     res.status(201).send({ images });
   },
 
-  deleteImages: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async deleteImages(req: Request, res: Response, next: NextFunction): Promise<void> {
     // array of image ids
     const { images } = req.body as { images: ImageDocument[] };
     const { id } = req.params;
@@ -498,7 +498,7 @@ const Group = {
     }
   },
 
-  removeUser: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  async removeUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { id } = req.params;
     let { user } = req.body;
     const group = (await GroupModel
