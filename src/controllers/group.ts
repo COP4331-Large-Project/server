@@ -380,7 +380,7 @@ const Group = {
 
   async deleteImages(req: Request, res: Response, next: NextFunction): Promise<void> {
     // array of image ids
-    const { images } = req.body as { images: ImageDocument[] };
+    const { images } = req.body as { images: string[] };
     const { id } = req.params;
     let group: GroupDocument | null;
 
@@ -425,8 +425,7 @@ const Group = {
         err,
       ));
     }
-    const imageIDs = images.map((x) => x.id);
-    const thumbnailDeleted = imageIDs.filter((x) => x.equals(group?.thumbnail));
+    const thumbnailDeleted = images.filter((x) => (x === group?.thumbnail));
 
     if (thumbnailDeleted.length === 1) {
       const groupImages = await ImageModel.find({ groupID: id }).exec();
