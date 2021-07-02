@@ -220,7 +220,7 @@ const Group = {
     }
 
     const validFileTypes = ['image/jpeg', 'image/gif', 'image/jpg', 'image/png'];
-    if (!validFileTypes.some((x) => x === req.file.mimetype)) {
+    if (!validFileTypes.some((x) => x === req.file?.mimetype)) {
       return next(new APIError(
         'Media not uploaded',
         'The uploaded media is not of a supported type',

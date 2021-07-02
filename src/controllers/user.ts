@@ -149,6 +149,8 @@ const UserController = {
 
       await ImageModel.deleteMany({ creator: id }).exec();
       await GroupModel.updateMany(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         { invitedUsers: { $in: [id] } },
         { $pull: { invitedUsers: id } },
       ).exec();
