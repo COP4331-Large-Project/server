@@ -21,7 +21,7 @@ async function initWebServer(): Promise<Server> {
   // Enable cross origin
   app.use(
     cors(),
-    express.json,
+    express.json(),
     requestSanitizer(),
     router,
     ErrorHandler,
